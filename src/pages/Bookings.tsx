@@ -1,11 +1,9 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
 import BookingForm from "@/components/dashboard/BookingForm";
 import RouteMap from "@/components/dashboard/RouteMap";
 import CostBreakdown from "@/components/dashboard/CostBreakdown";
-import CargoClassification from "@/components/dashboard/CargoClassification";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, Clock, Bookmark, History } from "lucide-react";
@@ -21,12 +19,12 @@ const Bookings = () => {
   const { showRouteChangeAlert } = useRouteAlert();
 
   // Function to simulate a route change alert
-  const simulateRouteChange = () => {
+  const simulateRouteAlert = () => {
     showRouteChangeAlert({
       origin: "Shanghai, China",
       destination: "Rotterdam, Netherlands",
-      originalRoute: "Sea → Rail → Truck",
-      newRoute: "Sea → Air → Truck",
+      originalRoute: "Sea → Truck",
+      newRoute: "Sea → Air",
       reason: "Severe storm warning in the Mediterranean Sea",
       costChange: "+$450",
       delay: "+1 day"
@@ -41,9 +39,8 @@ const Bookings = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <Sidebar />
       
-      <main className="pt-16 pl-64">
+      <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="grid gap-6">
             <div className="animate-fade-in flex items-center justify-between">
@@ -56,7 +53,7 @@ const Bookings = () => {
                 </p>
               </div>
               <div className="flex gap-3">
-                <Button variant="outline" size="sm" className="gap-2" onClick={simulateRouteChange}>
+                <Button variant="outline" size="sm" className="gap-2" onClick={simulateRouteAlert}>
                   <History className="h-4 w-4" />
                   Simulate Alert
                 </Button>
@@ -103,9 +100,8 @@ const Bookings = () => {
                     <RouteMap />
                   </div>
                   
-                  <div className="grid gap-6 md:grid-cols-3">
+                  <div className="grid gap-6 md:grid-cols-2">
                     <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
-                    <CargoClassification className="animate-fade-in [animation-delay:1000ms]" />
                     <EcoPointsCard />
                   </div>
                 </div>

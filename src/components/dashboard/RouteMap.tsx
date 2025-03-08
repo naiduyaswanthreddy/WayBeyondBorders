@@ -48,7 +48,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       duration: "6 days, 12 hours",
       cost: "$2,780",
       co2: "1.8 tons",
-      modes: ["Sea", "Rail", "Truck"],
+      modes: ["Sea", "Truck"],
       weather: "Mild Rain",
       weatherIcon: <Droplets className="h-4 w-4 text-blue-400" />,
       weatherStatus: "Minimal Delay",
@@ -63,7 +63,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       duration: "4 days, 8 hours",
       cost: "$3,950",
       co2: "2.1 tons",
-      modes: ["Air", "Rail", "Truck"],
+      modes: ["Air", "Truck"],
       weather: "Stormy",
       weatherIcon: <Umbrella className="h-4 w-4 text-yellow-400" />,
       weatherStatus: "Alternate Route",
@@ -78,7 +78,8 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       duration: "5 days, 6 hours",
       cost: "$3,450",
       co2: "0.9 tons",
-      modes: ["Rail", "Electric Truck"],
+      co2Savings: "1.5 tons",
+      modes: ["Sea", "Electric Truck"],
       weather: "Clear",
       weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
       weatherStatus: "Optimal",
@@ -103,6 +104,11 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     // Award eco points if eco-friendly route is selected
     if (selectedRouteDetails?.isEcoFriendly && selectedRouteDetails.ecoPoints) {
       addPoints(selectedRouteDetails.ecoPoints);
+      toast({
+        title: `Earned ${selectedRouteDetails.ecoPoints} Eco Points!`,
+        description: "Thank you for choosing the eco-friendly option",
+        variant: "success"
+      });
     }
   };
 

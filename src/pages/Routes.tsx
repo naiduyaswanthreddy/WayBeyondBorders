@@ -1,10 +1,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Clock, Download, DollarSign, MapPin, Package, Shield, Truck, Wind, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock, Download, DollarSign, MapPin, Package, Shield, Truck, Wind, Zap, Anchor, Plane, Leaf } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 
@@ -14,10 +13,12 @@ interface RouteDetails {
   duration: string;
   cost: string;
   co2: string;
+  co2Savings?: string;
   modes: string[];
   weather: string;
   weatherIcon: React.ReactNode;
   weatherStatus: string;
+  isEcoFriendly?: boolean;
 }
 
 interface BookingData {
@@ -28,7 +29,7 @@ interface BookingData {
   weight: string;
 }
 
-// Define the locations array that was missing
+// Define the locations array
 const locations = [
   { value: "shanghai", label: "Shanghai, China" },
   { value: "rotterdam", label: "Rotterdam, Netherlands" },
@@ -100,7 +101,7 @@ const Routes = () => {
         duration: "6 days, 12 hours",
         cost: "$2,780",
         co2: "1.8 tons",
-        modes: ["Sea", "Rail", "Truck"],
+        modes: ["Sea", "Truck"],
         weather: "Mild Rain",
         weatherIcon: <Wind className="h-4 w-4 text-blue-400" />,
         weatherStatus: "Minimal Delay",
@@ -111,10 +112,23 @@ const Routes = () => {
         duration: "4 days, 8 hours",
         cost: "$3,950",
         co2: "2.1 tons",
-        modes: ["Air", "Rail", "Truck"],
+        modes: ["Air", "Truck"],
         weather: "Stormy",
         weatherIcon: <Wind className="h-4 w-4 text-yellow-400" />,
         weatherStatus: "Alternate Route",
+      },
+      {
+        id: "eco-friendly",
+        name: "Eco-Friendly Route",
+        duration: "5 days, 6 hours",
+        cost: "$3,450",
+        co2: "0.9 tons",
+        co2Savings: "1.5 tons",
+        modes: ["Sea", "Electric Truck"],
+        weather: "Clear",
+        weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
+        weatherStatus: "Optimal",
+        isEcoFriendly: true
       },
     ];
     
@@ -130,32 +144,42 @@ const Routes = () => {
       description: "Your shipment has been scheduled. You can track it in the shipments section.",
     });
     
-    // Navigate to dashboard after booking
+    // Navigate to bookings after booking
     setTimeout(() => {
-      navigate('/dashboard');
+      navigate('/bookings');
     }, 1500);
   };
 
   const getIconForMode = (mode: string) => {
     switch (mode.toLowerCase()) {
       case 'air':
-        return <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-nexus-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>;
+        return <Plane className="h-6 w-6 text-nexus-blue" />;
       case 'sea':
-        return <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-nexus-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 16.016c1.245.529 2 1.223 2 1.984 0 1.657-3.582 3-8 3s-8-1.343-8-3c0-.76.755-1.456 2-1.984"/><path d="M6 12v4c0 1.657 3.582 3 8 3s8-1.343 8-3v-4"/><path d="M12 12c4.418 0 8-1.343 8-3V4.5C20 3.12 16.418 2 12 2S4 3.12 4 4.5V9c0 1.657 3.582 3 8 3z"/><path d="M4.5 9C4.5 10.38 8.082 11.5 12.5 11.5s8-1.12 8-2.5"/></svg>;
-      case 'rail':
-        return <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-nexus-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v16"/><path d="m4 19 4 2"/><path d="m16 21 4-2"/></svg>;
+        return <Anchor className="h-6 w-6 text-nexus-blue" />;
+      case 'electric truck':
+        return <div className="relative">
+          <Truck className="h-6 w-6 text-green-500" />
+          <Leaf className="h-3 w-3 absolute -top-1 -right-1 text-green-400" />
+        </div>;
       case 'truck':
       default:
         return <Truck className="h-6 w-6 text-nexus-teal" />;
     }
   };
 
+  const handleDownloadRouteDetails = () => {
+    toast({
+      title: "Route Details Downloaded",
+      description: "Route details have been saved to your downloads",
+    });
+  };
+
   if (!routeDetails) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <Sidebar />
-        <main className="pt-16 pl-64">
+        
+        <main className="pt-16">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col items-center justify-center h-[60vh]">
               <div className="animate-pulse text-center">
@@ -168,10 +192,10 @@ const Routes = () => {
                 </p>
                 <Button 
                   className="nexus-button-primary mt-6"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/bookings')}
                 >
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Return to Dashboard
+                  Return to Bookings
                 </Button>
               </div>
             </div>
@@ -184,9 +208,8 @@ const Routes = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <Sidebar />
       
-      <main className="pt-16 pl-64">
+      <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="grid gap-6">
             <div className="flex items-center justify-between">
@@ -195,10 +218,10 @@ const Routes = () => {
                   variant="ghost" 
                   size="sm" 
                   className="mb-2 gap-1"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/bookings')}
                 >
                   <ArrowLeft className="h-4 w-4" />
-                  Back to Dashboard
+                  Back to Bookings
                 </Button>
                 <h1 className="text-3xl font-bold tracking-tight text-white">
                   Route Planning
@@ -219,8 +242,14 @@ const Routes = () => {
             {/* Route Summary */}
             <Card className="bg-card border-white/10">
               <CardHeader className="pb-2">
-                <CardTitle className="text-xl font-semibold text-white">
+                <CardTitle className="text-xl font-semibold flex items-center text-white">
                   {routeDetails.name} - Summary
+                  {routeDetails.isEcoFriendly && (
+                    <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-green-500/20 text-green-400 flex items-center">
+                      <Leaf className="h-3 w-3 mr-1" />
+                      Eco-Friendly
+                    </span>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -240,10 +269,21 @@ const Routes = () => {
                   </div>
                   
                   <div className="flex flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-6">
-                    <Shield className="h-10 w-10 text-nexus-teal mb-3" />
-                    <h3 className="text-lg font-medium text-white">CO₂ Emissions</h3>
-                    <p className="mt-2 text-2xl font-bold text-white">{routeDetails.co2}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Carbon Footprint</p>
+                    {routeDetails.isEcoFriendly ? (
+                      <>
+                        <Leaf className="h-10 w-10 text-green-500 mb-3" />
+                        <h3 className="text-lg font-medium text-white">CO₂ Emissions</h3>
+                        <p className="mt-2 text-2xl font-bold text-white">{routeDetails.co2}</p>
+                        <p className="mt-1 text-sm text-green-400">Savings: {routeDetails.co2Savings}</p>
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="h-10 w-10 text-nexus-teal mb-3" />
+                        <h3 className="text-lg font-medium text-white">CO₂ Emissions</h3>
+                        <p className="mt-2 text-2xl font-bold text-white">{routeDetails.co2}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">Carbon Footprint</p>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -270,31 +310,62 @@ const Routes = () => {
                         <h3 className="text-lg font-medium text-white">{mode} Transport</h3>
                         <div className="mt-2 grid grid-cols-2 gap-4">
                           <div>
+                            <p className="text-sm text-muted-foreground">Route Section</p>
+                            <p className="text-white">
+                              {index === 0 ? 
+                                (mode.toLowerCase() === 'sea' ? "Shanghai to Rotterdam Port" : 
+                                 mode.toLowerCase() === 'air' ? "Shanghai to Amsterdam Airport" : 
+                                 "Shanghai Local Transport") : 
+                                "Rotterdam Local Delivery"}
+                            </p>
+                          </div>
+                          <div>
                             <p className="text-sm text-muted-foreground">Duration</p>
                             <p className="text-white">
-                              {index === 0 ? "1 day, 8 hours" : index === 1 ? "2 days" : "12 hours"}
+                              {index === 0 ? 
+                                (mode.toLowerCase() === 'sea' ? "5 days, 8 hours" : 
+                                 mode.toLowerCase() === 'air' ? "1 day, 6 hours" : 
+                                 "12 hours") : 
+                                "10 hours"}
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Distance</p>
                             <p className="text-white">
-                              {index === 0 ? "4,500 km" : index === 1 ? "6,500 km" : "425 km"}
+                              {index === 0 ? 
+                                (mode.toLowerCase() === 'sea' ? "11,000 km" : 
+                                 mode.toLowerCase() === 'air' ? "9,200 km" : 
+                                 "50 km") : 
+                                "120 km"}
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Carrier</p>
                             <p className="text-white">
-                              {mode === "Air" ? "Global Airways" : 
-                               mode === "Sea" ? "Ocean Express" : 
-                               mode === "Rail" ? "Continental Rail" : "FastTruck Logistics"}
+                              {mode.toLowerCase() === 'air' ? "Global Airways" : 
+                               mode.toLowerCase() === 'sea' ? "Ocean Express" : 
+                               mode.toLowerCase() === 'electric truck' ? "Green Transport Inc." : 
+                               "FastTruck Logistics"}
                             </p>
                           </div>
                           <div>
                             <p className="text-sm text-muted-foreground">Cost</p>
                             <p className="text-white">
-                              {mode === "Air" ? "$2,800" : 
-                               mode === "Sea" ? "$1,500" : 
-                               mode === "Rail" ? "$1,200" : "$450"}
+                              {index === 0 ? 
+                                (mode.toLowerCase() === 'sea' ? "$1,800" : 
+                                 mode.toLowerCase() === 'air' ? "$3,500" : 
+                                 "$350") : 
+                                (mode.toLowerCase() === 'electric truck' ? "$550" : "$400")}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm text-muted-foreground">Emissions</p>
+                            <p className={mode.toLowerCase() === 'electric truck' ? "text-green-400" : "text-white"}>
+                              {mode.toLowerCase() === 'sea' ? "1.2 tons CO₂" : 
+                               mode.toLowerCase() === 'air' ? "2.1 tons CO₂" : 
+                               mode.toLowerCase() === 'electric truck' ? "0.1 tons CO₂" : 
+                               "0.3 tons CO₂"}
+                              {mode.toLowerCase() === 'electric truck' && " (80% reduction)"}
                             </p>
                           </div>
                         </div>
@@ -305,9 +376,87 @@ const Routes = () => {
               </CardContent>
             </Card>
             
+            {/* Route Visualization */}
+            <Card className="bg-card border-white/10">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-xl font-semibold text-white">
+                  Route Visualization
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-hidden rounded-lg border border-white/10">
+                  <div className="relative aspect-[16/9] w-full">
+                    {/* Satellite Map Background */}
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-80"></div>
+                    
+                    {/* Origin Point */}
+                    <div className="absolute left-[15%] top-[40%] h-5 w-5 rounded-full bg-nexus-blue shadow-[0_0_15px_rgba(0,98,255,0.7)]"></div>
+                    
+                    {/* Destination Point */}
+                    <div className="absolute right-[15%] top-[30%] h-5 w-5 rounded-full bg-nexus-purple shadow-[0_0_15px_rgba(110,54,229,0.7)]"></div>
+                    
+                    {/* Route Line */}
+                    <svg className="absolute inset-0 h-full w-full" style={{ filter: 'drop-shadow(0 0 4px rgba(255, 255, 255, 0.4))' }}>
+                      <path
+                        d={routeDetails.id === "fastest" 
+                          ? "M 15% 40% C 40% 30%, 60% 30%, 85% 30%" 
+                          : routeDetails.id === "cheapest"
+                          ? "M 15% 40% C 30% 50%, 70% 40%, 85% 30%"
+                          : routeDetails.id === "eco-friendly"
+                          ? "M 15% 40% C 50% 45%, 40% 35%, 85% 30%"
+                          : "M 15% 40% C 40% 35%, 60% 35%, 85% 30%"}
+                        stroke={routeDetails.id === "fastest" 
+                          ? "#0062FF" 
+                          : routeDetails.id === "cheapest"
+                          ? "#6E36E5"
+                          : routeDetails.id === "eco-friendly"
+                          ? "#10B981"
+                          : "#00CFD5"}
+                        strokeWidth="3"
+                        fill="none"
+                        strokeDasharray="8,4"
+                        className="animate-pulse"
+                      />
+                    </svg>
+                    
+                    {/* Transport Mode Indicators */}
+                    {routeDetails.modes.map((mode, index) => {
+                      const position = {
+                        left: index === 0 ? '40%' : '70%',
+                        top: index === 0 ? '35%' : '32%'
+                      };
+                      
+                      return (
+                        <div
+                          key={index}
+                          className="absolute flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-lg"
+                          style={position}
+                        >
+                          {getIconForMode(mode)}
+                        </div>
+                      );
+                    })}
+
+                    {/* Cities/Points Labels */}
+                    <div className="absolute left-[10%] top-[36%] rounded-md bg-black/70 px-2 py-1 text-sm text-white backdrop-blur-sm">
+                      Shanghai, China
+                    </div>
+                    <div className="absolute right-[10%] top-[26%] rounded-md bg-black/70 px-2 py-1 text-sm text-white backdrop-blur-sm">
+                      Rotterdam, Netherlands
+                    </div>
+                    
+                    {/* Satellite map attribution */}
+                    <div className="absolute bottom-1 left-1 text-[8px] text-white/70">
+                      Satellite imagery © NASA/Google
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4 justify-end">
-              <Button variant="outline" className="gap-2">
+              <Button variant="outline" className="gap-2" onClick={handleDownloadRouteDetails}>
                 <Download className="h-4 w-4" />
                 Download Route Details
               </Button>

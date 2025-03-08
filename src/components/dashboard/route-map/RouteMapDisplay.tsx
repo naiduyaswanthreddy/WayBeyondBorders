@@ -27,7 +27,7 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
           <div className="flex h-full flex-col items-center justify-center">
             <div className="relative flex h-full w-full items-center justify-center">
               {/* Satellite Map Background */}
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1508433957232-3107f5fd5995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-60"></div>
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-80"></div>
               
               {/* Origin Point */}
               <div className="absolute left-[15%] top-[40%] h-4 w-4 rounded-full bg-nexus-blue shadow-[0_0_10px_rgba(0,98,255,0.7)]"></div>
@@ -89,11 +89,16 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
               })}
 
               {/* Cities/Points Labels */}
-              <div className="absolute left-[12%] top-[36%] rounded-md bg-black/50 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
+              <div className="absolute left-[12%] top-[36%] rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
                 Shanghai
               </div>
-              <div className="absolute right-[12%] top-[64%] rounded-md bg-black/50 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
+              <div className="absolute right-[12%] top-[64%] rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
                 Rotterdam
+              </div>
+              
+              {/* Satellite map attribution */}
+              <div className="absolute bottom-1 left-1 text-[8px] text-white/70">
+                Satellite imagery © NASA/Google
               </div>
             </div>
           </div>
