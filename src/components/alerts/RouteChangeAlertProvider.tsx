@@ -2,23 +2,18 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { RouteChangeAlert } from './RouteChangeAlert';
 
-interface AlertInfo {
-  show: boolean;
-  route?: {
-    origin: string;
-    destination: string;
-    originalRoute: string;
-    newRoute: string;
-    reason: string;
-    costChange: string;
-    delay: string;
-  };
+interface RouteAlert {
+  origin: string;
+  destination: string;
+  originalRoute: string;
+  newRoute: string;
+  reason: string;
+  costChange: string;
+  delay: string;
 }
 
 interface RouteAlertContextType {
-  alertInfo: AlertInfo;
-  showRouteChangeAlert: (routeInfo: Omit<AlertInfo['route'], 'show'>) => void;
-  hideRouteChangeAlert: () => void;
+  showRouteChangeAlert: (alert: RouteAlert) => void;
 }
 
 const RouteAlertContext = createContext<RouteAlertContextType | undefined>(undefined);
@@ -32,26 +27,25 @@ export const useRouteAlert = (): RouteAlertContextType => {
 };
 
 export const RouteChangeAlertProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [alertInfo, setAlertInfo] = useState<AlertInfo>({ show: false });
+  const [showAlert, setShowAlert] = useState(false);
+  const [routeAlert, setRouteAlert] = useState<RouteAlert | null>(null);
 
-  const showRouteChangeAlert = (routeInfo: Omit<AlertInfo['route'], 'show'>) => {
-    setAlertInfo({
-      show: true,
-      route: routeInfo
-    });
+  const showRouteChangeAlert = (alert: RouteAlert) => {
+    setRouteAlert(alert);
+    setShowAlert(true);
   };
 
-  const hideRouteChangeAlert = () => {
-    setAlertInfo({ show: false });
+  const handleCloseAlert = () => {
+    setShowAlert(false);
   };
 
   return (
-    <RouteAlertContext.Provider value={{ alertInfo, showRouteChangeAlert, hideRouteChangeAlert }}>
+    <RouteAlertContext.Provider value={{ showRouteChangeAlert }}>
       {children}
-      {alertInfo.show && alertInfo.route && (
-        <RouteChangeAlert
-          route={alertInfo.route}
-          onClose={hideRouteChangeAlert}
+      {showAlert && routeAlert && (
+        <RouteChangeAlert 
+          route={routeAlert} 
+          onClose={handleCloseAlert}
         />
       )}
     </RouteAlertContext.Provider>

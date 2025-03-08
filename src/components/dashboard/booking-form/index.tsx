@@ -4,7 +4,6 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 
-// Import sub-components
 import LocationSelector from "./LocationSelector";
 import ShippingDatePicker from "./ShippingDatePicker";
 import CargoTypeSelector from "./CargoTypeSelector";
@@ -15,7 +14,6 @@ import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
 
-// Import data and types
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, CargoItem, TemplateData } from "./types";
 
@@ -35,6 +33,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
+  const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -461,6 +460,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           estimatedTime={estimatedArrival}
           origin={origin || originInput}
           destination={destination || destinationInput}
+          transportMode={transportMode}
         />
         
         <CargoItemsSection 
@@ -472,6 +472,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           handleSaveTemplate={handleSaveTemplate}
           handleBookingConfirmation={handleBookingConfirmation}
           handleFindRoutes={handleFindRoutes}
+          origin={origin || originInput}
+          destination={destination || destinationInput}
+          weight={weight}
+          isEmergencyShipment={isEmergencyShipment}
+          setIsEmergencyShipment={setIsEmergencyShipment}
         />
       </div>
       

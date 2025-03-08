@@ -7,17 +7,19 @@ import RouteMap from "@/components/dashboard/RouteMap";
 import CostBreakdown from "@/components/dashboard/CostBreakdown";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, Clock, Bookmark, History } from "lucide-react";
+import { RefreshCw, Clock, Bookmark, History, Leaf, Route as RouteIcon, Share2 } from "lucide-react";
 import { BookingHistoryList } from "@/components/bookings/BookingHistoryList";
 import { ShipmentTemplates } from "@/components/bookings/ShipmentTemplates";
 import { RecurringShipments } from "@/components/bookings/RecurringShipments";
 import { EcoPointsCard } from "@/components/eco/EcoPointsCard";
+import { EcoDashboard } from "@/components/eco/EcoDashboard";
 import { useRouteAlert } from "@/components/alerts/RouteChangeAlertProvider";
 import { toast } from "@/components/ui/use-toast";
 
 const Bookings = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("new-booking");
+  const [activeSubTab, setActiveSubTab] = useState<string>("booking");
   const { showRouteChangeAlert } = useRouteAlert();
 
   // Check location state for active tab
@@ -80,9 +82,9 @@ const Bookings = () => {
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="grid w-full grid-cols-4 bg-muted/20">
+              <TabsList className="grid w-full grid-cols-5 bg-muted/20">
                 <TabsTrigger value="new-booking" className="gap-2">
-                  <Bookmark className="h-4 w-4" />
+                  <RouteIcon className="h-4 w-4" />
                   <span>New Booking</span>
                 </TabsTrigger>
                 <TabsTrigger value="history" className="gap-2">
@@ -97,23 +99,75 @@ const Bookings = () => {
                   <Clock className="h-4 w-4" />
                   <span>Recurring Shipments</span>
                 </TabsTrigger>
+                <TabsTrigger value="eco" className="gap-2">
+                  <Leaf className="h-4 w-4" />
+                  <span>Eco Dashboard</span>
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="new-booking" className="space-y-6 pt-4">
-                <div className="grid gap-6">
-                  <div className="animate-fade-in [animation-delay:700ms]">
-                    <BookingForm />
-                  </div>
+                <Tabs
+                  defaultValue="booking"
+                  value={activeSubTab}
+                  onValueChange={setActiveSubTab}
+                  className="w-full"
+                >
+                  <TabsList className="w-auto mb-4">
+                    <TabsTrigger value="booking" className="text-sm">Single Booking</TabsTrigger>
+                    <TabsTrigger value="multi-stop" className="text-sm">Multi-Stop</TabsTrigger>
+                    <TabsTrigger value="shared" className="text-sm">
+                      <Share2 className="h-3.5 w-3.5 mr-1" />
+                      Ride-Sharing
+                    </TabsTrigger>
+                  </TabsList>
                   
-                  <div className="animate-fade-in [animation-delay:800ms]">
-                    <RouteMap />
-                  </div>
+                  <TabsContent value="booking" className="space-y-6">
+                    <div className="animate-fade-in [animation-delay:700ms]">
+                      <BookingForm />
+                    </div>
+                    
+                    <div className="animate-fade-in [animation-delay:800ms]">
+                      <RouteMap />
+                    </div>
+                    
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
+                      <EcoPointsCard />
+                    </div>
+                  </TabsContent>
                   
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
-                    <EcoPointsCard />
-                  </div>
-                </div>
+                  <TabsContent value="multi-stop" className="pt-4">
+                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
+                      <RouteIcon className="h-12 w-12 text-muted-foreground" />
+                      <h3 className="mt-4 text-xl font-semibold text-white">Multi-Stop Shipping</h3>
+                      <p className="mt-2 text-center text-muted-foreground">
+                        Plan complex routes with multiple pickup and delivery locations.
+                      </p>
+                      <Button 
+                        className="mt-6"
+                        onClick={() => setActiveSubTab("booking")}
+                      >
+                        Switch to Single Booking
+                      </Button>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="shared" className="pt-4">
+                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
+                      <Share2 className="h-12 w-12 text-muted-foreground" />
+                      <h3 className="mt-4 text-xl font-semibold text-white">Shipment Ride-Sharing</h3>
+                      <p className="mt-2 text-center text-muted-foreground">
+                        Share transportation with others to reduce costs and environmental impact.
+                      </p>
+                      <Button 
+                        className="mt-6"
+                        onClick={() => setActiveSubTab("booking")}
+                      >
+                        Switch to Single Booking
+                      </Button>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </TabsContent>
               
               <TabsContent value="history" className="space-y-6 pt-4">
@@ -174,6 +228,10 @@ const Bookings = () => {
                     </Button>
                   </div>
                 )}
+              </TabsContent>
+              
+              <TabsContent value="eco" className="space-y-6 pt-4">
+                <EcoDashboard />
               </TabsContent>
             </Tabs>
           </div>
