@@ -133,7 +133,7 @@ const Bookings = () => {
               
               <TabsContent value="templates" className="space-y-6 pt-4">
                 {hasTemplates ? (
-                  <ShipmentTemplates onApplyTemplate={() => setActiveTab("new-booking")} />
+                  <ShipmentTemplates />
                 ) : (
                   <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
                     <Bookmark className="h-12 w-12 text-muted-foreground" />
@@ -153,7 +153,7 @@ const Bookings = () => {
               
               <TabsContent value="recurring" className="space-y-6 pt-4">
                 {hasRecurringShipments ? (
-                  <RecurringShipments onManageShipment={() => setActiveTab("new-booking")} />
+                  <RecurringShipments />
                 ) : (
                   <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
                     <Clock className="h-12 w-12 text-muted-foreground" />
