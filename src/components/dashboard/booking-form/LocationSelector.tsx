@@ -121,49 +121,58 @@ const LocationSelector = ({
               <TabsTrigger value="manual">Manual Entry</TabsTrigger>
             </TabsList>
             <TabsContent value="saved" className="mt-0">
-              <Command>
+              <div className="flex flex-col">
                 <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-                  <CommandInput 
-                    placeholder="Search location..." 
-                    onValueChange={setSearchQuery}
+                  <input
                     value={searchQuery}
-                    className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                    placeholder="Search location..."
                   />
                 </div>
+
                 <CommandEmpty>No location found. Try manual entry.</CommandEmpty>
-                <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {filteredLocations.map((location) => (
-                    <CommandItem
-                      key={location.value}
-                      value={location.value}
-                      onSelect={(currentValue) => {
-                        onChange(currentValue === value ? "" : currentValue);
-                        setOpen(false);
-                        setSearchQuery("");
-                      }}
-                      className="flex items-start py-2"
-                    >
-                      <div className="flex items-center">
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === location.value
-                              ? "opacity-100"
-                              : "opacity-0"
-                          )}
-                        />
-                        <div className="flex flex-col">
-                          <span className="font-medium">{location.label}</span>
-                          <span className="text-xs text-muted-foreground">
-                            {location.description}
-                          </span>
+                <div className="max-h-[300px] overflow-y-auto">
+                  {filteredLocations.length === 0 ? (
+                    <div className="py-6 text-center text-sm text-muted-foreground">
+                      No locations found
+                    </div>
+                  ) : (
+                    filteredLocations.map((location) => (
+                      <div
+                        key={location.value}
+                        className={cn(
+                          "flex items-start py-2 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground",
+                          value === location.value ? "bg-accent/50" : ""
+                        )}
+                        onClick={() => {
+                          onChange(location.value);
+                          setOpen(false);
+                          setSearchQuery("");
+                        }}
+                      >
+                        <div className="flex items-center">
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              value === location.value
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col">
+                            <span className="font-medium">{location.label}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {location.description}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </Command>
+                    ))
+                  )}
+                </div>
+              </div>
             </TabsContent>
             <TabsContent value="manual" className="mt-0 p-4 pt-2">
               <div className="flex flex-col space-y-3">
