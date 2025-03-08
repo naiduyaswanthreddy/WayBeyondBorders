@@ -15,7 +15,6 @@ import {
   Truck, 
   Clock, 
   AlertTriangle,
-  BarChart,
   RefreshCw,
   ChevronRight,
   ArrowRight
@@ -122,14 +121,20 @@ const Dashboard = () => {
               </Card>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2">
-              <BookingForm className="animate-fade-in [animation-delay:700ms]" />
-              <RouteMap className="animate-fade-in [animation-delay:800ms]" />
-            </div>
-            
-            <div className="grid gap-6 md:grid-cols-2">
-              <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
-              <CargoClassification className="animate-fade-in [animation-delay:1000ms]" />
+            {/* Combined Booking and Route Selection */}
+            <div className="grid gap-6">
+              <div className="animate-fade-in [animation-delay:700ms]">
+                <BookingForm />
+              </div>
+              
+              <div className="animate-fade-in [animation-delay:800ms]">
+                <RouteMap />
+              </div>
+              
+              <div className="grid gap-6 md:grid-cols-2">
+                <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
+                <CargoClassification className="animate-fade-in [animation-delay:1000ms]" />
+              </div>
             </div>
             
             {/* Recent Shipments */}

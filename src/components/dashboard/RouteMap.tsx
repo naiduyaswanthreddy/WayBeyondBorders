@@ -1,12 +1,15 @@
 
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 import { CheckCircle2, Clock, DollarSign, Droplets, Zap, Shield, Umbrella, Wind } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 // This is a placeholder for where a real map would go
 // In a real app, you would use a mapping library like Mapbox, Google Maps, etc.
 const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [selectedRoute, setSelectedRoute] = useState<"fastest" | "cheapest" | "reliable">("fastest");
+  const navigate = useNavigate();
 
   const routes = [
     {
@@ -56,6 +59,25 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     },
   ];
 
+  const handleRouteSelect = (routeId: string) => {
+    setSelectedRoute(routeId as any);
+    
+    // Store selected route in sessionStorage for use on the routes page
+    const selectedRouteDetails = routes.find(r => r.id === routeId);
+    sessionStorage.setItem('selectedRoute', JSON.stringify(selectedRouteDetails));
+    
+    // Show toast notification
+    toast({
+      title: `${selectedRouteDetails?.name} Selected`,
+      description: "Navigating to route details...",
+    });
+    
+    // Navigate to routes page with selected route info
+    setTimeout(() => {
+      navigate('/routes', { state: { selectedRoute: routeId } });
+    }, 500);
+  };
+
   const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
 
   return (
@@ -75,7 +97,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
           return (
             <button
               key={route.id}
-              onClick={() => setSelectedRoute(route.id as any)}
+              onClick={() => handleRouteSelect(route.id)}
               className={cn(
                 "relative flex flex-col items-center justify-center rounded-lg border p-4 transition-all duration-300 hover:scale-[1.02]",
                 isSelected

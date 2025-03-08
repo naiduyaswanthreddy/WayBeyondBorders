@@ -1,9 +1,11 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, ChevronsUpDown, Clock, MapPin, Package, Weight } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronsUpDown, Clock, MapPin, Package, Weight, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
+import { toast } from "@/components/ui/use-toast";
 import {
   Command,
   CommandEmpty,
@@ -50,6 +52,40 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [destination, setDestination] = useState("");
   const [cargoType, setCargoType] = useState("");
   const [weight, setWeight] = useState("");
+  const navigate = useNavigate();
+
+  const handleFindRoutes = () => {
+    // Validate form
+    if (!origin || !destination || !date || !cargoType || !weight) {
+      toast({
+        title: "Incomplete Information",
+        description: "Please fill in all required fields to find optimal routes.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Store booking data in session storage
+    const bookingData = {
+      origin,
+      destination,
+      date: date ? format(date, 'yyyy-MM-dd') : null,
+      cargoType,
+      weight
+    };
+    
+    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+    
+    toast({
+      title: "Finding optimal routes",
+      description: "Analyzing available routes based on your requirements...",
+    });
+    
+    // Navigate to routes page
+    setTimeout(() => {
+      navigate('/routes');
+    }, 500);
+  };
 
   return (
     <div className={cn("nexus-card-blue p-6", className)}>
@@ -255,7 +291,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
 
         {/* Submit Button */}
         <div className="col-span-2 mt-2">
-          <Button className="nexus-button-primary w-full">Find Optimal Routes</Button>
+          <Button 
+            className="nexus-button-primary w-full"
+            onClick={handleFindRoutes}
+          >
+            Find Optimal Routes
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </div>
     </div>

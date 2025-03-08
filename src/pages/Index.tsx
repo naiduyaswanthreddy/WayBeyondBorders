@@ -1,11 +1,22 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronRight, CheckCircle, BarChart3, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/dashboard/Hero";
+import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    toast({
+      title: "Welcome to WayBeyondBorders",
+      description: "Redirecting to dashboard...",
+    });
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -14,7 +25,7 @@ const Index = () => {
           <Link to="/" className="flex items-center gap-x-2">
             <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-nexus-blue">
               <div className="absolute inset-0 animate-pulse rounded-md bg-nexus-blue opacity-50"></div>
-              <span className="text-xl font-bold text-white">L</span>
+              <span className="text-xl font-bold text-white">W</span>
             </div>
             <span className="text-xl font-bold tracking-tight">
               <span className="text-gradient-blue">Way</span>
@@ -22,9 +33,6 @@ const Index = () => {
               <span className="text-gradient-teal">Borders</span>
             </span>
           </Link>
-
-
-         
 
           <nav className="hidden md:block">
             <ul className="flex items-center gap-x-8">
@@ -55,7 +63,10 @@ const Index = () => {
             <Link to="/login" className="text-sm font-medium text-white hover:text-nexus-blue transition-colors duration-200">
               Sign In
             </Link>
-            <Button className="nexus-button-primary">
+            <Button 
+              className="nexus-button-primary"
+              onClick={handleGetStarted}
+            >
               Get Started
               <ChevronRight className="ml-2 h-4 w-4" />
             </Button>
@@ -167,7 +178,7 @@ const Index = () => {
                 Ready to Transform Your Logistics Operations?
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Join forward-thinking companies that are already using LogiNexus AI
+                Join forward-thinking companies that are already using WayBeyondBorders
                 to optimize their supply chains and maximize profits.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
@@ -195,12 +206,12 @@ const Index = () => {
             <div className="flex items-center gap-x-2">
               <div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-nexus-blue">
                 <div className="absolute inset-0 animate-pulse rounded-md bg-nexus-blue opacity-50"></div>
-                <span className="text-xl font-bold text-white">L</span>
+                <span className="text-xl font-bold text-white">W</span>
               </div>
               <span className="text-xl font-bold tracking-tight">
-                <span className="text-gradient-blue">Logi</span>
-                <span className="text-white">Nexus</span>
-                <span className="text-gradient-teal">AI</span>
+                <span className="text-gradient-blue">Way</span>
+                <span className="text-white">Beyond</span>
+                <span className="text-gradient-teal">Borders</span>
               </span>
             </div>
             
@@ -218,7 +229,7 @@ const Index = () => {
           </div>
           
           <div className="mt-8 border-t border-white/10 pt-8 text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} LogiNexus AI. All rights reserved.
+            © {new Date().getFullYear()} WayBeyondBorders. All rights reserved.
           </div>
         </div>
       </footer>
