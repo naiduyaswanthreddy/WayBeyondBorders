@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Bookmark, ArrowRight, CheckCircle2, Share2, MapPin, Helicopter } from "lucide-react";
+import { Bookmark, ArrowRight, CheckCircle2, Share2, MapPin, Plane } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Dialog,
@@ -186,7 +186,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
               variant={isEmergencyShipment ? "destructive" : "outline"}
               className={!isEmergencyShipment ? "border-red-500/20 text-red-400 hover:bg-red-500/10" : ""}
             >
-              <Helicopter className="h-4 w-4" />
+              <Plane className="h-4 w-4" />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md border-white/10 bg-background">
@@ -200,11 +200,11 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
             <div className="grid gap-4 py-4">
               <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Helicopter className="h-4 w-4 text-red-400" />
+                  <Plane className="h-4 w-4 text-red-400" />
                   <h4 className="font-medium text-white">Emergency Transport Options</h4>
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Emergency shipping prioritizes helicopter transport for medical supplies, urgent goods, and time-sensitive materials.
+                  Emergency shipping prioritizes air transport for medical supplies, urgent goods, and time-sensitive materials.
                 </p>
                 
                 <div className="space-y-2 text-sm">
