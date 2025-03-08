@@ -5,7 +5,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { AlertTriangle } from "lucide-react";
 
 interface TermsConfirmationDialogProps {
   open: boolean;
@@ -39,21 +39,21 @@ const TermsConfirmationDialog: React.FC<TermsConfirmationDialogProps> = ({
         
         <div className="my-4 max-h-60 overflow-y-auto pr-2 space-y-4">
           <Alert>
-            <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
+            <AlertTriangle className="h-4 w-4 mr-2" />
             <AlertDescription>
               By confirming this booking, you acknowledge that you are the primary point of contact for this shipment.
             </AlertDescription>
           </Alert>
           
           <Alert variant="destructive">
-            <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
+            <AlertTriangle className="h-4 w-4 mr-2" />
             <AlertDescription>
               Any misleading information or prohibited items found will result in penalties, including potential fines and legal action.
             </AlertDescription>
           </Alert>
           
           <Alert>
-            <ExclamationTriangleIcon className="h-4 w-4 mr-2" />
+            <AlertTriangle className="h-4 w-4 mr-2" />
             <AlertDescription>
               Your booking details are being shared with regulatory authorities, customs, and relevant carriers as required by law.
             </AlertDescription>

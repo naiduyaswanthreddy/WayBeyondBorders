@@ -50,7 +50,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
   
   // Initialize map and directions when API loads and origin/destination change
   useEffect(() => {
-    if (!isLoaded || !origin || !destination || !mapRef.current) return;
+    if (!isLoaded || !origin || !destination || !mapRef.current || !window.google) return;
     
     try {
       // Initialize map if not already initialized
