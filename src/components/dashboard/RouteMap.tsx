@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +10,6 @@ import {
   Umbrella, 
   Leaf,
   Download,
-  Search,
   BadgeDollarSign
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
@@ -20,10 +18,7 @@ import { RouteMapDisplay } from "./route-map/RouteMapDisplay";
 import { RouteMapDetails } from "./route-map/RouteMapDetails";
 import { useEcoPoints } from "@/context/EcoPointsContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Comprehensive list of major shipping ports/hubs worldwide
 const majorLocations = [
   // Asia
   { value: "shanghai", label: "Shanghai, China" },
@@ -108,15 +103,65 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [selectedRoute, setSelectedRoute] = useState<"fastest" | "cheapest" | "reliable" | "eco-friendly">("fastest");
   const [origin, setOrigin] = useState<string>("shanghai");
   const [destination, setDestination] = useState<string>("rotterdam");
-  const [customOrigin, setCustomOrigin] = useState<string>("");
-  const [customDestination, setCustomDestination] = useState<string>("");
-  const [useCustomLocations, setUseCustomLocations] = useState<boolean>(false);
+  const [originLabel, setOriginLabel] = useState<string>("Shanghai, China");
+  const [destinationLabel, setDestinationLabel] = useState<string>("Rotterdam, Netherlands");
   const [showCostOptimizer, setShowCostOptimizer] = useState<boolean>(false);
   const [optimizationComplete, setOptimizationComplete] = useState<boolean>(false);
   const [savingsAmount, setSavingsAmount] = useState<number>(0);
   
   const navigate = useNavigate();
   const { addPoints } = useEcoPoints();
+
+  useEffect(() => {
+    const handleRouteDataUpdate = (event: CustomEvent) => {
+      const routeData = event.detail;
+      if (routeData.origin) {
+        setOrigin(routeData.origin);
+      }
+      if (routeData.destination) {
+        setDestination(routeData.destination);
+      }
+      if (routeData.originLabel) {
+        setOriginLabel(routeData.originLabel);
+      }
+      if (routeData.destinationLabel) {
+        setDestinationLabel(routeData.destinationLabel);
+      }
+    };
+    
+    const storedRouteData = sessionStorage.getItem('routeMapData');
+    if (storedRouteData) {
+      try {
+        const routeData = JSON.parse(storedRouteData);
+        if (routeData.origin) {
+          setOrigin(routeData.origin);
+        }
+        if (routeData.destination) {
+          setDestination(routeData.destination);
+        }
+        if (routeData.originLabel) {
+          setOriginLabel(routeData.originLabel);
+        }
+        if (routeData.destinationLabel) {
+          setDestinationLabel(routeData.destinationLabel);
+        }
+      } catch (error) {
+        console.error("Error parsing route data:", error);
+      }
+    }
+    
+    window.addEventListener('routeDataUpdated', handleRouteDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('routeDataUpdated', handleRouteDataUpdate as EventListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    setOptimizationComplete(false);
+    setShowCostOptimizer(false);
+    setSavingsAmount(0);
+  }, [selectedRoute, origin, destination]);
 
   const routes = [
     {
@@ -184,27 +229,10 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     }
   ];
 
-  // Reset cost optimization when route changes
-  useEffect(() => {
-    setOptimizationComplete(false);
-    setShowCostOptimizer(false);
-    setSavingsAmount(0);
-  }, [selectedRoute, origin, destination, useCustomLocations]);
-
   const handleRouteSelect = (routeId: string) => {
     setSelectedRoute(routeId as any);
     
-    // Store selected route in sessionStorage for use on the routes page
     const selectedRouteDetails = routes.find(r => r.id === routeId);
-    
-    // Include origin and destination in the stored route
-    const originLabel = useCustomLocations 
-      ? customOrigin 
-      : majorLocations.find(loc => loc.value === origin)?.label || "Shanghai, China";
-    
-    const destinationLabel = useCustomLocations
-      ? customDestination
-      : majorLocations.find(loc => loc.value === destination)?.label || "Rotterdam, Netherlands";
     
     const routeWithLocations = {
       ...selectedRouteDetails,
@@ -214,23 +242,20 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     
     sessionStorage.setItem('selectedRoute', JSON.stringify(routeWithLocations));
     
-    // Store booking data
     const bookingData = {
-      origin: useCustomLocations ? customOrigin : origin,
-      destination: useCustomLocations ? customDestination : destination,
+      origin: origin,
+      destination: destination,
       date: new Date().toISOString(),
       cargoType: "General Merchandise",
       weight: "2500kg"
     };
     sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
     
-    // Show toast notification
     toast({
       title: `${selectedRouteDetails?.name} Selected`,
       description: "Review detailed breakdown below",
     });
 
-    // Award eco points if eco-friendly route is selected
     if (selectedRouteDetails?.isEcoFriendly && selectedRouteDetails.ecoPoints) {
       addPoints(selectedRouteDetails.ecoPoints);
       toast({
@@ -245,16 +270,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
     if (!selectedRouteDetails) return;
     
-    // Get location labels
-    const originLabel = useCustomLocations 
-      ? customOrigin 
-      : majorLocations.find(loc => loc.value === origin)?.label || "Shanghai, China";
-    
-    const destinationLabel = useCustomLocations
-      ? customDestination
-      : majorLocations.find(loc => loc.value === destination)?.label || "Rotterdam, Netherlands";
-    
-    // Create a JSON Blob with locations
     const routeData = JSON.stringify({
       ...selectedRouteDetails,
       origin: originLabel,
@@ -263,7 +278,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     
     const blob = new Blob([routeData], { type: 'application/json' });
     
-    // Create download link
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -271,7 +285,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     document.body.appendChild(link);
     link.click();
     
-    // Clean up
     URL.revokeObjectURL(url);
     document.body.removeChild(link);
     
@@ -284,9 +297,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const runCostOptimization = () => {
     setShowCostOptimizer(true);
     
-    // Simulate AI cost optimization with a timeout
     setTimeout(() => {
-      // Calculate savings based on the route
       let savings = 0;
       switch(selectedRoute) {
         case "fastest":
@@ -315,14 +326,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   };
 
   const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
-  
-  const originLabel = useCustomLocations 
-    ? customOrigin 
-    : majorLocations.find(loc => loc.value === origin)?.label || "Shanghai, China";
-  
-  const destinationLabel = useCustomLocations
-    ? customDestination
-    : majorLocations.find(loc => loc.value === destination)?.label || "Rotterdam, Netherlands";
 
   return (
     <div className={cn("nexus-card-purple space-y-6 p-6", className)}>
@@ -344,108 +347,13 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
         </div>
       </div>
 
-      {/* Origin and Destination Selection */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-muted-foreground">Origin</label>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-6 text-xs"
-              onClick={() => setUseCustomLocations(!useCustomLocations)}
-            >
-              {useCustomLocations ? "Use Dropdown" : "Enter Manually"}
-            </Button>
-          </div>
-          
-          {useCustomLocations ? (
-            <Input 
-              placeholder="Enter origin location" 
-              value={customOrigin}
-              onChange={(e) => setCustomOrigin(e.target.value)}
-              className="bg-muted border-white/10"
-            />
-          ) : (
-            <Select value={origin} onValueChange={setOrigin}>
-              <SelectTrigger className="bg-muted border-white/10">
-                <SelectValue placeholder="Select origin" />
-              </SelectTrigger>
-              <SelectContent>
-                {majorLocations.map(location => (
-                  <SelectItem key={location.value} value={location.value}>
-                    {location.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
+      <div className="rounded-md bg-white/5 p-4 border border-white/10">
+        <div className="text-sm text-muted-foreground mb-2">
+          Current route: <span className="text-white font-medium">{originLabel}</span> to <span className="text-white font-medium">{destinationLabel}</span>
         </div>
-        
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium text-muted-foreground">Destination</label>
-            {!useCustomLocations && (
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 text-xs"
-                onClick={() => setUseCustomLocations(!useCustomLocations)}
-              >
-                {useCustomLocations ? "Use Dropdown" : "Enter Manually"}
-              </Button>
-            )}
-          </div>
-          
-          {useCustomLocations ? (
-            <Input 
-              placeholder="Enter destination location" 
-              value={customDestination}
-              onChange={(e) => setCustomDestination(e.target.value)}
-              className="bg-muted border-white/10"
-            />
-          ) : (
-            <Select value={destination} onValueChange={setDestination}>
-              <SelectTrigger className="bg-muted border-white/10">
-                <SelectValue placeholder="Select destination" />
-              </SelectTrigger>
-              <SelectContent>
-                {majorLocations.map(location => (
-                  <SelectItem key={location.value} value={location.value}>
-                    {location.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        </div>
-      </div>
-      
-      <div className="flex justify-end">
-        <Button 
-          className="nexus-button-primary gap-1"
-          onClick={() => {
-            if (
-              (useCustomLocations && (!customOrigin || !customDestination)) ||
-              (!useCustomLocations && (!origin || !destination))
-            ) {
-              toast({
-                title: "Missing Information",
-                description: "Please select both origin and destination",
-                variant: "destructive"
-              });
-              return;
-            }
-            
-            toast({
-              title: "Routes Updated",
-              description: `Showing routes from ${originLabel} to ${destinationLabel}`,
-            });
-          }}
-        >
-          <Search className="h-4 w-4" />
-          Find Routes
-        </Button>
+        <p className="text-xs text-muted-foreground">
+          Update the origin and destination in the New Booking section above to see different route options.
+        </p>
       </div>
 
       <RouteMapOptions 
@@ -463,7 +371,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       
       <RouteMapDetails selectedRouteDetails={selectedRouteDetails} />
       
-      {/* AI Cost Optimization */}
       {!showCostOptimizer ? (
         <div className="flex justify-center">
           <Button 
@@ -530,14 +437,12 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
                       description: `Cost savings of $${savingsAmount} have been applied to your route`,
                     });
                     
-                    // Update route cost with savings
                     const route = routes.find(r => r.id === selectedRoute);
                     if (route) {
                       const currentCost = parseFloat(route.cost.replace('$', '').replace(',', ''));
                       const newCost = currentCost - savingsAmount;
                       route.cost = `$${newCost.toLocaleString()}`;
                       
-                      // Update in session storage
                       sessionStorage.setItem('selectedRoute', JSON.stringify({
                         ...route,
                         cost: `$${newCost.toLocaleString()}`,
@@ -546,7 +451,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
                       }));
                     }
                     
-                    // Reset the optimization UI
                     setShowCostOptimizer(false);
                     setOptimizationComplete(false);
                   }}

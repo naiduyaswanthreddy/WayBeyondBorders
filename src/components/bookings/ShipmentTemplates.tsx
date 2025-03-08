@@ -64,6 +64,22 @@ export const ShipmentTemplates = () => {
     if (template) {
       sessionStorage.setItem('selectedTemplate', JSON.stringify(template));
       
+      // Also update the route map data to immediately reflect the template's route
+      const routeMapData = {
+        origin: template.origin,
+        originLabel: template.originLabel,
+        destination: template.destination,
+        destinationLabel: template.destinationLabel,
+        cargoType: template.cargoType,
+        weight: template.weight,
+        transportMode: template.transportMode
+      };
+      sessionStorage.setItem('routeMapData', JSON.stringify(routeMapData));
+      
+      // Trigger a custom event to update the route map
+      const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeMapData });
+      window.dispatchEvent(updateEvent);
+      
       toast({
         title: "Template Selected",
         description: `Using "${template.name}" template for new shipment.`,
