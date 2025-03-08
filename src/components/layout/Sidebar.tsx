@@ -1,19 +1,14 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
-  LayoutDashboard, 
-  PackageOpen, 
-  BarChart3, 
+  LayoutDashboard,
   Map, 
-  Truck, 
-  CalendarClock, 
-  ShieldCheck, 
-  DollarSign, 
+  BarChart3,
   Settings, 
   HelpCircle, 
-  LogOut 
+  LogOut,
+  ArrowLeftRight
 } from "lucide-react";
 
 interface SidebarItem {
@@ -24,13 +19,9 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: PackageOpen, label: "Shipments", href: "/shipments" },
-  { icon: Truck, label: "Carriers", href: "/carriers" },
   { icon: Map, label: "Route Planning", href: "/routes" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
-  { icon: CalendarClock, label: "Schedules", href: "/schedules" },
-  { icon: ShieldCheck, label: "Compliance", href: "/compliance" },
-  { icon: DollarSign, label: "Financials", href: "/financials" },
+  { icon: ArrowLeftRight, label: "Compare", href: "/compare" },
 ];
 
 const bottomItems: SidebarItem[] = [

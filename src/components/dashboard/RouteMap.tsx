@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, Clock, DollarSign, Droplets, Zap, Shield, Umbrella, Wind } from "lucide-react";
+import { CheckCircle2, Clock, DollarSign, Droplets, Zap, Shield, Umbrella, Wind, ArrowRight } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
-// This is a placeholder for where a real map would go
-// In a real app, you would use a mapping library like Mapbox, Google Maps, etc.
 const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [selectedRoute, setSelectedRoute] = useState<"fastest" | "cheapest" | "reliable">("fastest");
   const navigate = useNavigate();
@@ -69,12 +68,19 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     // Show toast notification
     toast({
       title: `${selectedRouteDetails?.name} Selected`,
-      description: "Navigating to route details...",
+      description: "Review detailed breakdown below",
+    });
+  };
+
+  const navigateToRoutePlanning = () => {
+    toast({
+      title: "Navigating to Route Planning",
+      description: "Loading detailed route information...",
     });
     
     // Navigate to routes page with selected route info
     setTimeout(() => {
-      navigate('/routes', { state: { selectedRoute: routeId } });
+      navigate('/routes', { state: { selectedRoute } });
     }, 500);
   };
 
@@ -134,15 +140,15 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
         })}
       </div>
 
-      {/* Map Display */}
+      {/* Map Display with Satellite View */}
       <div className="relative overflow-hidden rounded-lg bg-muted/50 p-1">
-        <div className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-gradient-to-br from-background via-background to-muted border border-white/10">
-          {/* Map Placeholder - This would be replaced with actual map component */}
+        <div className="aspect-[16/9] w-full overflow-hidden rounded-lg border border-white/10">
+          {/* Satellite Map Background - using an image that looks like satellite view */}
           <div className="h-full w-full p-4">
             <div className="flex h-full flex-col items-center justify-center">
               <div className="relative flex h-full w-full items-center justify-center">
-                {/* Map Background */}
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZGVmcz4KICA8cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj4KICAgIDxwYXRoIGQ9Ik0gMjAgMCBMIDAgMCAwIDIwIiBmaWxsPSJub25lIiBzdHJva2U9IiMyNTI5MzMiIHN0cm9rZS13aWR0aD0iMC41Ii8+CiAgPC9wYXR0ZXJuPgo8L2RlZnM+CjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiIC8+Cjwvc3ZnPg==')] opacity-30"></div>
+                {/* Satellite Map Background */}
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-40"></div>
                 
                 {/* Origin Point */}
                 <div className="absolute left-[15%] top-[40%] h-4 w-4 rounded-full bg-nexus-blue shadow-[0_0_10px_rgba(0,98,255,0.7)]"></div>
@@ -227,6 +233,70 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
             </div>
           </div>
         </div>
+      </div>
+      
+      {/* Detailed breakdown of selected route */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-white">
+          {selectedRouteDetails?.name} - Detailed Breakdown
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Transit Time</h4>
+            <div className="flex items-center">
+              <Clock className="mr-2 h-5 w-5 text-nexus-blue" />
+              <span className="text-lg font-medium text-white">{selectedRouteDetails?.duration}</span>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {selectedRoute === "fastest" 
+                ? "Priority processing at all checkpoints" 
+                : selectedRoute === "cheapest"
+                ? "Standard processing with some wait times"
+                : "Reliable checkpoints with dedicated handlers"}
+            </p>
+          </div>
+          
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Total Cost</h4>
+            <div className="flex items-center">
+              <DollarSign className="mr-2 h-5 w-5 text-nexus-purple" />
+              <span className="text-lg font-medium text-white">{selectedRouteDetails?.cost}</span>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {selectedRoute === "fastest" 
+                ? "Premium rate for expedited service" 
+                : selectedRoute === "cheapest"
+                ? "Cost-optimized with bulk shipping discounts"
+                : "Balanced cost with contingency included"}
+            </p>
+          </div>
+          
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="text-sm font-medium text-muted-foreground mb-2">Transport Modes</h4>
+            <div className="flex items-center gap-2">
+              {selectedRouteDetails?.modes.map((mode, idx) => (
+                <span 
+                  key={idx}
+                  className="px-2 py-1 rounded-full text-xs font-medium bg-white/10 text-white"
+                >
+                  {mode}
+                </span>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {selectedRouteDetails?.modes.length} transfer points with optimized handling
+            </p>
+          </div>
+        </div>
+        
+        <Button 
+          className="nexus-button-primary w-full"
+          onClick={navigateToRoutePlanning}
+        >
+          Choose This Route
+          <ArrowRight className="ml-2 h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
