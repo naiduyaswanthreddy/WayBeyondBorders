@@ -33,7 +33,7 @@ const Bookings = () => {
       origin: "Shanghai, China",
       destination: "Rotterdam, Netherlands",
       originalRoute: "Sea → Truck",
-      newRoute: "Sea → Air",
+      newRoute: "Air → Truck ",
       reason: "Severe storm warning in the Mediterranean Sea",
       costChange: "+$450",
       delay: "+1 day"

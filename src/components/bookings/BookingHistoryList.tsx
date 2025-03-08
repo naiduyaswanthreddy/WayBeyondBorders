@@ -125,12 +125,19 @@ export const BookingHistoryList: React.FC<BookingHistoryProps> = ({ className })
         <Button onClick={createNewShipment}>New Shipment</Button>
       </div>
 
+
+
+
+
       <div className="space-y-4">
         {bookingHistoryData.map((booking) => (
           <div 
             key={booking.id}
             className="rounded-lg border border-white/10 bg-card p-4 hover:border-white/20 transition-colors"
           >
+
+
+            
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="mr-4 rounded-full bg-white/10 p-2">
@@ -169,6 +176,8 @@ export const BookingHistoryList: React.FC<BookingHistoryProps> = ({ className })
                 </Button>
               </div>
             </div>
+
+
 
             {selectedBooking === booking.id && (
               <div className="mt-4 border-t border-white/10 pt-4">
