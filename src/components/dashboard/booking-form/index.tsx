@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -111,21 +110,29 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     let days = "";
     
-    if ((originLabel.includes("Shanghai") && destinationLabel.includes("Rotterdam")) ||
-        (originLabel.includes("Rotterdam") && destinationLabel.includes("Shanghai"))) {
-      days = mode === "air" || mode === "express" ? "2-3" : mode === "sea" ? "30-35" : "15-20";
+    if ((originLabel.includes("New York") || originLabel.includes("Los Angeles") || originLabel.includes("Miami")) && 
+        (destinationLabel.includes("London") || destinationLabel.includes("Rotterdam") || destinationLabel.includes("Hamburg"))) {
+      days = mode === "air" || mode === "express" ? "1-2" : mode === "sea" ? "8-12" : "5-7";
     }
-    else if ((originLabel.includes("New York") && destinationLabel.includes("Hamburg")) ||
-             (originLabel.includes("Hamburg") && destinationLabel.includes("New York"))) {
-      days = mode === "air" || mode === "express" ? "1-2" : mode === "sea" ? "10-14" : "5-8";
+    else if ((destinationLabel.includes("New York") || destinationLabel.includes("Los Angeles") || destinationLabel.includes("Miami")) && 
+             (originLabel.includes("London") || originLabel.includes("Rotterdam") || originLabel.includes("Hamburg"))) {
+      days = mode === "air" || mode === "express" ? "1-2" : mode === "sea" ? "8-12" : "5-7";
     }
-    else if ((originLabel.includes("Dubai") && destinationLabel.includes("Mumbai")) ||
-             (originLabel.includes("Mumbai") && destinationLabel.includes("Dubai"))) {
-      days = mode === "air" || mode === "express" ? "1" : mode === "sea" ? "4-6" : "3-4";
+    else if ((originLabel.includes("Shanghai") || originLabel.includes("Singapore") || originLabel.includes("Tokyo")) && 
+             (destinationLabel.includes("New York") || destinationLabel.includes("Los Angeles") || 
+              destinationLabel.includes("London") || destinationLabel.includes("Rotterdam"))) {
+      days = mode === "air" || mode === "express" ? "2-3" : mode === "sea" ? "18-25" : "12-16";
     }
-    else if ((originLabel.includes("Tokyo") && destinationLabel.includes("Los Angeles")) ||
-             (originLabel.includes("Los Angeles") && destinationLabel.includes("Tokyo"))) {
-      days = mode === "air" || mode === "express" ? "1-2" : mode === "sea" ? "12-15" : "7-10";
+    else if ((destinationLabel.includes("Shanghai") || destinationLabel.includes("Singapore") || destinationLabel.includes("Tokyo")) && 
+             (originLabel.includes("New York") || originLabel.includes("Los Angeles") || 
+              originLabel.includes("London") || originLabel.includes("Rotterdam"))) {
+      days = mode === "air" || mode === "express" ? "2-3" : mode === "sea" ? "18-25" : "12-16";
+    }
+    else if ((originLabel.includes("Dubai") || destinationLabel.includes("Dubai"))) {
+      days = mode === "air" || mode === "express" ? "1-3" : mode === "sea" ? "12-18" : "8-12";
+    }
+    else if ((originLabel.includes("Sydney") || destinationLabel.includes("Sydney"))) {
+      days = mode === "air" || mode === "express" ? "2-3" : mode === "sea" ? "20-30" : "15-20";
     }
     else {
       days = mode === "air" || mode === "express" ? "2-4" : mode === "sea" ? "14-28" : "7-14";
