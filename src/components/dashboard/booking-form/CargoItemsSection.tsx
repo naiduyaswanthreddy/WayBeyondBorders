@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
@@ -55,16 +55,19 @@ const CargoItemsSection: React.FC<CargoItemsSectionProps> = ({
   };
 
   return (
-    <div className="col-span-2 mt-4 space-y-4 border border-white/10 rounded-md p-4">
+    <div className="col-span-2 mt-4 space-y-4 premium-glass p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-md font-medium text-white">Cargo Items</h3>
-        <span className="text-xs text-muted-foreground">
+        <div className="flex items-center">
+          <Package className="h-5 w-5 text-nexus-purple-light mr-2" />
+          <h3 className="text-md font-medium text-white">Cargo Items</h3>
+        </div>
+        <span className="premium-pill-purple">
           {cargoItems.length} items added
         </span>
       </div>
       
       {cargoItems.length > 0 && (
-        <div className="rounded-md border border-white/10 overflow-hidden">
+        <div className="premium-glass overflow-hidden">
           <table className="w-full">
             <thead className="bg-white/5">
               <tr>
@@ -75,7 +78,7 @@ const CargoItemsSection: React.FC<CargoItemsSectionProps> = ({
             </thead>
             <tbody className="divide-y divide-white/10">
               {cargoItems.map((item, index) => (
-                <tr key={index} className="bg-white/5">
+                <tr key={index} className="bg-white/5 hover:bg-white/10 transition-colors">
                   <td className="p-2 text-sm text-white">{item.name}</td>
                   <td className="p-2 text-sm text-white">{item.length}×{item.width}×{item.height} cm</td>
                   <td className="p-2 text-sm text-white">{item.weight} kg</td>
@@ -88,34 +91,34 @@ const CargoItemsSection: React.FC<CargoItemsSectionProps> = ({
       
       <div className="grid grid-cols-6 gap-2">
         <Input
-          className="col-span-2 bg-muted border-white/10"
+          className="col-span-2 nexus-input"
           placeholder="Item name"
           value={newItemName}
           onChange={(e) => setNewItemName(e.target.value)}
         />
         <Input
-          className="bg-muted border-white/10"
+          className="nexus-input"
           placeholder="Length (cm)"
           value={newItemLength}
           onChange={(e) => setNewItemLength(e.target.value)}
           type="number"
         />
         <Input
-          className="bg-muted border-white/10"
+          className="nexus-input"
           placeholder="Width (cm)"
           value={newItemWidth}
           onChange={(e) => setNewItemWidth(e.target.value)}
           type="number"
         />
         <Input
-          className="bg-muted border-white/10"
+          className="nexus-input"
           placeholder="Height (cm)"
           value={newItemHeight}
           onChange={(e) => setNewItemHeight(e.target.value)}
           type="number"
         />
         <Input
-          className="bg-muted border-white/10"
+          className="nexus-input"
           placeholder="Weight (kg)"
           value={newItemWeight}
           onChange={(e) => setNewItemWeight(e.target.value)}
@@ -124,8 +127,8 @@ const CargoItemsSection: React.FC<CargoItemsSectionProps> = ({
       </div>
       
       <Button 
-        variant="outline"
-        className="w-full border-dashed border-white/20"
+        variant="premium-purple"
+        className="w-full"
         onClick={handleAddCargoItem}
       >
         <PlusCircle className="h-4 w-4 mr-2" />

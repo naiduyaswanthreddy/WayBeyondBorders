@@ -33,7 +33,7 @@
     --input: 217 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 210 40% 98%;
@@ -59,6 +59,27 @@
   html {
     @apply scroll-smooth;
   }
+  
+  /* Typography enhancements */
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tight font-bold;
+  }
+  
+  h1 {
+    @apply text-4xl leading-tight sm:text-5xl md:text-6xl;
+  }
+  
+  h2 {
+    @apply text-3xl leading-tight sm:text-4xl;
+  }
+  
+  h3 {
+    @apply text-2xl leading-tight;
+  }
+  
+  p {
+    @apply leading-relaxed;
+  }
 }
 
 @layer utilities {
@@ -71,6 +92,7 @@
     display: none;
   }
 
+  /* Modern UI elements */
   .glass-card {
     @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_15px_-2px_rgba(0,0,0,0.4)];
   }
@@ -80,15 +102,19 @@
   }
   
   .text-gradient-blue {
-    @apply bg-gradient-to-r from-nexus-blue via-nexus-blue/90 to-nexus-blue/70 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nexus-blue via-nexus-blue-light to-nexus-blue bg-clip-text text-transparent;
   }
   
   .text-gradient-purple {
-    @apply bg-gradient-to-r from-nexus-purple via-nexus-purple/90 to-nexus-purple/70 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nexus-purple via-nexus-purple-light to-nexus-purple bg-clip-text text-transparent;
   }
   
   .text-gradient-teal {
-    @apply bg-gradient-to-r from-nexus-teal via-nexus-teal/90 to-nexus-teal/70 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-nexus-teal via-nexus-teal-light to-nexus-teal bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-premium {
+    @apply bg-gradient-to-r from-nexus-blue via-nexus-purple to-nexus-pink bg-clip-text text-transparent;
   }
 
   .shimmer {
@@ -130,6 +156,10 @@
     @apply opacity-100 bg-nexus-teal/30;
   }
   
+  .glow-pink:hover::after {
+    @apply opacity-100 bg-nexus-pink/30;
+  }
+  
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
   }
@@ -138,16 +168,80 @@
     animation: float 6s ease-in-out infinite;
   }
   
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+  /* Premium effect utilities */
+  .neo-button {
+    @apply shadow-neo hover:shadow-premium-hover transition-shadow duration-300;
+  }
+  
+  .premium-glass {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-glass rounded-xl;
+  }
+  
+  .premium-card {
+    @apply bg-card-gradient-blue border border-white/10 shadow-premium rounded-xl hover:shadow-premium-hover transition-all duration-300;
+  }
+  
+  .card-animated {
+    @apply relative overflow-hidden transition-all duration-300 ease-out hover:shadow-premium-hover hover:translate-y-[-5px];
+  }
+  
+  .card-animated::before {
+    @apply absolute inset-0 bg-premium-gradient-subtle opacity-0 transition-opacity duration-300 ease-out rounded-xl content-[''];
+  }
+  
+  .card-animated:hover::before {
+    @apply opacity-100;
+  }
+  
+  .animated-border {
+    @apply relative overflow-hidden after:absolute after:inset-0 after:content-[''];
+  }
+  
+  .animated-border::after {
+    outline: 1px solid rgba(255, 255, 255, 0.1);
+    outline-offset: -1px;
+    border-radius: inherit;
+    animation: border-pulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes border-pulse {
+    0%, 100% { outline-color: rgba(255, 255, 255, 0.05); }
+    50% { outline-color: rgba(255, 255, 255, 0.2); }
+  }
+  
+  .button-shine {
+    @apply relative overflow-hidden;
+  }
+  
+  .button-shine::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.05) 100%
+    );
+    transform: rotate(30deg);
+    transition: transform 0.3s ease-out;
+  }
+  
+  .button-shine:hover::after {
+    transform: rotate(30deg) translate(10%, 10%);
+  }
+  
+  .hover-subtle {
+    @apply transition-all duration-300 hover:brightness-110;
   }
 }
 
 /* Custom elements - moved from utilities layer to components layer */
 @layer components {
   .nexus-button {
-    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-muted border border-white/10 rounded-md;
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-white/5 backdrop-blur-md border border-white/10 rounded-md shadow-premium hover:shadow-premium-hover;
   }
 
   .nexus-button::before {
@@ -162,46 +256,106 @@
   }
 
   .nexus-button-primary {
-    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-blue/20 border border-white/10 rounded-md;
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-gradient-to-r from-nexus-blue/20 to-nexus-blue-dark/20 backdrop-blur-md border border-white/10 rounded-md shadow-premium hover:shadow-premium-hover;
   }
   
   .nexus-button-primary:hover {
-    @apply bg-nexus-blue/30 shadow-[0_0_15px_-2px_rgba(0,98,255,0.5)];
+    @apply bg-nexus-blue/30 shadow-[0_0_15px_-2px_rgba(58,134,255,0.5)];
   }
 
   .nexus-button-secondary {
-    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-purple/20 border border-white/10 rounded-md;
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-gradient-to-r from-nexus-purple/20 to-nexus-purple-dark/20 backdrop-blur-md border border-white/10 rounded-md shadow-premium hover:shadow-premium-hover;
   }
   
   .nexus-button-secondary:hover {
-    @apply bg-nexus-purple/30 shadow-[0_0_15px_-2px_rgba(110,54,229,0.5)];
+    @apply bg-nexus-purple/30 shadow-[0_0_15px_-2px_rgba(131,56,236,0.5)];
   }
 
   .nexus-button-accent {
-    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-teal/20 border border-white/10 rounded-md;
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-gradient-to-r from-nexus-teal/20 to-nexus-teal-dark/20 backdrop-blur-md border border-white/10 rounded-md shadow-premium hover:shadow-premium-hover;
   }
   
   .nexus-button-accent:hover {
-    @apply bg-nexus-teal/30 shadow-[0_0_15px_-2px_rgba(0,207,213,0.5)];
+    @apply bg-nexus-teal/30 shadow-[0_0_15px_-2px_rgba(0,229,232,0.5)];
   }
 
   .nexus-card {
-    @apply relative overflow-hidden rounded-xl border border-white/10 shadow-xl transition-all duration-300 hover:border-white/20 hover:shadow-2xl;
+    @apply relative overflow-hidden rounded-xl border border-white/10 bg-card shadow-premium transition-all duration-300 hover:border-white/20 hover:shadow-premium-hover;
   }
 
   .nexus-card-blue {
-    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-blue/10;
+    @apply nexus-card bg-card-gradient-blue;
   }
 
   .nexus-card-purple {
-    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-purple/10;
+    @apply nexus-card bg-card-gradient-purple;
   }
 
   .nexus-card-teal {
-    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-teal/10;
+    @apply nexus-card bg-card-gradient-teal;
+  }
+  
+  .nexus-card-financial {
+    @apply nexus-card flex flex-col;
+  }
+  
+  .nexus-card-financial-header {
+    @apply flex items-center justify-between p-4 border-b border-white/10 bg-black/20;
+  }
+  
+  .nexus-card-financial-body {
+    @apply p-4 flex-grow;
+  }
+  
+  .nexus-card-financial-footer {
+    @apply flex items-center justify-between p-4 bg-black/10 border-t border-white/10;
   }
 
   .nexus-input {
-    @apply bg-muted border-white/10 focus:border-nexus-blue/50 focus:ring-1 focus:ring-nexus-blue/50 rounded-md px-3 py-2 transition-all duration-200;
+    @apply bg-white/5 backdrop-blur-md border border-white/10 focus:border-nexus-blue/50 focus:ring-1 focus:ring-nexus-blue/50 rounded-md px-3 py-2 transition-all duration-200;
+  }
+  
+  .premium-data-point {
+    @apply flex items-center justify-between rounded-lg bg-white/5 p-3 hover:bg-white/10 transition-colors duration-200;
+  }
+  
+  .premium-data-label {
+    @apply text-sm text-muted-foreground font-medium;
+  }
+  
+  .premium-data-value {
+    @apply text-sm font-semibold;
+  }
+  
+  .premium-pill {
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 text-xs font-medium rounded-full bg-white/10 backdrop-blur-sm;
+  }
+  
+  .premium-pill-blue {
+    @apply premium-pill bg-nexus-blue/20 text-nexus-blue-light;
+  }
+  
+  .premium-pill-purple {
+    @apply premium-pill bg-nexus-purple/20 text-nexus-purple-light;
+  }
+  
+  .premium-pill-teal {
+    @apply premium-pill bg-nexus-teal/20 text-nexus-teal-light;
+  }
+  
+  .premium-pill-pink {
+    @apply premium-pill bg-nexus-pink/20 text-nexus-pink-light;
+  }
+  
+  .premium-pill-amber {
+    @apply premium-pill bg-nexus-amber/20 text-nexus-amber-light;
+  }
+  
+  .premium-pill-green {
+    @apply premium-pill bg-nexus-green/20 text-nexus-green-light;
+  }
+  
+  .premium-pill-red {
+    @apply premium-pill bg-nexus-red/20 text-nexus-red-light;
   }
 }

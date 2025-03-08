@@ -17,7 +17,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   return (
     <div className="col-span-2 mt-4 grid grid-cols-3 gap-4">
       <Button 
-        variant="outline"
+        variant="premium-outline"
         className="border-white/10"
         onClick={handleSaveTemplate}
       >
@@ -25,14 +25,16 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         Save as Template
       </Button>
       <Button 
-        className="nexus-button-primary"
+        variant="premium-blue"
         onClick={handleFindRoutes}
+        className="animated-border"
       >
         Find Optimal Routes
         <ArrowRight className="ml-2 h-4 w-4" />
       </Button>
       <Button 
-        className="bg-green-600 hover:bg-green-700"
+        variant="premium"
+        className="bg-gradient-to-r from-nexus-green to-nexus-green-dark"
         onClick={handleBookingConfirmation}
       >
         Confirm Booking

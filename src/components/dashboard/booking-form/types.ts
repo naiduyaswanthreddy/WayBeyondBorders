@@ -154,3 +154,26 @@ export interface FinancialBreakdown {
   profitMargin: number;
   companyCost: number;
 }
+
+// New UI theme interfaces
+export interface ThemeColors {
+  primary: string;
+  secondary: string;
+  accent: string;
+  background: string;
+  card: string;
+  text: string;
+  border: string;
+}
+
+export interface GradientTheme {
+  primary: string;
+  secondary: string;
+  accent: string;
+}
+
+export interface AnimationConfig {
+  duration: number;
+  easing: string;
+  delay: number;
+}

@@ -74,7 +74,7 @@ const LocationSelector = ({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            variant="premium-outline"
             role="combobox"
             aria-expanded={open}
             className={cn(
@@ -96,26 +96,29 @@ const LocationSelector = ({
                 </div>
               ) 
               : (
-                <span className="text-muted-foreground">{placeholder}</span>
+                <div className="flex items-center">
+                  <MapPin className="mr-2 h-4 w-4 text-muted-foreground" />
+                  <span className="text-muted-foreground">{placeholder}</span>
+                </div>
               )
             }
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 bg-popover z-50" align="start">
+        <PopoverContent className="w-[300px] p-0 bg-card backdrop-blur-xl border border-white/10 shadow-premium z-50" align="start">
           <Tabs
             defaultValue={inputMode}
             value={inputMode}
             onValueChange={handleModeChange}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 bg-muted/30 backdrop-blur-md">
               <TabsTrigger value="saved">Search Location</TabsTrigger>
               <TabsTrigger value="manual">Manual Entry</TabsTrigger>
             </TabsList>
             <TabsContent value="saved" className="mt-0">
               <div className="flex flex-col">
-                <div className="flex items-center border-b px-3">
+                <div className="flex items-center border-b border-white/10 px-3">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <input
                     value={searchQuery}
@@ -135,8 +138,8 @@ const LocationSelector = ({
                       <div
                         key={location.value}
                         className={cn(
-                          "flex items-start py-2 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                          value === location.value ? "bg-accent/50" : ""
+                          "flex items-start py-2 px-2 cursor-pointer transition-colors hover:bg-white/5",
+                          value === location.value ? "bg-nexus-blue/10" : ""
                         )}
                         onClick={() => {
                           onChange(location.value);
@@ -147,7 +150,7 @@ const LocationSelector = ({
                         <div className="flex items-center">
                           <Check
                             className={cn(
-                              "mr-2 h-4 w-4",
+                              "mr-2 h-4 w-4 text-nexus-blue-light",
                               value === location.value
                                 ? "opacity-100"
                                 : "opacity-0"
@@ -158,6 +161,17 @@ const LocationSelector = ({
                             <span className="text-xs text-muted-foreground">
                               {location.description}
                             </span>
+                            <div className="flex gap-1 mt-1">
+                              {location.port && (
+                                <span className="premium-pill-blue">Port</span>
+                              )}
+                              {location.airport && (
+                                <span className="premium-pill-purple">Airport</span>
+                              )}
+                              {location.roadHub && (
+                                <span className="premium-pill-teal">Road Hub</span>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -174,11 +188,11 @@ const LocationSelector = ({
                     placeholder="Enter location manually"
                     value={manualInput}
                     onChange={(e) => onManualInputChange(e.target.value)}
-                    className="w-full"
+                    className="w-full nexus-input"
                   />
                 </div>
                 <Button
-                  variant="default"
+                  variant="premium-blue"
                   onClick={() => setOpen(false)}
                   className="w-full"
                 >

@@ -41,7 +41,7 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant="outline"
+            variant="premium-outline"
             role="combobox"
             type="button"
             className={cn(
@@ -50,15 +50,18 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
               error && "border-destructive"
             )}
           >
-            {cargoType
-              ? cargoTypes.find((type) => type.value === cargoType)?.label
-              : "Select cargo type"}
+            <div className="flex items-center">
+              <Box className="mr-2 h-4 w-4 text-muted-foreground" />
+              {cargoType
+                ? cargoTypes.find((type) => type.value === cargoType)?.label
+                : "Select cargo type"}
+            </div>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 bg-popover z-50" align="start">
+        <PopoverContent className="w-[300px] p-0 bg-card backdrop-blur-xl border border-white/10 shadow-premium z-50" align="start">
           <div className="flex flex-col">
-            <div className="flex items-center border-b px-3">
+            <div className="flex items-center border-b border-white/10 px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <input
                 value={searchQuery}
@@ -78,8 +81,8 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
                   <div
                     key={type.value}
                     className={cn(
-                      "flex items-start py-2 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground",
-                      cargoType === type.value ? "bg-accent/50" : ""
+                      "flex items-start py-2 px-2 cursor-pointer transition-colors hover:bg-white/5",
+                      cargoType === type.value ? "bg-nexus-blue/10" : ""
                     )}
                     onClick={() => {
                       setCargoType(type.value);
@@ -90,7 +93,7 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
                     <div className="flex items-center">
                       <Check
                         className={cn(
-                          "mr-2 h-4 w-4",
+                          "mr-2 h-4 w-4 text-nexus-blue-light",
                           cargoType === type.value
                             ? "opacity-100"
                             : "opacity-0"
@@ -100,25 +103,25 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
                         <span className="font-medium">{type.label}</span>
                         <div className="ml-auto flex flex-wrap gap-1 mt-1">
                           {type.restrictions.includes("no-air") && (
-                            <span className="text-xs bg-red-500/20 text-red-500 px-1 rounded">No Air</span>
+                            <span className="premium-pill-red">No Air</span>
                           )}
                           {type.restrictions.includes("prioritize-air") && (
-                            <span className="text-xs bg-green-500/20 text-green-500 px-1 rounded">Air Priority</span>
+                            <span className="premium-pill-green">Air Priority</span>
                           )}
                           {type.restrictions.includes("temperature-control") && (
-                            <span className="text-xs bg-blue-500/20 text-blue-500 px-1 rounded">Temp Control</span>
+                            <span className="premium-pill-blue">Temp Control</span>
                           )}
                           {type.restrictions.includes("special-handling") && (
-                            <span className="text-xs bg-yellow-500/20 text-yellow-500 px-1 rounded">Special Handling</span>
+                            <span className="premium-pill-amber">Special Handling</span>
                           )}
                           {type.restrictions.includes("high-value") && (
-                            <span className="text-xs bg-purple-500/20 text-purple-500 px-1 rounded">High Value</span>
+                            <span className="premium-pill-purple">High Value</span>
                           )}
                           {type.restrictions.includes("oversized") && (
-                            <span className="text-xs bg-orange-500/20 text-orange-500 px-1 rounded">Oversized</span>
+                            <span className="premium-pill-teal">Oversized</span>
                           )}
                           {type.restrictions.includes("weight-restrictions") && (
-                            <span className="text-xs bg-gray-500/20 text-gray-500 px-1 rounded">Weight Limit</span>
+                            <span className="premium-pill">Weight Limit</span>
                           )}
                         </div>
                       </div>
@@ -138,7 +141,7 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
           {restrictions.map((restriction, index) => (
             <span 
               key={index} 
-              className="rounded bg-white/10 px-1 py-0.5 text-xs text-muted-foreground"
+              className="premium-pill"
             >
               {restriction}
             </span>
