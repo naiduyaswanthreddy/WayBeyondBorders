@@ -84,7 +84,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
               <TabsTrigger value="manual">Manual Entry</TabsTrigger>
             </TabsList>
             <TabsContent value="saved" className="mt-0">
-              <Command className="w-full">
+              <Command>
                 <CommandInput placeholder="Search location..." />
                 <CommandEmpty>No location found.</CommandEmpty>
                 <CommandGroup className="max-h-[300px] overflow-y-auto">

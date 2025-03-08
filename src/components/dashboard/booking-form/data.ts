@@ -4,6 +4,8 @@ export const locations: LocationData[] = [
   { label: "New York, USA", value: "newyork", port: true, airport: true, roadHub: true, description: "Major East Coast logistics center" },
   { label: "Los Angeles, USA", value: "losangeles", port: true, airport: true, roadHub: true, description: "Busiest port in Western USA" },
   { label: "Miami, USA", value: "miami", port: true, airport: true, roadHub: true, description: "Gateway to Latin America" },
+  { label: "Chicago, USA", value: "chicago", port: false, airport: true, roadHub: true, description: "Major Midwest transportation hub" },
+  { label: "Houston, USA", value: "houston", port: true, airport: true, roadHub: true, description: "Gulf Coast shipping center" },
   { label: "London, UK", value: "london", port: true, airport: true, roadHub: true, description: "European commercial hub" },
   { label: "Rotterdam, Netherlands", value: "rotterdam", port: true, airport: true, roadHub: true, description: "Europe's largest seaport" },
   { label: "Hamburg, Germany", value: "hamburg", port: true, airport: true, roadHub: true, description: "Germany's largest port" },
@@ -12,10 +14,8 @@ export const locations: LocationData[] = [
   { label: "Tokyo, Japan", value: "tokyo", port: true, airport: true, roadHub: true, description: "Japan's main logistics gateway" },
   { label: "Sydney, Australia", value: "sydney", port: true, airport: true, roadHub: true, description: "Australia's busiest port" },
   { label: "Dubai, UAE", value: "dubai", port: true, airport: true, roadHub: true, description: "Leading Middle Eastern logistics hub" },
-  { label: "Cape Town, South Africa", value: "capetown", port: true, airport: true, roadHub: true, description: "Major African logistics hub" },
-  { label: "São Paulo, Brazil", value: "saopaulo", port: false, airport: true, roadHub: true, description: "South America's largest city" },
   { label: "Mumbai, India", value: "mumbai", port: true, airport: true, roadHub: true, description: "India's largest port city" },
-  { label: "Moscow, Russia", value: "moscow", port: false, airport: true, roadHub: true, description: "Northern European transport hub" },
+  { label: "São Paulo, Brazil", value: "saopaulo", port: false, airport: true, roadHub: true, description: "South America's largest city" },
 ];
 
 export const cargoTypes: CargoTypeData[] = [
