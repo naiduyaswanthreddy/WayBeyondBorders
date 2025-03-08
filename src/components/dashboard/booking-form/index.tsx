@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -64,7 +65,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking."
+          description: `"${template.name}" template has been applied to your new booking.`
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
@@ -166,7 +167,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         setTransportMode("any");
         toast({
           title: "Transport Mode Reset",
-          description: `Selected transport mode is not available between ${originLocation.label} and ${destLocation.label}`,
+          description: `Selected transport mode is not available between ${originLocation.label} and ${destLocation.label}`
         });
       }
     }
@@ -261,7 +262,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     toast({
       title: "Finding optimal routes",
-      description: "Analyzing available routes based on your requirements...",
+      description: "Analyzing available routes based on your requirements..."
     });
     
     setTimeout(() => {
@@ -308,7 +309,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     toast({
       title: "Booking Confirmed",
-      description: `Booking #${bookingData.id} has been confirmed successfully.`,
+      description: `Booking #${bookingData.id} has been confirmed successfully.`
     });
     
     setOrigin("");
