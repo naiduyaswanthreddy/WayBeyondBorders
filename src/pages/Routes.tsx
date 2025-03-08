@@ -28,6 +28,20 @@ interface BookingData {
   weight: string;
 }
 
+// Define the locations array that was missing
+const locations = [
+  { value: "shanghai", label: "Shanghai, China" },
+  { value: "rotterdam", label: "Rotterdam, Netherlands" },
+  { value: "singapore", label: "Singapore" },
+  { value: "losangeles", label: "Los Angeles, USA" },
+  { value: "dubai", label: "Dubai, UAE" },
+  { value: "hamburg", label: "Hamburg, Germany" },
+  { value: "busan", label: "Busan, South Korea" },
+  { value: "newyork", label: "New York, USA" },
+  { value: "tokyo", label: "Tokyo, Japan" },
+  { value: "antwerp", label: "Antwerp, Belgium" }
+];
+
 const Routes = () => {
   const location = useLocation();
   const navigate = useNavigate();
