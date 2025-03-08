@@ -17,11 +17,14 @@ const Index = () => {
               <span className="text-xl font-bold text-white">L</span>
             </div>
             <span className="text-xl font-bold tracking-tight">
-              <span className="text-gradient-blue">Logi</span>
-              <span className="text-white">Nexus</span>
-              <span className="text-gradient-teal">AI</span>
+              <span className="text-gradient-blue">Way</span>
+              <span className="text-white">Beyond</span>
+              <span className="text-gradient-teal">Borders</span>
             </span>
           </Link>
+
+
+         
 
           <nav className="hidden md:block">
             <ul className="flex items-center gap-x-8">
