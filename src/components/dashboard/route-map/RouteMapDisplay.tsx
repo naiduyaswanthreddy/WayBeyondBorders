@@ -27,7 +27,7 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
           <div className="flex h-full flex-col items-center justify-center">
             <div className="relative flex h-full w-full items-center justify-center">
               {/* Satellite Map Background */}
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-40"></div>
+              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1508433957232-3107f5fd5995?ixlib=rb-4.0.3&auto=format&fit=crop&w=1080&q=80')] bg-cover bg-center opacity-60"></div>
               
               {/* Origin Point */}
               <div className="absolute left-[15%] top-[40%] h-4 w-4 rounded-full bg-nexus-blue shadow-[0_0_10px_rgba(0,98,255,0.7)]"></div>
@@ -52,7 +52,7 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
                     : selectedRoute === "eco-friendly"
                     ? "#10B981"
                     : "#00CFD5"}
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   fill="none"
                   strokeDasharray="6,3"
                   className="animate-pulse"
@@ -72,7 +72,7 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
                 return (
                   <div
                     key={index}
-                    className={`absolute flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
+                    className={`absolute flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold shadow-lg ${
                       selectedRoute === "fastest" 
                         ? "bg-nexus-blue text-white" 
                         : selectedRoute === "cheapest"
@@ -87,6 +87,14 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
                   </div>
                 );
               })}
+
+              {/* Cities/Points Labels */}
+              <div className="absolute left-[12%] top-[36%] rounded-md bg-black/50 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
+                Shanghai
+              </div>
+              <div className="absolute right-[12%] top-[64%] rounded-md bg-black/50 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
+                Rotterdam
+              </div>
             </div>
           </div>
         </div>
@@ -118,6 +126,10 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">CO₂ Emissions:</span>
             <span className="font-medium text-white">{selectedRouteDetails?.co2}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground">Transport Modes:</span>
+            <span className="font-medium text-white">{selectedRouteDetails?.modes.join(" → ")}</span>
           </div>
         </div>
       </div>

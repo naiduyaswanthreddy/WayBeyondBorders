@@ -1,175 +1,129 @@
 
 import React from "react";
-import { AlertTriangle, X, Truck, Clock, DollarSign, Route, Navigation } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { AlertTriangle, ArrowRight, Clock, DollarSign } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 
-interface RouteChangeAlertProps {
-  isOpen: boolean;
-  onClose: () => void;
-  alertDetails: {
-    reason: string;
+interface RouteAlertProps {
+  route: {
+    origin: string;
+    destination: string;
+    originalRoute: string;
     newRoute: string;
-    additionalCost: string;
+    reason: string;
+    costChange: string;
     delay: string;
-    originalEta: string;
-    newEta: string;
   };
+  onClose: () => void;
 }
 
-export const RouteChangeAlert: React.FC<RouteChangeAlertProps> = ({
-  isOpen,
-  onClose,
-  alertDetails
+export const RouteChangeAlert: React.FC<RouteAlertProps> = ({ 
+  route,
+  onClose 
 }) => {
   const handleAccept = () => {
     toast({
       title: "Route Change Accepted",
-      description: "Your shipment has been rerouted and is back on track.",
+      description: "Your shipment has been rerouted to avoid delays.",
     });
     onClose();
   };
 
-  if (!isOpen) return null;
-  
+  const handleDecline = () => {
+    toast({
+      title: "Route Change Declined",
+      description: "Your shipment will continue on the original route.",
+      variant: "destructive",
+    });
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center px-4 py-6 sm:items-start sm:justify-end">
-      <div className="w-full max-w-sm rounded-lg border border-red-500/20 bg-background/95 p-4 shadow-lg backdrop-blur-sm sm:mt-16 sm:mr-6">
-        <div className="flex items-start">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/20">
-            <AlertTriangle className="h-6 w-6 text-red-400" />
-          </div>
-          <div className="ml-3 w-0 flex-1">
-            <p className="text-sm font-medium text-white">Route Change Required</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {alertDetails.reason}
-            </p>
-            
-            <div className="mt-3 space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <Route className="mr-1 h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">New Route:</span>
-                </div>
-                <span className="font-medium text-white">{alertDetails.newRoute}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <DollarSign className="mr-1 h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">Additional Cost:</span>
-                </div>
-                <span className="font-medium text-red-400">{alertDetails.additionalCost}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <Clock className="mr-1 h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">Delay:</span>
-                </div>
-                <span className="font-medium text-yellow-400">{alertDetails.delay}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <Navigation className="mr-1 h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">Original ETA:</span>
-                </div>
-                <span className="line-through font-medium text-muted-foreground">{alertDetails.originalEta}</span>
-              </div>
-              
-              <div className="flex items-center justify-between text-xs">
-                <div className="flex items-center">
-                  <Truck className="mr-1 h-3 w-3 text-muted-foreground" />
-                  <span className="text-muted-foreground">New ETA:</span>
-                </div>
-                <span className="font-medium text-white">{alertDetails.newEta}</span>
-              </div>
-            </div>
-            
-            <div className="mt-4 flex gap-2">
-              <Button 
-                size="sm" 
-                className="w-full"
-                onClick={handleAccept}
-              >
-                Accept Change
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="w-full"
-                onClick={onClose}
-              >
-                Details
-              </Button>
+    <AlertDialog defaultOpen={true} open={true} onOpenChange={(open) => !open && onClose()}>
+      <AlertDialogContent className="border-yellow-500/30 bg-gradient-to-b from-background to-yellow-950/20">
+        <AlertDialogHeader>
+          <div className="mb-2 flex items-center justify-center">
+            <div className="rounded-full bg-yellow-500/20 p-3">
+              <AlertTriangle className="h-6 w-6 text-yellow-500" />
             </div>
           </div>
-          <div className="ml-4 flex flex-shrink-0">
-            <button
-              className="inline-flex rounded-md text-muted-foreground hover:text-white focus:outline-none"
-              onClick={onClose}
-            >
-              <X className="h-5 w-5" />
-            </button>
+          <AlertDialogTitle className="text-center text-xl text-white">
+            Route Change Alert
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-center text-white/70">
+            A potential disruption has been detected on your route.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+
+        <div className="mt-4 space-y-4">
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="mb-2 text-sm font-medium text-white/70">Shipment Details</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="text-muted-foreground">Origin:</div>
+              <div className="text-right font-medium text-white">{route.origin}</div>
+              <div className="text-muted-foreground">Destination:</div>
+              <div className="text-right font-medium text-white">{route.destination}</div>
+            </div>
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="mb-2 text-sm font-medium text-white/70">Reason for Change</h4>
+            <p className="text-sm text-white">{route.reason}</p>
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <h4 className="mb-2 text-sm font-medium text-white/70">Route Change</h4>
+            <div className="grid grid-cols-1 gap-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Original:</span>
+                <span className="text-sm font-medium text-white">{route.originalRoute}</span>
+              </div>
+              <div className="flex items-center justify-center">
+                <ArrowRight className="h-4 w-4 text-yellow-500" />
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">New:</span>
+                <span className="text-sm font-medium text-white">{route.newRoute}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="flex items-center">
+                <DollarSign className="mr-2 h-4 w-4 text-yellow-500" />
+                <span className="text-xs text-muted-foreground">Cost Change:</span>
+              </div>
+              <p className="mt-1 text-base font-medium text-white">{route.costChange}</p>
+            </div>
+            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+              <div className="flex items-center">
+                <Clock className="mr-2 h-4 w-4 text-yellow-500" />
+                <span className="text-xs text-muted-foreground">Time Impact:</span>
+              </div>
+              <p className="mt-1 text-base font-medium text-white">{route.delay}</p>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
 
-// Utility function to simulate a route change alert
-export const simulateRouteChangeAlert = (callback: (isOpen: boolean, details: any) => void) => {
-  const reasons = [
-    "Severe weather conditions ahead on current route",
-    "Port congestion detected at destination",
-    "Customs delay at transit point",
-    "Traffic congestion on land route segment",
-    "Mechanical issue with transport vehicle"
-  ];
-  
-  const routes = [
-    "Via Singapore - Bangkok - Dubai",
-    "Northern Sea Route",
-    "Trans-Siberian Rail Route",
-    "Panama Canal Alternative",
-    "Southern African Route"
-  ];
-  
-  // Choose random reason and route
-  const reason = reasons[Math.floor(Math.random() * reasons.length)];
-  const newRoute = routes[Math.floor(Math.random() * routes.length)];
-  
-  // Generate random additional cost between $100-500
-  const additionalCost = `$${Math.floor(Math.random() * 400) + 100}`;
-  
-  // Generate random delay between 4-48 hours
-  const delayHours = Math.floor(Math.random() * 44) + 4;
-  const delay = `${delayHours} hours`;
-  
-  // Calculate ETAs
-  const now = new Date();
-  const originalEta = new Date(now);
-  originalEta.setDate(originalEta.getDate() + 5);
-  
-  const newEta = new Date(originalEta);
-  newEta.setHours(newEta.getHours() + delayHours);
-  
-  const alertDetails = {
-    reason,
-    newRoute,
-    additionalCost,
-    delay,
-    originalEta: originalEta.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    newEta: newEta.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  };
-  
-  callback(true, alertDetails);
-  
-  toast({
-    title: "Alert: Route Change Required",
-    description: reason,
-    variant: "destructive",
-  });
+        <AlertDialogFooter className="mt-6">
+          <AlertDialogCancel onClick={handleDecline}>
+            Keep Original Route
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleAccept} className="bg-yellow-500 text-black hover:bg-yellow-600">
+            Accept New Route
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 };

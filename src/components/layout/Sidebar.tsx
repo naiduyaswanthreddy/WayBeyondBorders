@@ -1,14 +1,16 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
-  LayoutDashboard,
   Map, 
   BarChart3,
   Settings, 
   HelpCircle, 
   LogOut,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Bookmark,
+  Clock
 } from "lucide-react";
 
 interface SidebarItem {
@@ -18,7 +20,7 @@ interface SidebarItem {
 }
 
 const mainItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+  { icon: Bookmark, label: "Bookings", href: "/bookings" },
   { icon: Map, label: "Route Planning", href: "/routes" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: ArrowLeftRight, label: "Compare", href: "/compare" },

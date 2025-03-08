@@ -1,92 +1,123 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Leaf, Award, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Leaf, BadgeCheck, BadgePercent, ArrowRight } from "lucide-react";
+import { useEcoPoints } from "@/context/EcoPointsContext";
 import { toast } from "@/components/ui/use-toast";
 
-interface EcoPointsCardProps {
-  points: number;
-  className?: string;
-}
+export const EcoPointsCard: React.FC = () => {
+  const { points, redeemPoints } = useEcoPoints();
 
-export const EcoPointsCard: React.FC<EcoPointsCardProps> = ({ points, className }) => {
-  const handleRedeem = () => {
+  const handleRedeem100 = () => {
+    redeemPoints(100);
     toast({
-      title: "Redeeming Eco Points",
-      description: "Your discount will be applied to your next shipment.",
+      title: "Discount Redeemed!",
+      description: "You've received a 5% discount on your next shipment.",
+    });
+  };
+
+  const handleRedeem250 = () => {
+    redeemPoints(250);
+    toast({
+      title: "Discount Redeemed!",
+      description: "You've received a 15% discount on your next shipment.",
+    });
+  };
+
+  const handleRedeem500 = () => {
+    redeemPoints(500);
+    toast({
+      title: "Discount Redeemed!",
+      description: "You've received a 30% discount on your next shipment.",
     });
   };
 
   return (
-    <Card className={`bg-gradient-to-br from-background to-green-500/20 border-white/10 ${className}`}>
+    <Card className="bg-gradient-to-br from-background to-green-500/10 border-white/10">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg flex items-center">
-            <Leaf className="mr-2 h-5 w-5 text-green-400" />
-            Eco Points
-          </CardTitle>
-          <span className="flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1 text-xs font-medium text-green-400">
-            <Award className="h-3.5 w-3.5 mr-1" />
-            Level {Math.floor(points / 100) + 1}
-          </span>
+          <div className="flex items-center">
+            <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-500/20">
+              <Leaf className="h-5 w-5 text-green-400" />
+            </div>
+            <CardTitle className="text-lg">Eco Points</CardTitle>
+          </div>
+          <div className="flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1.5 text-sm font-semibold text-green-400">
+            <BadgeCheck className="mr-1 h-4 w-4" />
+            {points} Points
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mt-2 flex items-center justify-between">
-          <div>
-            <p className="text-3xl font-bold text-white">{points}</p>
-            <p className="text-xs text-muted-foreground">Available points</p>
-          </div>
-          <div className="rounded-full bg-white/10 p-3">
-            <Leaf className="h-6 w-6 text-green-400" />
-          </div>
-        </div>
+        <p className="mb-4 text-sm text-muted-foreground">
+          Earn points by choosing eco-friendly routes. Redeem for discounts on future shipments.
+        </p>
 
-        <div className="mt-4">
-          <div className="relative pt-1">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="text-xs font-semibold text-muted-foreground">{points % 100}/100 to next level</span>
-              <span className="text-xs font-semibold text-green-400">{Math.floor(points / 100) + 1}</span>
-            </div>
-            <div className="mb-4 h-2 rounded-full bg-white/10">
-              <div
-                style={{ width: `${points % 100}%` }}
-                className="h-2 rounded-full bg-gradient-to-r from-green-400 to-green-500"
-              ></div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-2 space-y-3">
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3 flex items-center">
-            <Gift className="h-5 w-5 mr-3 text-green-400" />
-            <div>
-              <p className="text-sm font-medium text-white">10% Shipping Discount</p>
-              <p className="text-xs text-muted-foreground">100 points</p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-green-500/20 p-2">
+                <BadgePercent className="h-4 w-4 text-green-400" />
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">5% Discount</h4>
+                <p className="text-xs text-muted-foreground">100 points</p>
+              </div>
             </div>
             <Button 
+              variant="outline" 
               size="sm" 
-              className="ml-auto" 
+              className="gap-1 border-green-500/20 hover:bg-green-500/10 hover:text-green-400"
+              onClick={handleRedeem100}
               disabled={points < 100}
-              onClick={handleRedeem}
             >
-              Redeem
+              Redeem 
+              <ArrowRight className="h-3 w-3" />
             </Button>
           </div>
-          <div className="rounded-lg border border-white/10 bg-white/5 p-3 flex items-center">
-            <Gift className="h-5 w-5 mr-3 text-green-400" />
-            <div>
-              <p className="text-sm font-medium text-white">20% Shipping Discount</p>
-              <p className="text-xs text-muted-foreground">200 points</p>
+          
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-green-500/20 p-2">
+                <BadgePercent className="h-4 w-4 text-green-400" />
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">15% Discount</h4>
+                <p className="text-xs text-muted-foreground">250 points</p>
+              </div>
             </div>
             <Button 
+              variant="outline" 
               size="sm" 
-              className="ml-auto" 
-              disabled={points < 200}
-              onClick={handleRedeem}
+              className="gap-1 border-green-500/20 hover:bg-green-500/10 hover:text-green-400"
+              onClick={handleRedeem250}
+              disabled={points < 250}
             >
-              Redeem
+              Redeem 
+              <ArrowRight className="h-3 w-3" />
+            </Button>
+          </div>
+          
+          <div className="flex items-center justify-between rounded-lg border border-white/10 bg-white/5 p-3">
+            <div className="flex items-center gap-3">
+              <div className="rounded-full bg-green-500/20 p-2">
+                <BadgePercent className="h-4 w-4 text-green-400" />
+              </div>
+              <div>
+                <h4 className="text-sm font-medium">30% Discount</h4>
+                <p className="text-xs text-muted-foreground">500 points</p>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="gap-1 border-green-500/20 hover:bg-green-500/10 hover:text-green-400"
+              onClick={handleRedeem500}
+              disabled={points < 500}
+            >
+              Redeem 
+              <ArrowRight className="h-3 w-3" />
             </Button>
           </div>
         </div>

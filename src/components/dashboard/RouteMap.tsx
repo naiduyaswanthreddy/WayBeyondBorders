@@ -15,10 +15,12 @@ import { toast } from "@/components/ui/use-toast";
 import { RouteMapOptions } from "./route-map/RouteMapOptions";
 import { RouteMapDisplay } from "./route-map/RouteMapDisplay";
 import { RouteMapDetails } from "./route-map/RouteMapDetails";
+import { useEcoPoints } from "@/context/EcoPointsContext";
 
 const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [selectedRoute, setSelectedRoute] = useState<"fastest" | "cheapest" | "reliable" | "eco-friendly">("fastest");
   const navigate = useNavigate();
+  const { addPoints } = useEcoPoints();
 
   const routes = [
     {
@@ -98,12 +100,9 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       description: "Review detailed breakdown below",
     });
 
-    // Add eco points notification if eco-friendly route is selected
-    if (selectedRouteDetails?.isEcoFriendly) {
-      toast({
-        title: "Eco Points Earned!",
-        description: `You've earned ${selectedRouteDetails.ecoPoints} Eco Points for selecting an eco-friendly route.`,
-      });
+    // Award eco points if eco-friendly route is selected
+    if (selectedRouteDetails?.isEcoFriendly && selectedRouteDetails.ecoPoints) {
+      addPoints(selectedRouteDetails.ecoPoints);
     }
   };
 

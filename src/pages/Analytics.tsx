@@ -6,17 +6,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
-  BarChart3, 
   TrendingUp, 
   TrendingDown, 
-  Clock, 
-  DollarSign, 
   Globe, 
   AlertTriangle,
   BarChart,
   LineChart,
   PieChart,
-  Download
+  Download,
+  Lightbulb,
+  ArrowRight
 } from "lucide-react";
 import {
   LineChart as RechartsLineChart,
@@ -38,48 +37,134 @@ const Analytics = () => {
   const [dateRange, setDateRange] = useState("month");
 
   // Sample data for charts
-  const performanceData = [
-    { name: "Jan", shipments: 32, onTime: 28, delay: 4 },
-    { name: "Feb", shipments: 40, onTime: 36, delay: 4 },
-    { name: "Mar", shipments: 45, onTime: 42, delay: 3 },
-    { name: "Apr", shipments: 55, onTime: 52, delay: 3 },
-    { name: "May", shipments: 48, onTime: 46, delay: 2 },
-    { name: "Jun", shipments: 62, onTime: 59, delay: 3 },
-    { name: "Jul", shipments: 70, onTime: 67, delay: 3 },
-  ];
+  const performanceData = {
+    week: [
+      { name: "Mon", shipments: 12, onTime: 11, delay: 1 },
+      { name: "Tue", shipments: 18, onTime: 17, delay: 1 },
+      { name: "Wed", shipments: 15, onTime: 14, delay: 1 },
+      { name: "Thu", shipments: 22, onTime: 20, delay: 2 },
+      { name: "Fri", shipments: 28, onTime: 26, delay: 2 },
+      { name: "Sat", shipments: 16, onTime: 15, delay: 1 },
+      { name: "Sun", shipments: 8, onTime: 8, delay: 0 },
+    ],
+    month: [
+      { name: "Week 1", shipments: 32, onTime: 28, delay: 4 },
+      { name: "Week 2", shipments: 40, onTime: 36, delay: 4 },
+      { name: "Week 3", shipments: 45, onTime: 42, delay: 3 },
+      { name: "Week 4", shipments: 55, onTime: 52, delay: 3 },
+    ],
+    quarter: [
+      { name: "Jan", shipments: 120, onTime: 108, delay: 12 },
+      { name: "Feb", shipments: 135, onTime: 125, delay: 10 },
+      { name: "Mar", shipments: 150, onTime: 140, delay: 10 },
+    ],
+    year: [
+      { name: "Q1", shipments: 405, onTime: 373, delay: 32 },
+      { name: "Q2", shipments: 520, onTime: 488, delay: 32 },
+      { name: "Q3", shipments: 480, onTime: 456, delay: 24 },
+      { name: "Q4", shipments: 550, onTime: 528, delay: 22 },
+    ]
+  };
 
-  const costData = [
-    { name: "Jan", actual: 4200, optimized: 3800 },
-    { name: "Feb", actual: 4500, optimized: 4000 },
-    { name: "Mar", actual: 4800, optimized: 4200 },
-    { name: "Apr", actual: 5100, optimized: 4400 },
-    { name: "May", actual: 4900, optimized: 4200 },
-    { name: "Jun", actual: 5400, optimized: 4600 },
-    { name: "Jul", actual: 5800, optimized: 4900 },
-  ];
+  const costData = {
+    week: [
+      { name: "Mon", actual: 1200, optimized: 1050 },
+      { name: "Tue", actual: 1400, optimized: 1200 },
+      { name: "Wed", actual: 1300, optimized: 1100 },
+      { name: "Thu", actual: 1600, optimized: 1350 },
+      { name: "Fri", actual: 1800, optimized: 1500 },
+      { name: "Sat", actual: 1200, optimized: 1000 },
+      { name: "Sun", actual: 800, optimized: 700 },
+    ],
+    month: [
+      { name: "Week 1", actual: 4200, optimized: 3800 },
+      { name: "Week 2", actual: 4500, optimized: 4000 },
+      { name: "Week 3", actual: 4800, optimized: 4200 },
+      { name: "Week 4", actual: 5100, optimized: 4400 },
+    ],
+    quarter: [
+      { name: "Jan", actual: 18000, optimized: 15500 },
+      { name: "Feb", actual: 19500, optimized: 16800 },
+      { name: "Mar", actual: 21000, optimized: 18000 },
+    ],
+    year: [
+      { name: "Q1", actual: 58500, optimized: 50300 },
+      { name: "Q2", actual: 65000, optimized: 56000 },
+      { name: "Q3", actual: 61000, optimized: 53000 },
+      { name: "Q4", actual: 70000, optimized: 61000 },
+    ]
+  };
 
-  const transportModeData = [
-    { name: "Sea", value: 45 },
-    { name: "Air", value: 30 },
-    { name: "Rail", value: 15 },
-    { name: "Road", value: 10 },
-  ];
+  const transportModeData = {
+    week: [
+      { name: "Sea", value: 42 },
+      { name: "Air", value: 35 },
+      { name: "Rail", value: 13 },
+      { name: "Road", value: 10 },
+    ],
+    month: [
+      { name: "Sea", value: 45 },
+      { name: "Air", value: 30 },
+      { name: "Rail", value: 15 },
+      { name: "Road", value: 10 },
+    ],
+    quarter: [
+      { name: "Sea", value: 48 },
+      { name: "Air", value: 27 },
+      { name: "Rail", value: 15 },
+      { name: "Road", value: 10 },
+    ],
+    year: [
+      { name: "Sea", value: 50 },
+      { name: "Air", value: 25 },
+      { name: "Rail", value: 15 },
+      { name: "Road", value: 10 },
+    ]
+  };
 
-  const routeData = [
-    { name: "Asia - Europe", shipments: 42 },
-    { name: "Asia - North America", shipments: 28 },
-    { name: "Europe - North America", shipments: 18 },
-    { name: "Intra-Asia", shipments: 12 },
-    { name: "Africa - Europe", shipments: 8 },
-    { name: "South America - North America", shipments: 7 },
-  ];
+  const routeData = {
+    week: [
+      { name: "Asia - Europe", shipments: 15 },
+      { name: "Asia - North America", shipments: 12 },
+      { name: "Europe - North America", shipments: 8 },
+      { name: "Intra-Asia", shipments: 6 },
+      { name: "Africa - Europe", shipments: 4 },
+      { name: "South America - North America", shipments: 3 },
+    ],
+    month: [
+      { name: "Asia - Europe", shipments: 42 },
+      { name: "Asia - North America", shipments: 28 },
+      { name: "Europe - North America", shipments: 18 },
+      { name: "Intra-Asia", shipments: 12 },
+      { name: "Africa - Europe", shipments: 8 },
+      { name: "South America - North America", shipments: 7 },
+    ],
+    quarter: [
+      { name: "Asia - Europe", shipments: 125 },
+      { name: "Asia - North America", shipments: 95 },
+      { name: "Europe - North America", shipments: 65 },
+      { name: "Intra-Asia", shipments: 45 },
+      { name: "Africa - Europe", shipments: 30 },
+      { name: "South America - North America", shipments: 25 },
+    ],
+    year: [
+      { name: "Asia - Europe", shipments: 520 },
+      { name: "Asia - North America", shipments: 380 },
+      { name: "Europe - North America", shipments: 260 },
+      { name: "Intra-Asia", shipments: 180 },
+      { name: "Africa - Europe", shipments: 120 },
+      { name: "South America - North America", shipments: 100 },
+    ]
+  };
 
   const COLORS = ["#0062FF", "#6E36E5", "#00CFD5", "#F43F5E", "#F59E0B", "#10B981"];
 
-  const totalSavings = costData.reduce((sum, item) => sum + (item.actual - item.optimized), 0);
-  const averageSavingsPercent = Math.round((totalSavings / costData.reduce((sum, item) => sum + item.actual, 0)) * 100);
-  const totalShipments = performanceData.reduce((sum, item) => sum + item.shipments, 0);
-  const onTimePercentage = Math.round((performanceData.reduce((sum, item) => sum + item.onTime, 0) / totalShipments) * 100);
+  const activeData = {
+    performanceData: performanceData[dateRange as keyof typeof performanceData],
+    costData: costData[dateRange as keyof typeof costData],
+    transportModeData: transportModeData[dateRange as keyof typeof transportModeData],
+    routeData: routeData[dateRange as keyof typeof routeData]
+  };
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -106,86 +191,11 @@ const Analytics = () => {
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight text-white">
-              Analytics Dashboard
+              Analytics
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Comprehensive metrics and insights to optimize your logistics operations
+              Explore shipping patterns and optimize your logistics with AI-powered insights
             </p>
-          </div>
-          
-          {/* Overview Cards */}
-          <div className="grid gap-6 md:grid-cols-4">
-            <Card className="bg-card border-white/10 hover:border-white/20 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Total Shipments</p>
-                    <h3 className="mt-2 text-3xl font-bold text-white">{totalShipments}</h3>
-                    <p className="mt-1 flex items-center text-sm text-green-400">
-                      <TrendingUp className="mr-1 h-4 w-4" />
-                      <span>+12.5% from last period</span>
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-nexus-blue/20 p-3">
-                    <BarChart3 className="h-6 w-6 text-nexus-blue" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-card border-white/10 hover:border-white/20 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">On-Time Delivery</p>
-                    <h3 className="mt-2 text-3xl font-bold text-white">{onTimePercentage}%</h3>
-                    <p className="mt-1 flex items-center text-sm text-green-400">
-                      <TrendingUp className="mr-1 h-4 w-4" />
-                      <span>+3.2% from last period</span>
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-nexus-teal/20 p-3">
-                    <Clock className="h-6 w-6 text-nexus-teal" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-card border-white/10 hover:border-white/20 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Cost Savings</p>
-                    <h3 className="mt-2 text-3xl font-bold text-white">${totalSavings.toLocaleString()}</h3>
-                    <p className="mt-1 flex items-center text-sm text-green-400">
-                      <TrendingDown className="mr-1 h-4 w-4" />
-                      <span>{averageSavingsPercent}% reduction</span>
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-nexus-purple/20 p-3">
-                    <DollarSign className="h-6 w-6 text-nexus-purple" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card className="bg-card border-white/10 hover:border-white/20 transition-colors">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Routes Covered</p>
-                    <h3 className="mt-2 text-3xl font-bold text-white">24</h3>
-                    <p className="mt-1 flex items-center text-sm text-yellow-400">
-                      <AlertTriangle className="mr-1 h-4 w-4" />
-                      <span>3 with weather alerts</span>
-                    </p>
-                  </div>
-                  <div className="rounded-full bg-nexus-blue/20 p-3">
-                    <Globe className="h-6 w-6 text-nexus-blue" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
           
           {/* Charts Section */}
@@ -223,7 +233,7 @@ const Analytics = () => {
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsLineChart
-                        data={performanceData}
+                        data={activeData.performanceData}
                         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -279,7 +289,7 @@ const Analytics = () => {
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsBarChart
-                        data={costData}
+                        data={activeData.costData}
                         margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
@@ -326,7 +336,7 @@ const Analytics = () => {
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsPieChart>
                         <Pie
-                          data={transportModeData}
+                          data={activeData.transportModeData}
                           cx="50%"
                           cy="50%"
                           labelLine={false}
@@ -335,7 +345,7 @@ const Analytics = () => {
                           dataKey="value"
                           label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                         >
-                          {transportModeData.map((entry, index) => (
+                          {activeData.transportModeData.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                           ))}
                         </Pie>
@@ -361,7 +371,7 @@ const Analytics = () => {
                   <div className="h-80">
                     <ResponsiveContainer width="100%" height="100%">
                       <RechartsBarChart
-                        data={routeData}
+                        data={activeData.routeData}
                         layout="vertical"
                         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                       >
@@ -394,7 +404,7 @@ const Analytics = () => {
             </div>
           </div>
           
-          {/* AI Insights Section */}
+          {/* AI Insights Section - Improved with better predictions */}
           <div className="mt-8">
             <h2 className="mb-6 text-xl font-semibold text-white">AI-Powered Insights</h2>
             
@@ -406,9 +416,21 @@ const Analytics = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-white">Cost Reduction Opportunity</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    AI analysis suggests consolidating shipments to Mumbai and Dubai could reduce costs by 15% next month.
+                    AI analysis shows you could save 18% on Shanghai-Hamburg routes by switching to rail for the middle segment. Estimated savings: $12,450 over the next quarter.
                   </p>
-                  <Button className="mt-4 w-full nexus-button-primary">View Details</Button>
+                  <div className="mt-4 rounded-lg bg-white/5 p-3">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4 text-nexus-blue" />
+                      <h4 className="text-sm font-medium text-white">AI Recommendation</h4>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Schedule bulk shipments during off-peak season (Aug-Oct) to leverage better rates. This pattern alone saved similar customers 22% last year.
+                    </p>
+                  </div>
+                  <Button className="mt-4 w-full nexus-button-primary gap-2">
+                    View Details 
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </CardContent>
               </Card>
               
@@ -419,9 +441,21 @@ const Analytics = () => {
                   </div>
                   <h3 className="text-lg font-semibold text-white">Weather Disruption Forecast</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Potential weather disruptions detected on Asia-Pacific routes in the next 2 weeks. Consider alternate routing.
+                    Severe typhoon warning detected in South China Sea for June 12-18. This will impact 16 of your scheduled shipments with potential delays of 4-7 days.
                   </p>
-                  <Button className="mt-4 w-full nexus-button-secondary">View Alternatives</Button>
+                  <div className="mt-4 rounded-lg bg-white/5 p-3">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4 text-nexus-purple" />
+                      <h4 className="text-sm font-medium text-white">AI Recommendation</h4>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Reroute through Taiwan Strait earlier than planned to avoid 89% of projected delays. Cost impact: +8% but avoiding 5-day delays.
+                    </p>
+                  </div>
+                  <Button className="mt-4 w-full nexus-button-secondary gap-2">
+                    View Alternatives 
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </CardContent>
               </Card>
               
@@ -430,11 +464,23 @@ const Analytics = () => {
                   <div className="mb-4 rounded-full bg-nexus-teal/20 p-2 w-fit">
                     <Globe className="h-5 w-5 text-nexus-teal" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white">New Route Recommendation</h3>
+                  <h3 className="text-lg font-semibold text-white">New Route Opportunity</h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Based on your shipping patterns, a new rail route through Central Asia could be 22% more efficient.
+                    A new rail route through Kazakhstan is opening next month. For your India-Europe shipments, this will reduce transit time by 35% and costs by 18% compared to sea routes.
                   </p>
-                  <Button className="mt-4 w-full nexus-button-accent">Explore Route</Button>
+                  <div className="mt-4 rounded-lg bg-white/5 p-3">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="h-4 w-4 text-nexus-teal" />
+                      <h4 className="text-sm font-medium text-white">AI Recommendation</h4>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Lock in capacity now at introductory rates - historical data shows new route prices increase by 25% after the first 3 months of operation.
+                    </p>
+                  </div>
+                  <Button className="mt-4 w-full nexus-button-accent gap-2">
+                    Explore Route 
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
                 </CardContent>
               </Card>
             </div>
