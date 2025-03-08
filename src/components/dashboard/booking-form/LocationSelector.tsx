@@ -5,13 +5,6 @@ import { Check, ChevronsUpDown, MapPin, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -109,7 +102,7 @@ const LocationSelector = ({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0" align="start">
+        <PopoverContent className="w-[300px] p-0 bg-popover z-50" align="start">
           <Tabs
             defaultValue={inputMode}
             value={inputMode}
@@ -122,7 +115,7 @@ const LocationSelector = ({
             </TabsList>
             <TabsContent value="saved" className="mt-0">
               <div className="flex flex-col">
-                <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+                <div className="flex items-center border-b px-3">
                   <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
                   <input
                     value={searchQuery}
@@ -132,11 +125,10 @@ const LocationSelector = ({
                   />
                 </div>
 
-                <CommandEmpty>No location found. Try manual entry.</CommandEmpty>
                 <div className="max-h-[300px] overflow-y-auto">
                   {filteredLocations.length === 0 ? (
                     <div className="py-6 text-center text-sm text-muted-foreground">
-                      No locations found
+                      No locations found. Try manual entry.
                     </div>
                   ) : (
                     filteredLocations.map((location) => (
