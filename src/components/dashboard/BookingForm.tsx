@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -28,9 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
-// Enhanced location list with more specific transport modes
 const locations = [
-  // Major global ports with all transport options
   { label: "Shanghai, China", value: "shanghai", port: true, airport: true, roadHub: true, description: "World's busiest container port" },
   { label: "Singapore", value: "singapore", port: true, airport: true, roadHub: true, description: "Major maritime hub in Southeast Asia" },
   { label: "Rotterdam, Netherlands", value: "rotterdam", port: true, airport: true, roadHub: true, description: "Europe's largest seaport" },
@@ -39,19 +36,16 @@ const locations = [
   { label: "Hamburg, Germany", value: "hamburg", port: true, airport: true, roadHub: true, description: "Germany's largest port" },
   { label: "New York, USA", value: "newyork", port: true, airport: true, roadHub: true, description: "Major East Coast logistics center" },
   
-  // Air-focused hubs
   { label: "Hong Kong, China", value: "hongkong", port: true, airport: true, roadHub: true, description: "Premier air freight hub" },
   { label: "Memphis, USA", value: "memphis", port: false, airport: true, roadHub: true, description: "Global air cargo superhub" },
   { label: "Incheon, South Korea", value: "incheon", port: true, airport: true, roadHub: true, description: "Leading Asian air freight center" },
   { label: "Frankfurt, Germany", value: "frankfurt", port: false, airport: true, roadHub: true, description: "Central European air cargo hub" },
   
-  // Sea-focused ports
   { label: "Busan, South Korea", value: "busan", port: true, airport: false, roadHub: true, description: "Northeast Asia's transport hub" },
   { label: "Antwerp, Belgium", value: "antwerp", port: true, airport: false, roadHub: true, description: "Major European port" },
   { label: "Ningbo, China", value: "ningbo", port: true, airport: false, roadHub: true, description: "Second busiest port in China" },
   { label: "Jebel Ali, UAE", value: "jebelali", port: true, airport: false, roadHub: true, description: "Middle East's largest marine terminal" },
   
-  // Mixed transport hubs
   { label: "Tokyo, Japan", value: "tokyo", port: true, airport: true, roadHub: true, description: "Japan's main logistics gateway" },
   { label: "Sydney, Australia", value: "sydney", port: true, airport: true, roadHub: true, description: "Australia's busiest port" },
   { label: "Mumbai, India", value: "mumbai", port: true, airport: true, roadHub: true, description: "India's largest port city" },
@@ -154,7 +148,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking.`
+          description: `"${template.name}" template has been applied to your new booking."
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
@@ -399,11 +393,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
+            <PopoverContent className="w-full p-0" align="start" sideOffset={5}>
+              <Command className="w-full">
                 <CommandInput placeholder="Search location..." />
                 <CommandEmpty>No location found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
                   {locations.map((location) => (
                     <CommandItem
                       key={location.value}
@@ -459,11 +453,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
-              <Command>
+            <PopoverContent className="w-full p-0" align="start" sideOffset={5}>
+              <Command className="w-full">
                 <CommandInput placeholder="Search location..." />
                 <CommandEmpty>No location found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
                   {locations.map((location) => (
                     <CommandItem
                       key={location.value}
