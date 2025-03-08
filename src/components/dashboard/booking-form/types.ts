@@ -14,8 +14,10 @@ export interface TemplateData {
   name: string;
   origin: string;
   originLabel?: string;
+  originInput?: string;
   destination: string;
   destinationLabel?: string;
+  destinationInput?: string;
   cargoType: string;
   weight?: string;
   transportMode?: string;

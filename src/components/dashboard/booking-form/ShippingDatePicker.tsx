@@ -1,7 +1,8 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -9,14 +10,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 
 interface ShippingDatePickerProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
+  error?: string;
 }
 
-const ShippingDatePicker: React.FC<ShippingDatePickerProps> = ({ date, setDate }) => {
+const ShippingDatePicker: React.FC<ShippingDatePickerProps> = ({
+  date,
+  setDate,
+  error
+}) => {
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-muted-foreground">
@@ -28,10 +33,11 @@ const ShippingDatePicker: React.FC<ShippingDatePickerProps> = ({ date, setDate }
             variant={"outline"}
             className={cn(
               "w-full justify-start border-white/10 bg-muted text-left font-normal",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
+              error && "border-destructive"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-nexus-teal" />
+            <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? format(date, "PPP") : <span>Select date</span>}
           </Button>
         </PopoverTrigger>
@@ -41,7 +47,7 @@ const ShippingDatePicker: React.FC<ShippingDatePickerProps> = ({ date, setDate }
             selected={date}
             onSelect={setDate}
             initialFocus
-            className="p-3 pointer-events-auto"
+            disabled={(date) => date < new Date()}
           />
         </PopoverContent>
       </Popover>

@@ -10,7 +10,8 @@ import {
   Umbrella, 
   Leaf,
   Download,
-  BadgeDollarSign
+  BadgeDollarSign,
+  ArrowDownUp
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { RouteMapOptions } from "./route-map/RouteMapOptions";
@@ -18,6 +19,8 @@ import { RouteMapDisplay } from "./route-map/RouteMapDisplay";
 import { RouteMapDetails } from "./route-map/RouteMapDetails";
 import { useEcoPoints } from "@/context/EcoPointsContext";
 import { Button } from "@/components/ui/button";
+import GoogleMapDisplay from "./maps/GoogleMapDisplay";
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 const majorLocations = [
   // Asia
@@ -108,6 +111,8 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [showCostOptimizer, setShowCostOptimizer] = useState<boolean>(false);
   const [optimizationComplete, setOptimizationComplete] = useState<boolean>(false);
   const [savingsAmount, setSavingsAmount] = useState<number>(0);
+  const [showGoogleMap, setShowGoogleMap] = useState<boolean>(false);
+  const [googleMapDialogOpen, setGoogleMapDialogOpen] = useState<boolean>(false);
   
   const navigate = useNavigate();
   const { addPoints } = useEcoPoints();
@@ -325,6 +330,19 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     }, 1500);
   };
 
+  const toggleMapView = () => {
+    setShowGoogleMap(!showGoogleMap);
+    
+    toast({
+      title: showGoogleMap ? "Switched to Stylized View" : "Switched to Google Maps View",
+      description: showGoogleMap ? "Using simplified route visualization" : "Using real-time Google Maps data",
+    });
+  };
+  
+  const openFullMapView = () => {
+    setGoogleMapDialogOpen(true);
+  };
+
   const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
 
   return (
@@ -335,6 +353,15 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
           <span className="rounded-full bg-nexus-purple/20 px-3 py-1 text-xs font-medium text-nexus-purple">
             AI Optimized
           </span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1 text-xs"
+            onClick={toggleMapView}
+          >
+            <ArrowDownUp className="h-3 w-3" />
+            {showGoogleMap ? "Switch to Stylized" : "Switch to Google Maps"}
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
@@ -362,12 +389,28 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
         onRouteSelect={handleRouteSelect}
       />
 
-      <RouteMapDisplay 
-        selectedRoute={selectedRoute}
-        selectedRouteDetails={selectedRouteDetails}
-        origin={originLabel}
-        destination={destinationLabel}
-      />
+      {showGoogleMap ? (
+        <div className="relative">
+          <GoogleMapDisplay 
+            origin={originLabel}
+            destination={destinationLabel}
+          />
+          <Button
+            size="sm"
+            className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-md"
+            onClick={openFullMapView}
+          >
+            View Larger Map
+          </Button>
+        </div>
+      ) : (
+        <RouteMapDisplay 
+          selectedRoute={selectedRoute}
+          selectedRouteDetails={selectedRouteDetails}
+          origin={originLabel}
+          destination={destinationLabel}
+        />
+      )}
       
       <RouteMapDetails selectedRouteDetails={selectedRouteDetails} />
       
@@ -462,6 +505,24 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
           )}
         </div>
       )}
+      
+      <Dialog open={googleMapDialogOpen} onOpenChange={setGoogleMapDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogTitle>Route Map: {originLabel} to {destinationLabel}</DialogTitle>
+          <DialogDescription>
+            Real-time route visualization with traffic, weather and customs data
+          </DialogDescription>
+          <div className="h-[600px] w-full">
+            <GoogleMapDisplay 
+              origin={originLabel}
+              destination={destinationLabel}
+            />
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setGoogleMapDialogOpen(false)}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

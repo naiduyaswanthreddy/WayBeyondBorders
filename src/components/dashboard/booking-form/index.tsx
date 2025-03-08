@@ -14,6 +14,7 @@ import WeightInput from "./WeightInput";
 import EstimatedArrival from "./EstimatedArrival";
 import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
+import TermsConfirmationDialog from "./TermsConfirmationDialog";
 
 // Import data and types
 import { locations, cargoTypes, transportModes } from "./data";
@@ -22,7 +23,9 @@ import { BookingFormProps, CargoItem, TemplateData } from "./types";
 const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [date, setDate] = useState<Date | undefined>();
   const [origin, setOrigin] = useState("");
+  const [originInput, setOriginInput] = useState("");
   const [destination, setDestination] = useState("");
+  const [destinationInput, setDestinationInput] = useState("");
   const [cargoType, setCargoType] = useState("");
   const [weight, setWeight] = useState("");
   const [transportMode, setTransportMode] = useState("any");
@@ -30,6 +33,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [restrictionWarning, setRestrictionWarning] = useState("");
   const [availableRoutes, setAvailableRoutes] = useState<string[]>([]);
   const [cargoItems, setCargoItems] = useState<CargoItem[]>([]);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -73,9 +79,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       
       const routeData = {
         origin,
-        originLabel: originLocation?.label || origin,
+        originLabel: originLocation?.label || originInput || origin,
         destination,
-        destinationLabel: destLocation?.label || destination,
+        destinationLabel: destLocation?.label || destinationInput || destination,
         date: date ? format(date, 'yyyy-MM-dd') : null,
         cargoType,
         weight,
@@ -89,7 +95,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeData });
       window.dispatchEvent(updateEvent);
     }
-  }, [origin, destination, date, cargoType, weight, transportMode, cargoItems, availableRoutes]);
+  }, [origin, destination, originInput, destinationInput, date, cargoType, weight, transportMode, cargoItems, availableRoutes]);
 
   useEffect(() => {
     if (!cargoType) return;
@@ -170,8 +176,22 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     setTransportMode(value);
   };
 
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!origin && !originInput) errors.origin = "Source location is required";
+    if (!destination && !destinationInput) errors.destination = "Destination location is required";
+    if (!date) errors.date = "Shipping date is required";
+    if (!cargoType) errors.cargoType = "Cargo type is required";
+    if (!weight && cargoItems.length === 0) errors.weight = "Weight or cargo items are required";
+    
+    setValidationErrors(errors);
+    
+    return Object.keys(errors).length === 0;
+  };
+
   const handleFindRoutes = () => {
-    if (!origin || !destination || !date || !cargoType || (!weight && cargoItems.length === 0)) {
+    if (!validateForm()) {
       toast({
         title: "Incomplete Information",
         description: "Please fill in all required fields to find optimal routes.",
@@ -185,9 +205,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
 
     const bookingData = {
       origin,
-      originLabel: originLocation?.label || origin,
+      originLabel: originLocation?.label || originInput,
       destination,
-      destinationLabel: destLocation?.label || destination,
+      destinationLabel: destLocation?.label || destinationInput,
       date: date ? format(date, 'yyyy-MM-dd') : null,
       cargoType,
       weight,
@@ -207,9 +227,69 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       navigate('/routes');
     }, 500);
   };
+  
+  const handleBookingConfirmation = () => {
+    if (!validateForm()) {
+      toast({
+        title: "Incomplete Information",
+        description: "Please fill in all required fields before confirming booking.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setConfirmDialogOpen(true);
+  };
+  
+  const completeBooking = () => {
+    const originLocation = locations.find(loc => loc.value === origin);
+    const destLocation = locations.find(loc => loc.value === destination);
+
+    const bookingData = {
+      id: `BK-${Date.now().toString().slice(-6)}`,
+      origin,
+      originLabel: originLocation?.label || originInput,
+      destination,
+      destinationLabel: destLocation?.label || destinationInput,
+      date: date ? format(date, 'yyyy-MM-dd') : null,
+      cargoType,
+      weight,
+      transportMode,
+      cargoItems,
+      availableRoutes,
+      status: "Confirmed",
+      createdAt: new Date().toISOString()
+    };
+    
+    // Save to local storage for history
+    const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
+    bookingHistory.push(bookingData);
+    localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
+    
+    toast({
+      title: "Booking Confirmed",
+      description: `Booking #${bookingData.id} has been confirmed successfully.`,
+    });
+    
+    // Reset form
+    setOrigin("");
+    setOriginInput("");
+    setDestination("");
+    setDestinationInput("");
+    setDate(undefined);
+    setCargoType("");
+    setWeight("");
+    setTransportMode("any");
+    setCargoItems([]);
+    
+    // Navigate to booking history
+    setTimeout(() => {
+      navigate('/bookings', { state: { activeTab: 'history' } });
+    }, 1000);
+  };
 
   const handleSaveTemplate = () => {
-    if (!origin || !destination || !cargoType) {
+    if (!origin && !originInput || !destination && !destinationInput || !cargoType) {
       toast({
         title: "Incomplete Template",
         description: "Please fill in at least origin, destination and cargo type to save a template.",
@@ -218,14 +298,19 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
     
-    const templateName = `${locations.find(loc => loc.value === origin)?.label} to ${locations.find(loc => loc.value === destination)?.label}`;
+    const originLocation = locations.find(loc => loc.value === origin);
+    const destLocation = locations.find(loc => loc.value === destination);
+    
+    const templateName = `${originLocation?.label || originInput} to ${destLocation?.label || destinationInput}`;
     const templates = JSON.parse(localStorage.getItem('shipmentTemplates') || '[]');
     
     templates.push({
       id: Date.now().toString(),
       name: templateName,
       origin,
+      originInput,
       destination,
+      destinationInput,
       cargoType,
       transportMode,
       cargoItems
@@ -249,33 +334,61 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        <LocationSelector 
-          label="Origin"
-          value={origin}
-          onChange={setOrigin}
-          locations={locations}
-          placeholder="Select origin location"
-        />
+        <div className="space-y-2">
+          <LocationSelector 
+            label="Origin"
+            value={origin}
+            onChange={setOrigin}
+            manualInput={originInput}
+            onManualInputChange={setOriginInput}
+            locations={locations}
+            placeholder="Select or enter origin location"
+            error={validationErrors.origin}
+          />
+          {validationErrors.origin && (
+            <p className="text-xs text-destructive">{validationErrors.origin}</p>
+          )}
+        </div>
 
-        <LocationSelector 
-          label="Destination"
-          value={destination}
-          onChange={setDestination}
-          locations={locations}
-          placeholder="Select destination location"
-        />
+        <div className="space-y-2">
+          <LocationSelector 
+            label="Destination"
+            value={destination}
+            onChange={setDestination}
+            manualInput={destinationInput}
+            onManualInputChange={setDestinationInput}
+            locations={locations}
+            placeholder="Select or enter destination location"
+            error={validationErrors.destination}
+          />
+          {validationErrors.destination && (
+            <p className="text-xs text-destructive">{validationErrors.destination}</p>
+          )}
+        </div>
 
-        <ShippingDatePicker 
-          date={date}
-          setDate={setDate}
-        />
+        <div className="space-y-2">
+          <ShippingDatePicker 
+            date={date}
+            setDate={setDate}
+            error={validationErrors.date}
+          />
+          {validationErrors.date && (
+            <p className="text-xs text-destructive">{validationErrors.date}</p>
+          )}
+        </div>
 
-        <CargoTypeSelector 
-          cargoType={cargoType}
-          setCargoType={setCargoType}
-          cargoTypes={cargoTypes}
-          restrictions={restrictions}
-        />
+        <div className="space-y-2">
+          <CargoTypeSelector 
+            cargoType={cargoType}
+            setCargoType={setCargoType}
+            cargoTypes={cargoTypes}
+            restrictions={restrictions}
+            error={validationErrors.cargoType}
+          />
+          {validationErrors.cargoType && (
+            <p className="text-xs text-destructive">{validationErrors.cargoType}</p>
+          )}
+        </div>
 
         <TransportModeSelector 
           transportMode={transportMode}
@@ -287,14 +400,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           restrictionWarning={restrictionWarning}
         />
 
-        <WeightInput 
-          weight={weight}
-          setWeight={setWeight}
-        />
+        <div className="space-y-2">
+          <WeightInput 
+            weight={weight}
+            setWeight={setWeight}
+            error={validationErrors.weight}
+          />
+          {validationErrors.weight && (
+            <p className="text-xs text-destructive">{validationErrors.weight}</p>
+          )}
+        </div>
         
         <EstimatedArrival 
-          origin={origin}
-          destination={destination}
+          origin={origin || originInput}
+          destination={destination || destinationInput}
         />
         
         <CargoItemsSection 
@@ -304,9 +423,16 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
 
         <ActionButtons 
           handleSaveTemplate={handleSaveTemplate}
+          handleBookingConfirmation={handleBookingConfirmation}
           handleFindRoutes={handleFindRoutes}
         />
       </div>
+      
+      <TermsConfirmationDialog
+        open={confirmDialogOpen}
+        onOpenChange={setConfirmDialogOpen}
+        onConfirm={completeBooking}
+      />
     </div>
   );
 };

@@ -11,9 +11,9 @@ const Hero = () => {
   const handleBookShipment = () => {
     toast({
       title: "Booking Started",
-      description: "Redirecting to route planning...",
+      description: "Redirecting to booking page...",
     });
-    navigate("/routes");
+    navigate("/bookings");
   };
 
   return (
