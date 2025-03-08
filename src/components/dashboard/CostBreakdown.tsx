@@ -1,4 +1,4 @@
-<lov-code>
+
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
@@ -764,3 +764,28 @@ const CostBreakdown: React.FC<CostBreakdownProps> = ({ className }) => {
               +{Math.round(financialBreakdown.profitMargin * 100)}%
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Optimization Notice */}
+      <div className="mt-4 rounded-lg bg-nexus-blue/10 p-4 border border-nexus-blue/20">
+        <div className="flex">
+          <Info className="mr-3 h-5 w-5 flex-shrink-0 text-nexus-blue" />
+          <div>
+            <h4 className="text-sm font-medium text-white">AI Cost Optimization</h4>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Our AI has identified potential savings of {currencySymbols[userCurrency] || null} 
+              {Math.round(financialBreakdown.totalCost * 0.12).toLocaleString()} through alternative routing and carrier selection.
+            </p>
+            <Button variant="link" size="sm" className="mt-2 h-auto p-0 text-xs text-nexus-blue">
+              View optimization details
+              <ArrowRight className="ml-1 h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CostBreakdown;
