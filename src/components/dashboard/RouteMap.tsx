@@ -9,13 +9,15 @@ import {
   Droplets, 
   Wind, 
   Umbrella, 
-  Leaf
+  Leaf,
+  Download
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { RouteMapOptions } from "./route-map/RouteMapOptions";
 import { RouteMapDisplay } from "./route-map/RouteMapDisplay";
 import { RouteMapDetails } from "./route-map/RouteMapDetails";
 import { useEcoPoints } from "@/context/EcoPointsContext";
+import { Button } from "@/components/ui/button";
 
 const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [selectedRoute, setSelectedRoute] = useState<"fastest" | "cheapest" | "reliable" | "eco-friendly">("fastest");
@@ -112,15 +114,52 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     }
   };
 
+  const handleDownloadRoute = () => {
+    const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
+    if (!selectedRouteDetails) return;
+    
+    // Create a JSON Blob
+    const routeData = JSON.stringify(selectedRouteDetails, null, 2);
+    const blob = new Blob([routeData], { type: 'application/json' });
+    
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `route-${selectedRouteDetails.id}.json`;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Route Details Downloaded",
+      description: "Route information saved to your device",
+    });
+  };
+
   const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
 
   return (
     <div className={cn("nexus-card-purple space-y-6 p-6", className)}>
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold text-white">Smart Route Selection</h2>
-        <span className="rounded-full bg-nexus-purple/20 px-3 py-1 text-xs font-medium text-nexus-purple">
-          AI Optimized
-        </span>
+        <div className="flex gap-2">
+          <span className="rounded-full bg-nexus-purple/20 px-3 py-1 text-xs font-medium text-nexus-purple">
+            AI Optimized
+          </span>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-1 text-xs"
+            onClick={handleDownloadRoute}
+          >
+            <Download className="h-3 w-3" />
+            Download
+          </Button>
+        </div>
       </div>
 
       <RouteMapOptions 

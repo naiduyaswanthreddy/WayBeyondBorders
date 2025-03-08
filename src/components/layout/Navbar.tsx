@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   Bell, 
@@ -10,7 +10,12 @@ import {
   User, 
   Globe, 
   ChevronDown,
-  X
+  X,
+  Map,
+  BarChart3,
+  Bookmark,
+  ArrowLeftRight,
+  LogOut
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -21,6 +26,7 @@ import {
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -48,6 +54,14 @@ const Navbar = () => {
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleLogout = () => {
+    toast({
+      title: "Logged out",
+      description: "You have been successfully logged out",
+    });
+    navigate('/login');
   };
 
   return (
@@ -103,7 +117,7 @@ const Navbar = () => {
         </div>
 
         <nav className="hidden md:block">
-          <ul className="flex items-center gap-x-8">
+          <ul className="flex items-center gap-x-6">
             <li>
               <Link 
                 to="/dashboard" 
@@ -117,7 +131,21 @@ const Navbar = () => {
                 to="/bookings" 
                 className={`text-sm font-medium transition-colors duration-200 ${isActive('/bookings') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
               >
-                Bookings
+                <span className="flex items-center gap-1">
+                  <Bookmark className="h-4 w-4" />
+                  Bookings
+                </span>
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/routes" 
+                className={`text-sm font-medium transition-colors duration-200 ${isActive('/routes') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
+              >
+                <span className="flex items-center gap-1">
+                  <Map className="h-4 w-4" />
+                  Route Planning
+                </span>
               </Link>
             </li>
             <li>
@@ -125,15 +153,21 @@ const Navbar = () => {
                 to="/analytics" 
                 className={`text-sm font-medium transition-colors duration-200 ${isActive('/analytics') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
               >
-                Analytics
+                <span className="flex items-center gap-1">
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </span>
               </Link>
             </li>
             <li>
               <Link 
-                to="/integrations" 
-                className={`text-sm font-medium transition-colors duration-200 ${isActive('/integrations') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
+                to="/compare" 
+                className={`text-sm font-medium transition-colors duration-200 ${isActive('/compare') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
               >
-                Integrations
+                <span className="flex items-center gap-1">
+                  <ArrowLeftRight className="h-4 w-4" />
+                  Compare
+                </span>
               </Link>
             </li>
           </ul>
@@ -202,9 +236,24 @@ const Navbar = () => {
             </PopoverContent>
           </Popover>
           
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white">
-            <Settings className="h-5 w-5" />
-          </Button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-white">
+                <Settings className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0">
+              <div className="border-b border-white/10 p-4">
+                <h3 className="font-medium">Settings</h3>
+              </div>
+              <div className="space-y-2 p-4">
+                <Button variant="ghost" className="w-full justify-start text-sm">Account Settings</Button>
+                <Button variant="ghost" className="w-full justify-start text-sm">Preferences</Button>
+                <Button variant="ghost" className="w-full justify-start text-sm">Notifications</Button>
+                <Button variant="ghost" className="w-full justify-start text-sm">Security</Button>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <div className="ml-2 h-8 w-[1px] bg-white/10"></div>
 
@@ -227,7 +276,12 @@ const Navbar = () => {
                 <Button variant="ghost" className="w-full justify-start text-sm">Subscription</Button>
               </div>
               <div className="border-t border-white/10 p-2">
-                <Button variant="ghost" className="w-full justify-start text-sm text-red-500 hover:text-red-600 hover:bg-red-500/10">
+                <Button 
+                  variant="ghost" 
+                  className="w-full justify-start text-sm text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                  onClick={handleLogout}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
                   Log Out
                 </Button>
               </div>

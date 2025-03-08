@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -27,22 +28,40 @@ import {
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 
+// Enhanced location list with more specific transport modes
 const locations = [
-  { label: "Los Angeles, USA", value: "losangeles", port: true, airport: true, roadHub: true },
-  { label: "New York, USA", value: "newyork", port: true, airport: true, roadHub: true },
-  { label: "Shanghai, China", value: "shanghai", port: true, airport: true, roadHub: true },
-  { label: "Singapore", value: "singapore", port: true, airport: true, roadHub: true },
-  { label: "Dubai, UAE", value: "dubai", port: true, airport: true, roadHub: true },
-  { label: "Rotterdam, Netherlands", value: "rotterdam", port: true, airport: false, roadHub: true },
-  { label: "Mumbai, India", value: "mumbai", port: true, airport: true, roadHub: true },
-  { label: "Sydney, Australia", value: "sydney", port: true, airport: true, roadHub: true },
-  { label: "Cairo, Egypt", value: "cairo", port: true, airport: true, roadHub: true },
-  { label: "Cape Town, South Africa", value: "capetown", port: true, airport: true, roadHub: true },
-  { label: "Buenos Aires, Argentina", value: "buenosaires", port: true, airport: true, roadHub: true },
-  { label: "Vancouver, Canada", value: "vancouver", port: true, airport: true, roadHub: true },
-  { label: "Tokyo, Japan", value: "tokyo", port: true, airport: true, roadHub: true },
-  { label: "Helsinki, Finland", value: "helsinki", port: true, airport: true, roadHub: true },
-  { label: "Rio de Janeiro, Brazil", value: "rio", port: true, airport: true, roadHub: true },
+  // Major global ports with all transport options
+  { label: "Shanghai, China", value: "shanghai", port: true, airport: true, roadHub: true, description: "World's busiest container port" },
+  { label: "Singapore", value: "singapore", port: true, airport: true, roadHub: true, description: "Major maritime hub in Southeast Asia" },
+  { label: "Rotterdam, Netherlands", value: "rotterdam", port: true, airport: true, roadHub: true, description: "Europe's largest seaport" },
+  { label: "Los Angeles, USA", value: "losangeles", port: true, airport: true, roadHub: true, description: "Busiest port in Western USA" },
+  { label: "Dubai, UAE", value: "dubai", port: true, airport: true, roadHub: true, description: "Leading Middle Eastern logistics hub" },
+  { label: "Hamburg, Germany", value: "hamburg", port: true, airport: true, roadHub: true, description: "Germany's largest port" },
+  { label: "New York, USA", value: "newyork", port: true, airport: true, roadHub: true, description: "Major East Coast logistics center" },
+  
+  // Air-focused hubs
+  { label: "Hong Kong, China", value: "hongkong", port: true, airport: true, roadHub: true, description: "Premier air freight hub" },
+  { label: "Memphis, USA", value: "memphis", port: false, airport: true, roadHub: true, description: "Global air cargo superhub" },
+  { label: "Incheon, South Korea", value: "incheon", port: true, airport: true, roadHub: true, description: "Leading Asian air freight center" },
+  { label: "Frankfurt, Germany", value: "frankfurt", port: false, airport: true, roadHub: true, description: "Central European air cargo hub" },
+  
+  // Sea-focused ports
+  { label: "Busan, South Korea", value: "busan", port: true, airport: false, roadHub: true, description: "Northeast Asia's transport hub" },
+  { label: "Antwerp, Belgium", value: "antwerp", port: true, airport: false, roadHub: true, description: "Major European port" },
+  { label: "Ningbo, China", value: "ningbo", port: true, airport: false, roadHub: true, description: "Second busiest port in China" },
+  { label: "Jebel Ali, UAE", value: "jebelali", port: true, airport: false, roadHub: true, description: "Middle East's largest marine terminal" },
+  
+  // Mixed transport hubs
+  { label: "Tokyo, Japan", value: "tokyo", port: true, airport: true, roadHub: true, description: "Japan's main logistics gateway" },
+  { label: "Sydney, Australia", value: "sydney", port: true, airport: true, roadHub: true, description: "Australia's busiest port" },
+  { label: "Mumbai, India", value: "mumbai", port: true, airport: true, roadHub: true, description: "India's largest port city" },
+  { label: "Sao Paulo, Brazil", value: "saopaulo", port: false, airport: true, roadHub: true, description: "South America's largest city" },
+  { label: "Johannesburg, South Africa", value: "johannesburg", port: false, airport: true, roadHub: true, description: "Africa's economic powerhouse" },
+  { label: "Vancouver, Canada", value: "vancouver", port: true, airport: true, roadHub: true, description: "Canada's gateway to the Pacific" },
+  { label: "Bangkok, Thailand", value: "bangkok", port: true, airport: true, roadHub: true, description: "Southeast Asian transport center" },
+  { label: "Cairo, Egypt", value: "cairo", port: false, airport: true, roadHub: true, description: "North African logistics hub" },
+  { label: "Moscow, Russia", value: "moscow", port: false, airport: true, roadHub: true, description: "Northern European transport hub" },
+  { label: "Madrid, Spain", value: "madrid", port: false, airport: true, roadHub: true, description: "Southern European logistics center" },
 ];
 
 const cargoTypes = [
@@ -216,14 +235,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
 
+    // Get location labels for better display
+    const originLocation = locations.find(loc => loc.value === origin);
+    const destLocation = locations.find(loc => loc.value === destination);
+
     const bookingData = {
       origin,
+      originLabel: originLocation?.label || origin,
       destination,
+      destinationLabel: destLocation?.label || destination,
       date: date ? format(date, 'yyyy-MM-dd') : null,
       cargoType,
       weight,
       transportMode,
-      cargoItems
+      cargoItems,
+      availableRoutes
     };
     
     sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
@@ -248,7 +274,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
     
-    const templateName = `Template ${Math.floor(Math.random() * 1000)}`;
+    const templateName = `${locations.find(loc => loc.value === origin)?.label} to ${locations.find(loc => loc.value === destination)?.label}`;
     const templates = JSON.parse(localStorage.getItem('shipmentTemplates') || '[]');
     
     templates.push({
@@ -331,6 +357,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
               </Command>
             </PopoverContent>
           </Popover>
+          {origin && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {locations.find(loc => loc.value === origin)?.description}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -385,6 +416,11 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
               </Command>
             </PopoverContent>
           </Popover>
+          {destination && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {locations.find(loc => loc.value === destination)?.description}
+            </p>
+          )}
         </div>
 
         <div className="space-y-2">

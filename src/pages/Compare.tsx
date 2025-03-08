@@ -1,11 +1,10 @@
 
 import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Map, Clock, DollarSign, ShieldCheck, Zap, AlertTriangle, ArrowLeftRight } from "lucide-react";
+import { Map, Clock, DollarSign, ShieldCheck, Zap, AlertTriangle, ArrowLeftRight, Leaf, Download } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 const locations = [
@@ -18,7 +17,12 @@ const locations = [
   { value: "busan", label: "Busan, South Korea" },
   { value: "newyork", label: "New York, USA" },
   { value: "tokyo", label: "Tokyo, Japan" },
-  { value: "antwerp", label: "Antwerp, Belgium" }
+  { value: "antwerp", label: "Antwerp, Belgium" },
+  { value: "hongkong", label: "Hong Kong, China" },
+  { value: "mumbai", label: "Mumbai, India" },
+  { value: "sydney", label: "Sydney, Australia" },
+  { value: "bangkok", label: "Bangkok, Thailand" },
+  { value: "vancouver", label: "Vancouver, Canada" }
 ];
 
 // Route options for demonstration
@@ -52,7 +56,7 @@ const routeOptions = [
     co2: "1.8 tons",
     risk: "Low",
     riskColor: "text-green-500",
-    modes: ["Sea", "Rail", "Truck"],
+    modes: ["Sea", "Truck"],
     weather: "Mild Rain",
     weatherStatus: "Minimal Delay",
     customsClearance: "Standard",
@@ -70,12 +74,32 @@ const routeOptions = [
     co2: "2.1 tons",
     risk: "Very Low",
     riskColor: "text-green-500",
-    modes: ["Air", "Rail", "Truck"],
+    modes: ["Air", "Truck"],
     weather: "Stormy",
     weatherStatus: "Alternate Route",
     customsClearance: "Priority",
     portCongestion: "Bypassed",
     rerouting: "Premium",
+  },
+  {
+    id: "eco-friendly",
+    name: "Eco-Friendly",
+    icon: Leaf,
+    color: "text-green-500",
+    bgColor: "bg-green-500/20",
+    duration: "5 days, 6 hours",
+    cost: "$3,450",
+    co2: "0.9 tons",
+    co2Savings: "1.5 tons",
+    risk: "Low",
+    riskColor: "text-green-500",
+    modes: ["Sea", "Electric Truck"],
+    weather: "Clear",
+    weatherStatus: "Optimal",
+    customsClearance: "Green Priority",
+    portCongestion: "Low",
+    rerouting: "Available",
+    isEcoFriendly: true
   },
 ];
 
@@ -83,6 +107,7 @@ const ComparePage = () => {
   const [origin, setOrigin] = useState<string>("");
   const [destination, setDestination] = useState<string>("");
   const [showComparison, setShowComparison] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   const handleCompare = () => {
     if (!origin || !destination) {
@@ -96,6 +121,7 @@ const ComparePage = () => {
 
     // In a real app, this would fetch data based on the selected locations
     setShowComparison(true);
+    setShowMap(true);
     
     toast({
       title: "Routes Compared",
@@ -103,12 +129,42 @@ const ComparePage = () => {
     });
   };
 
+  const handleDownloadComparison = () => {
+    // Create comparison data
+    const comparisonData = {
+      origin: locations.find(loc => loc.value === origin)?.label,
+      destination: locations.find(loc => loc.value === destination)?.label,
+      comparedAt: new Date().toISOString(),
+      routes: routeOptions
+    };
+    
+    // Create a JSON Blob
+    const jsonData = JSON.stringify(comparisonData, null, 2);
+    const blob = new Blob([jsonData], { type: 'application/json' });
+    
+    // Create download link
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `route-comparison-${origin}-to-${destination}.json`;
+    document.body.appendChild(link);
+    link.click();
+    
+    // Clean up
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Comparison Downloaded",
+      description: "Route comparison saved to your device",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <Sidebar />
       
-      <main className="pt-16 pl-64">
+      <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
             <h1 className="text-3xl font-bold tracking-tight text-white">
@@ -121,8 +177,19 @@ const ComparePage = () => {
           
           <Card className="bg-card border-white/10 mb-6">
             <CardHeader className="pb-2">
-              <CardTitle className="text-xl font-semibold text-white">
-                Select Locations to Compare
+              <CardTitle className="text-xl font-semibold text-white flex justify-between items-center">
+                <span>Select Locations to Compare</span>
+                {showComparison && (
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    className="gap-1"
+                    onClick={handleDownloadComparison}
+                  >
+                    <Download className="h-4 w-4" />
+                    Download Comparison
+                  </Button>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -194,6 +261,11 @@ const ComparePage = () => {
                                   <option.icon className={`h-4 w-4 ${option.color}`} />
                                 </div>
                                 {option.name}
+                                {option.isEcoFriendly && (
+                                  <span className="ml-1 text-xs bg-green-500/20 text-green-400 px-1 py-0.5 rounded-full">
+                                    Eco
+                                  </span>
+                                )}
                               </div>
                             </th>
                           ))}
@@ -229,6 +301,26 @@ const ComparePage = () => {
                         <tr>
                           <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-white">
                             <div className="flex items-center">
+                              <Leaf className="mr-2 h-4 w-4 text-muted-foreground" />
+                              CO2 Emissions
+                            </div>
+                          </td>
+                          {routeOptions.map(option => (
+                            <td key={option.id} className="whitespace-nowrap px-6 py-4 text-sm text-white">
+                              <div>
+                                {option.co2}
+                                {option.co2Savings && (
+                                  <span className="ml-2 text-xs text-green-400">
+                                    (Saves {option.co2Savings})
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-white">
+                            <div className="flex items-center">
                               <AlertTriangle className="mr-2 h-4 w-4 text-muted-foreground" />
                               Risk Level
                             </div>
@@ -248,7 +340,7 @@ const ComparePage = () => {
                           </td>
                           {routeOptions.map(option => (
                             <td key={option.id} className="whitespace-nowrap px-6 py-4 text-sm text-white">
-                              {option.modes.join(", ")}
+                              {option.modes.join(" → ")}
                             </td>
                           ))}
                         </tr>
@@ -294,6 +386,12 @@ const ComparePage = () => {
                                 onClick={() => {
                                   // Store selected route in sessionStorage
                                   sessionStorage.setItem('selectedRoute', JSON.stringify(option));
+                                  
+                                  toast({
+                                    title: `${option.name} Selected`,
+                                    description: "Navigate to Route Planning to see details",
+                                  });
+                                  
                                   // Navigate to route details page
                                   window.location.href = '/routes';
                                 }}
@@ -316,12 +414,25 @@ const ComparePage = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center">
-                    <div className="text-center">
-                      <Map className="h-10 w-10 mx-auto mb-4 text-muted-foreground opacity-40" />
-                      <p className="text-muted-foreground">Interactive map comparison coming soon</p>
+                  {showMap ? (
+                    <div className="aspect-video w-full rounded-lg bg-muted overflow-hidden relative">
+                      <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18586022.05810485!2d-10.457399016361367!3d41.170118430643825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzHCsDE3JzEyLjQiTiA3wrAwNSczNi4wIlc!5e0!3m2!1sen!2sus!4v1622321710813!5m2!1sen!2sus"
+                        className="absolute inset-0 w-full h-full border-0"
+                        allowFullScreen={false}
+                        loading="lazy"
+                        style={{ filter: 'grayscale(1) brightness(0.8) invert(1) hue-rotate(180deg)' }}
+                      ></iframe>
+                      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-background/30"></div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="aspect-video w-full rounded-lg bg-muted flex items-center justify-center">
+                      <div className="text-center">
+                        <Map className="h-10 w-10 mx-auto mb-4 text-muted-foreground opacity-40" />
+                        <p className="text-muted-foreground">Select origin and destination to view the map</p>
+                      </div>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
