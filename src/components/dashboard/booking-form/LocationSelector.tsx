@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -47,6 +47,15 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const selectedLocation = locations.find(loc => loc.value === value);
   const displayValue = selectedLocation?.label || manualInput || placeholder;
   
+  // Set active tab based on whether manual input is being used
+  useEffect(() => {
+    if (manualInput && !value) {
+      setActiveTab("manual");
+    } else if (value) {
+      setActiveTab("saved");
+    }
+  }, [manualInput, value]);
+  
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-muted-foreground">
@@ -85,6 +94,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                       value={location.value}
                       onSelect={(currentValue) => {
                         onChange(currentValue === value ? "" : currentValue);
+                        // Clear manual input when selecting a predefined location
                         if (onManualInputChange) onManualInputChange("");
                         setIsOpen(false);
                       }}
@@ -122,6 +132,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                     size="sm"
                     disabled={!manualInput}
                     onClick={() => {
+                      // Clear dropdown selection when using manual entry
                       onChange("");
                       setIsOpen(false);
                     }}
@@ -137,6 +148,11 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
       {value && (
         <p className="text-xs text-muted-foreground mt-1">
           {locations.find(loc => loc.value === value)?.description}
+        </p>
+      )}
+      {manualInput && !value && (
+        <p className="text-xs text-muted-foreground mt-1">
+          Custom location entered manually
         </p>
       )}
     </div>

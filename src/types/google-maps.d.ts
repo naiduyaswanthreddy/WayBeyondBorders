@@ -3,40 +3,31 @@ declare namespace google {
   namespace maps {
     class Map {
       constructor(mapDiv: Element, opts?: MapOptions);
-      fitBounds(bounds: LatLngBounds): void;
       setCenter(latLng: LatLng | LatLngLiteral): void;
       setZoom(zoom: number): void;
+      setMapTypeId(mapTypeId: string): void;
+      fitBounds(bounds: LatLngBounds): void;
     }
 
-    class LatLngBounds {
-      constructor(sw?: LatLng | LatLngLiteral, ne?: LatLng | LatLngLiteral);
-      extend(latLng: LatLng | LatLngLiteral): LatLngBounds;
+    class DirectionsService {
+      route(request: DirectionsRequest, callback: (result: DirectionsResult, status: DirectionsStatus) => void): void;
     }
 
     class DirectionsRenderer {
       constructor(opts?: DirectionsRendererOptions);
-      setMap(map: Map | null): void;
       setDirections(directions: DirectionsResult): void;
+      setMap(map: Map): void;
     }
 
-    class DirectionsService {
-      route(request: DirectionsRequest, callback: (result: DirectionsResult | null, status: DirectionsStatus) => void): void;
+    class LatLngBounds {
+      constructor();
+      extend(latLng: LatLng | LatLngLiteral): void;
     }
 
-    interface DirectionsResult {
-      routes: DirectionsRoute[];
-    }
-
-    interface DirectionsRoute {
-      legs: DirectionsLeg[];
-    }
-
-    interface DirectionsLeg {
-      steps: DirectionsStep[];
-    }
-
-    interface DirectionsStep {
-      path: LatLng[];
+    interface MapOptions {
+      center?: LatLng | LatLngLiteral;
+      zoom?: number;
+      mapTypeId?: string;
     }
 
     interface LatLng {
@@ -49,11 +40,6 @@ declare namespace google {
       lng: number;
     }
 
-    interface DirectionsRendererOptions {
-      map?: Map;
-      suppressMarkers?: boolean;
-    }
-
     interface DirectionsRequest {
       origin: string | LatLng | LatLngLiteral;
       destination: string | LatLng | LatLngLiteral;
@@ -62,46 +48,62 @@ declare namespace google {
       drivingOptions?: DrivingOptions;
     }
 
+    interface DirectionsResult {
+      routes: DirectionsRoute[];
+    }
+
+    interface DirectionsRoute {
+      legs: DirectionsLeg[];
+      overview_path: LatLng[];
+    }
+
+    interface DirectionsLeg {
+      steps: DirectionsStep[];
+    }
+
+    interface DirectionsStep {
+      path: LatLng[];
+    }
+
     interface DrivingOptions {
       departureTime: Date;
-      trafficModel: TrafficModel;
+      trafficModel: any;
     }
 
-    enum TravelMode {
-      DRIVING = "DRIVING",
-      BICYCLING = "BICYCLING",
-      TRANSIT = "TRANSIT",
-      WALKING = "WALKING"
-    }
-
-    enum TrafficModel {
-      BEST_GUESS = "bestguess",
-      OPTIMISTIC = "optimistic",
-      PESSIMISTIC = "pessimistic"
+    interface DirectionsRendererOptions {
+      map?: Map;
+      suppressMarkers?: boolean;
     }
 
     enum DirectionsStatus {
-      OK = "OK",
-      NOT_FOUND = "NOT_FOUND",
-      ZERO_RESULTS = "ZERO_RESULTS",
-      MAX_WAYPOINTS_EXCEEDED = "MAX_WAYPOINTS_EXCEEDED",
-      INVALID_REQUEST = "INVALID_REQUEST",
-      OVER_QUERY_LIMIT = "OVER_QUERY_LIMIT",
-      REQUEST_DENIED = "REQUEST_DENIED",
-      UNKNOWN_ERROR = "UNKNOWN_ERROR"
+      OK = 'OK',
+      NOT_FOUND = 'NOT_FOUND',
+      ZERO_RESULTS = 'ZERO_RESULTS',
+      MAX_WAYPOINTS_EXCEEDED = 'MAX_WAYPOINTS_EXCEEDED',
+      INVALID_REQUEST = 'INVALID_REQUEST',
+      OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT',
+      REQUEST_DENIED = 'REQUEST_DENIED',
+      UNKNOWN_ERROR = 'UNKNOWN_ERROR'
     }
 
-    enum MapTypeId {
-      ROADMAP = "roadmap",
-      SATELLITE = "satellite",
-      HYBRID = "hybrid",
-      TERRAIN = "terrain"
+    enum TravelMode {
+      DRIVING = 'DRIVING',
+      BICYCLING = 'BICYCLING',
+      TRANSIT = 'TRANSIT',
+      WALKING = 'WALKING'
     }
 
-    interface MapOptions {
-      center?: LatLng | LatLngLiteral;
-      zoom?: number;
-      mapTypeId?: MapTypeId;
+    enum TrafficModel {
+      BEST_GUESS = 'bestguess',
+      OPTIMISTIC = 'optimistic',
+      PESSIMISTIC = 'pessimistic'
+    }
+
+    namespace MapTypeId {
+      const ROADMAP: string;
+      const SATELLITE: string;
+      const HYBRID: string;
+      const TERRAIN: string;
     }
   }
 }

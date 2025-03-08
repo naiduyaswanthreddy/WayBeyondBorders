@@ -5,11 +5,13 @@ import { Clock } from "lucide-react";
 interface EstimatedArrivalProps {
   origin: string;
   destination: string;
+  estimatedTime?: string;
 }
 
 const EstimatedArrival: React.FC<EstimatedArrivalProps> = ({
   origin,
   destination,
+  estimatedTime
 }) => {
   return (
     <div className="space-y-2">
@@ -19,7 +21,9 @@ const EstimatedArrival: React.FC<EstimatedArrivalProps> = ({
       <div className="flex items-center rounded-md border border-white/10 bg-muted px-3 py-2 text-white">
         <Clock className="mr-2 h-4 w-4 text-nexus-teal" />
         <span>
-          {origin && destination ? "3-5 days (AI optimized)" : "Select origin & destination"}
+          {origin && destination 
+            ? estimatedTime || "3-5 days (AI optimized)" 
+            : "Select origin & destination"}
         </span>
       </div>
     </div>
