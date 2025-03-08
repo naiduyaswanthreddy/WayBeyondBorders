@@ -1,13 +1,9 @@
 
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
+import React, { useState } from "react";
+import { LocationData } from "./types";
+import { Check, ChevronsUpDown, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { 
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -15,72 +11,94 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { ChevronsUpDown } from "lucide-react";
-import { LocationData } from "./types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 
 interface LocationSelectorProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
-  manualInput?: string;
-  onManualInputChange?: (value: string) => void;
+  manualInput: string;
+  onManualInputChange: (value: string) => void;
   locations: LocationData[];
-  placeholder: string;
+  placeholder?: string;
   error?: string;
 }
 
-const LocationSelector: React.FC<LocationSelectorProps> = ({
+const LocationSelector = ({
   label,
   value,
   onChange,
-  manualInput = "",
+  manualInput,
   onManualInputChange,
   locations,
-  placeholder,
-  error
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("saved");
-  
-  const selectedLocation = locations.find(loc => loc.value === value);
-  const displayValue = selectedLocation?.label || manualInput || placeholder;
-  
-  // Set active tab based on whether manual input is being used
-  useEffect(() => {
-    if (manualInput && !value) {
-      setActiveTab("manual");
-    } else if (value) {
-      setActiveTab("saved");
+  placeholder = "Select a location",
+  error,
+}: LocationSelectorProps) => {
+  const [open, setOpen] = useState(false);
+  const [inputMode, setInputMode] = useState<"saved" | "manual">(
+    "saved"
+  );
+
+  const selectedLocation = locations.find(
+    (location) => location.value === value
+  );
+
+  const handleModeChange = (mode: string) => {
+    setInputMode(mode as "saved" | "manual");
+    if (mode === "saved" && manualInput) {
+      onManualInputChange("");
+    } else if (mode === "manual" && value) {
+      onChange("");
     }
-  }, [manualInput, value]);
-  
+  };
+
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-muted-foreground">
-        {label}
-      </label>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
+    <div className="w-full space-y-2">
+      <div className="flex justify-between">
+        <label className="text-sm font-medium text-muted-foreground">
+          {label}
+        </label>
+      </div>
+
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
-            type="button"
+            aria-expanded={open}
             className={cn(
-              "w-full justify-between border-white/10 bg-muted text-left font-normal",
-              !value && !manualInput && "text-muted-foreground",
-              error && "border-destructive"
+              "w-full justify-between font-normal",
+              error ? "border-destructive" : ""
             )}
           >
-            {displayValue}
+            {value
+              ? selectedLocation?.label
+              : manualInput
+              ? manualInput
+              : placeholder}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-2" align="start" sideOffset={5}>
-          <Tabs defaultValue="saved" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 mb-2">
-              <TabsTrigger value="saved">Saved Locations</TabsTrigger>
+        <PopoverContent className="w-full p-0" align="start">
+          <Tabs
+            defaultValue={inputMode}
+            value={inputMode}
+            onValueChange={handleModeChange}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="saved">Select Location</TabsTrigger>
               <TabsTrigger value="manual">Manual Entry</TabsTrigger>
             </TabsList>
             <TabsContent value="saved" className="mt-0">
@@ -88,73 +106,54 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
                 <CommandInput placeholder="Search location..." />
                 <CommandEmpty>No location found.</CommandEmpty>
                 <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {locations.map((location) => (
+                  {locations && locations.map((location) => (
                     <CommandItem
                       key={location.value}
                       value={location.value}
                       onSelect={(currentValue) => {
                         onChange(currentValue === value ? "" : currentValue);
-                        // Clear manual input when selecting a predefined location
-                        if (onManualInputChange) onManualInputChange("");
-                        setIsOpen(false);
+                        setOpen(false);
                       }}
                     >
-                      <MapPin className={cn(
-                        "mr-2 h-4 w-4",
-                        label === "Origin" ? "text-nexus-blue" : "text-nexus-purple"
-                      )} />
-                      {location.label}
-                      <div className="ml-auto flex space-x-1">
-                        {location.port && (
-                          <span className="text-xs bg-blue-500/20 text-blue-500 px-1 rounded">Sea</span>
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === location.value
+                            ? "opacity-100"
+                            : "opacity-0"
                         )}
-                        {location.airport && (
-                          <span className="text-xs bg-purple-500/20 text-purple-500 px-1 rounded">Air</span>
-                        )}
-                        {location.roadHub && (
-                          <span className="text-xs bg-green-500/20 text-green-500 px-1 rounded">Road</span>
-                        )}
+                      />
+                      <div className="flex flex-col">
+                        <span>{location.label}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {location.description}
+                        </span>
                       </div>
                     </CommandItem>
                   ))}
                 </CommandGroup>
               </Command>
             </TabsContent>
-            <TabsContent value="manual" className="mt-0">
-              <div className="space-y-2 p-1">
+            <TabsContent value="manual" className="mt-0 p-4 pt-2">
+              <div className="flex flex-col space-y-3">
                 <Input
                   placeholder="Enter location manually"
                   value={manualInput}
-                  onChange={(e) => onManualInputChange && onManualInputChange(e.target.value)}
+                  onChange={(e) => onManualInputChange(e.target.value)}
+                  className="w-full"
                 />
-                <div className="flex justify-end mt-2">
-                  <Button 
-                    size="sm"
-                    disabled={!manualInput}
-                    onClick={() => {
-                      // Clear dropdown selection when using manual entry
-                      onChange("");
-                      setIsOpen(false);
-                    }}
-                  >
-                    Use Manual Entry
-                  </Button>
-                </div>
+                <Button
+                  variant="default"
+                  onClick={() => setOpen(false)}
+                  className="w-full"
+                >
+                  Confirm
+                </Button>
               </div>
             </TabsContent>
           </Tabs>
         </PopoverContent>
       </Popover>
-      {value && (
-        <p className="text-xs text-muted-foreground mt-1">
-          {locations.find(loc => loc.value === value)?.description}
-        </p>
-      )}
-      {manualInput && !value && (
-        <p className="text-xs text-muted-foreground mt-1">
-          Custom location entered manually
-        </p>
-      )}
     </div>
   );
 };
