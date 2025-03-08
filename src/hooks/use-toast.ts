@@ -15,6 +15,9 @@ type ToasterToast = {
   description?: React.ReactNode;
   action?: ToastActionElement;
   variant?: "default" | "destructive";
+  // Add the open property to fix the error
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export type ToastProps = ToasterToast;
