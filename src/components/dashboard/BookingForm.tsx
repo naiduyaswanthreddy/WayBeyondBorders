@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -386,6 +387,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
               <Button
                 variant="outline"
                 role="combobox"
+                type="button" // Explicitly set type to button to prevent form submission
                 className={cn(
                   "w-full justify-between border-white/10 bg-muted text-left font-normal",
                   !origin && "text-muted-foreground"
@@ -445,6 +447,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
               <Button
                 variant="outline"
                 role="combobox"
+                type="button" // Explicitly set type to button to prevent form submission
                 className={cn(
                   "w-full justify-between border-white/10 bg-muted text-left font-normal",
                   !destination && "text-muted-foreground"
