@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, ChevronsUpDown, Clock, MapPin, Package, Weight, ArrowRight, AlertTriangle, PlusCircle, DollarSign } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronsUpDown, Clock, MapPin, Package, Weight, ArrowRight, AlertTriangle, PlusCircle, DollarSign, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "@/components/ui/use-toast";
@@ -95,7 +94,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [newItemWeight, setNewItemWeight] = useState("");
   const navigate = useNavigate();
 
-  // Apply cargo type restrictions whenever cargoType changes
   useEffect(() => {
     if (!cargoType) return;
     
@@ -103,12 +101,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     if (selectedCargo) {
       setRestrictions(selectedCargo.restrictions);
       
-      // Handle air restrictions
       if (selectedCargo.restrictions.includes("no-air") && (transportMode === "air" || transportMode === "express")) {
         setTransportMode("sea");
         setRestrictionWarning("This cargo type cannot be transported by air. Switched to sea freight.");
       } 
-      // Handle air priority for perishables
       else if (selectedCargo.restrictions.includes("prioritize-air") && transportMode !== "air" && transportMode !== "express") {
         setTransportMode("air");
         setRestrictionWarning("Perishable goods are best transported by air for faster delivery.");
@@ -119,7 +115,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     }
   }, [cargoType]);
 
-  // Update available routes when origin, destination or transport mode changes
   useEffect(() => {
     if (!origin || !destination) return;
     
@@ -130,27 +125,21 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     const availableModes = [];
     
-    // Check for sea route
     if (originLocation.port && destLocation.port) {
       availableModes.push("sea");
     }
     
-    // Check for air route
     if (originLocation.airport && destLocation.airport) {
       availableModes.push("air");
       availableModes.push("express");
     }
     
-    // Check for road route (only for nearby locations)
     if (originLocation.roadHub && destLocation.roadHub) {
-      // In a real app, we would check distances here
-      // For now, just add road for all
       availableModes.push("road");
     }
     
     setAvailableRoutes(availableModes);
     
-    // If current transport mode is not available, reset to any
     if (transportMode !== "any" && !availableModes.includes(transportMode)) {
       setTransportMode("any");
       toast({
@@ -163,7 +152,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const handleTransportModeChange = (value: string) => {
     const selectedCargo = cargoTypes.find(c => c.value === cargoType);
     
-    // Check if the selected mode is allowed for this cargo
     if (selectedCargo?.restrictions.includes("no-air") && (value === "air" || value === "express")) {
       toast({
         title: "Transport Mode Restricted",
@@ -173,7 +161,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
     
-    // Check if the selected mode is available for this route
     if (value !== "any" && !availableRoutes.includes(value)) {
       toast({
         title: "Transport Mode Unavailable",
@@ -207,7 +194,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       }
     ]);
     
-    // Clear item form
     setNewItemName("");
     setNewItemLength("");
     setNewItemWidth("");
@@ -221,7 +207,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   };
 
   const handleFindRoutes = () => {
-    // Validate form
     if (!origin || !destination || !date || !cargoType || (!weight && cargoItems.length === 0)) {
       toast({
         title: "Incomplete Information",
@@ -231,7 +216,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
 
-    // Store booking data in session storage
     const bookingData = {
       origin,
       destination,
@@ -249,14 +233,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       description: "Analyzing available routes based on your requirements...",
     });
     
-    // Navigate to routes page
     setTimeout(() => {
       navigate('/routes');
     }, 500);
   };
 
   const handleSaveTemplate = () => {
-    // Validate form
     if (!origin || !destination || !cargoType) {
       toast({
         title: "Incomplete Template",
@@ -266,8 +248,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
     
-    // In a real app, this would save to a database
-    // For now, we'll save to localStorage
     const templateName = `Template ${Math.floor(Math.random() * 1000)}`;
     const templates = JSON.parse(localStorage.getItem('shipmentTemplates') || '[]');
     
@@ -299,7 +279,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Origin */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Origin
@@ -354,7 +333,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </Popover>
         </div>
 
-        {/* Destination */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Destination
@@ -409,7 +387,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </Popover>
         </div>
 
-        {/* Date */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Shipping Date
@@ -439,7 +416,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </Popover>
         </div>
 
-        {/* Cargo Type */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Cargo Type
@@ -478,7 +454,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           )}
         </div>
 
-        {/* Transport Mode */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Transport Mode
@@ -534,7 +509,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           )}
         </div>
 
-        {/* Total Weight */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Total Weight (kg)
@@ -551,7 +525,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </div>
         </div>
         
-        {/* ETA */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-muted-foreground">
             Estimated Arrival
@@ -564,7 +537,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </div>
         </div>
         
-        {/* Cargo Items - New Section */}
         <div className="col-span-2 mt-4 space-y-4 border border-white/10 rounded-md p-4">
           <div className="flex items-center justify-between">
             <h3 className="text-md font-medium text-white">Cargo Items</h3>
@@ -643,7 +615,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           </Button>
         </div>
 
-        {/* Action Buttons */}
         <div className="col-span-2 mt-4 grid grid-cols-2 gap-4">
           <Button 
             variant="outline"

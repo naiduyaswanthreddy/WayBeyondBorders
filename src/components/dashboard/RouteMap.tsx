@@ -107,7 +107,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       toast({
         title: `Earned ${selectedRouteDetails.ecoPoints} Eco Points!`,
         description: "Thank you for choosing the eco-friendly option",
-        variant: "success"
+        variant: "default"
       });
     }
   };
