@@ -27,7 +27,8 @@ import {
   Cell,
   Area,
   AreaChart,
-  ComposedChart
+  ComposedChart,
+  Legend
 } from "recharts";
 import CustomTooltip from './CustomTooltip';
 import { COLORS } from './ChartColors';
