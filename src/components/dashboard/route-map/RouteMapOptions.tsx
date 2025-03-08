@@ -1,7 +1,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Clock } from "lucide-react";
+import { CheckCircle2, Clock, Leaf } from "lucide-react";
 
 interface RouteOption {
   id: string;
