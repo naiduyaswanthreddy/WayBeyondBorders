@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Clock, Calendar } from "lucide-react";
+import { Clock, Calendar, MapPin } from "lucide-react";
 
 interface EstimatedArrivalProps {
   estimatedTime: string;
@@ -37,7 +37,7 @@ const EstimatedArrival = ({ estimatedTime, origin, destination }: EstimatedArriv
             <span>{estimatedTime}</span>
           </div>
           <div className="mt-1 flex items-center text-xs text-muted-foreground">
-            <Calendar className="mr-2 h-3 w-3" />
+            <MapPin className="mr-2 h-3 w-3" />
             <span>
               From {origin} to {destination}
             </span>
