@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -118,14 +117,6 @@ const Navbar = () => {
 
         <nav className="hidden md:block">
           <ul className="flex items-center gap-x-6">
-            <li>
-              <Link 
-                to="/dashboard" 
-                className={`text-sm font-medium transition-colors duration-200 ${isActive('/dashboard') ? 'text-nexus-blue' : 'text-white hover:text-nexus-blue'}`}
-              >
-                Dashboard
-              </Link>
-            </li>
             <li>
               <Link 
                 to="/bookings" 

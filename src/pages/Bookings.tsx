@@ -1,5 +1,6 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import BookingForm from "@/components/dashboard/BookingForm";
 import RouteMap from "@/components/dashboard/RouteMap";
@@ -15,8 +16,16 @@ import { useRouteAlert } from "@/components/alerts/RouteChangeAlertProvider";
 import { toast } from "@/components/ui/use-toast";
 
 const Bookings = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<string>("new-booking");
   const { showRouteChangeAlert } = useRouteAlert();
+
+  // Check location state for active tab
+  useEffect(() => {
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   // Function to simulate a route change alert
   const simulateRouteAlert = () => {

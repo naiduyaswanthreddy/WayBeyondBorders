@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface RouteMapDisplayProps {
   selectedRoute: string;
@@ -21,6 +21,45 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
   origin = "Shanghai, China",
   destination = "Rotterdam, Netherlands"
 }) => {
+  const [dynamicOrigin, setDynamicOrigin] = useState(origin);
+  const [dynamicDestination, setDynamicDestination] = useState(destination);
+  
+  // Listen for route data updates from the booking form
+  useEffect(() => {
+    const handleRouteDataUpdate = (event: CustomEvent) => {
+      const routeData = event.detail;
+      if (routeData.originLabel) {
+        setDynamicOrigin(routeData.originLabel);
+      }
+      if (routeData.destinationLabel) {
+        setDynamicDestination(routeData.destinationLabel);
+      }
+    };
+    
+    // Check for existing route data in session storage
+    const storedRouteData = sessionStorage.getItem('routeMapData');
+    if (storedRouteData) {
+      try {
+        const routeData = JSON.parse(storedRouteData);
+        if (routeData.originLabel) {
+          setDynamicOrigin(routeData.originLabel);
+        }
+        if (routeData.destinationLabel) {
+          setDynamicDestination(routeData.destinationLabel);
+        }
+      } catch (error) {
+        console.error("Error parsing route data:", error);
+      }
+    }
+    
+    // Add event listener for real-time updates
+    window.addEventListener('routeDataUpdated', handleRouteDataUpdate as EventListener);
+    
+    return () => {
+      window.removeEventListener('routeDataUpdated', handleRouteDataUpdate as EventListener);
+    };
+  }, []);
+  
   if (!selectedRouteDetails) return null;
 
   const getRouteColor = () => {
@@ -98,10 +137,10 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
 
               {/* Cities/Points Labels */}
               <div className="absolute left-[12%] top-[36%] rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
-                {origin}
+                {dynamicOrigin}
               </div>
               <div className="absolute right-[12%] top-[64%] rounded-md bg-black/70 px-1.5 py-0.5 text-xs text-white backdrop-blur-sm">
-                {destination}
+                {dynamicDestination}
               </div>
               
               {/* Satellite map attribution */}
@@ -126,18 +165,25 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
         <div className="mt-3 space-y-2 text-xs">
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Origin:</span>
-            <span className="font-medium text-white">{origin}</span>
+            <span className="font-medium text-white">{dynamicOrigin}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Destination:</span>
-            <span className="font-medium text-white">{destination}</span>
+            <span className="font-medium text-white">{dynamicDestination}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Distance:</span>
             <span className="font-medium text-white">
-              {origin === "Shanghai, China" && destination === "Rotterdam, Netherlands" 
+              {/* Calculate approximate distance based on location */}
+              {dynamicOrigin.includes("Shanghai") && dynamicDestination.includes("Rotterdam") 
                 ? "11,425 km" 
-                : "~10,000 km"}
+                : dynamicOrigin.includes("New York") && dynamicDestination.includes("Hamburg")
+                ? "6,214 km"
+                : dynamicOrigin.includes("Dubai") && dynamicDestination.includes("Mumbai")
+                ? "1,935 km"
+                : dynamicOrigin.includes("Tokyo") && dynamicDestination.includes("Los Angeles")
+                ? "8,782 km"
+                : "~7,500 km"}
             </span>
           </div>
           <div className="flex items-center justify-between">

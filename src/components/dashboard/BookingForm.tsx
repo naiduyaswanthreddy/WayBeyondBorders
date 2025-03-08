@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, ChevronsUpDown, Clock, MapPin, Package, Weight, ArrowRight, AlertTriangle, PlusCircle, DollarSign, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -85,6 +84,7 @@ const transportModes = [
 
 interface BookingFormProps {
   className?: string;
+  updateRouteMap?: (data: any) => void;
 }
 
 interface CargoItem {
@@ -95,8 +95,22 @@ interface CargoItem {
   weight: string;
 }
 
+interface TemplateData {
+  id: string;
+  name: string;
+  origin: string;
+  originLabel?: string;
+  destination: string;
+  destinationLabel?: string;
+  cargoType: string;
+  weight?: string;
+  transportMode?: string;
+  cargoItems?: CargoItem[];
+  date?: string;
+}
+
 const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
-  const [date, setDate] = useState<Date>();
+  const [date, setDate] = useState<Date | undefined>();
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [cargoType, setCargoType] = useState("");
@@ -112,6 +126,65 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [newItemHeight, setNewItemHeight] = useState("");
   const [newItemWeight, setNewItemWeight] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const templateString = sessionStorage.getItem('selectedTemplate');
+    if (templateString) {
+      try {
+        const template: TemplateData = JSON.parse(templateString);
+        
+        if (template.origin) setOrigin(template.origin);
+        if (template.destination) setDestination(template.destination);
+        if (template.cargoType) setCargoType(template.cargoType);
+        if (template.weight) setWeight(template.weight);
+        if (template.transportMode) setTransportMode(template.transportMode);
+        if (template.date) {
+          const templateDate = new Date(template.date);
+          if (!isNaN(templateDate.getTime())) {
+            setDate(templateDate);
+          }
+        }
+        if (template.cargoItems && template.cargoItems.length > 0) {
+          setCargoItems(template.cargoItems);
+        }
+        
+        sessionStorage.removeItem('selectedTemplate');
+        
+        toast({
+          title: "Template Loaded",
+          description: `"${template.name}" template has been applied to your new booking.`
+        });
+      } catch (error) {
+        console.error("Error parsing template data:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (origin && destination) {
+      const originLocation = locations.find(loc => loc.value === origin);
+      const destLocation = locations.find(loc => loc.value === destination);
+      
+      const routeData = {
+        origin,
+        originLabel: originLocation?.label || origin,
+        destination,
+        destinationLabel: destLocation?.label || destination,
+        date: date ? format(date, 'yyyy-MM-dd') : null,
+        cargoType,
+        weight,
+        transportMode,
+        cargoItems,
+        availableRoutes
+      };
+      
+      sessionStorage.setItem('routeMapData', JSON.stringify(routeData));
+      
+      const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeData });
+      window.dispatchEvent(updateEvent);
+    }
+  }, [origin, destination, date, cargoType, weight, transportMode, cargoItems, availableRoutes]);
 
   useEffect(() => {
     if (!cargoType) return;
@@ -235,7 +308,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
 
-    // Get location labels for better display
     const originLocation = locations.find(loc => loc.value === origin);
     const destLocation = locations.find(loc => loc.value === destination);
 

@@ -10,38 +10,46 @@ const templateData = [
   {
     id: "TPL-001",
     name: "Electronics Shipment",
-    origin: "Shanghai, China",
-    destination: "Rotterdam, Netherlands",
-    cargoType: "Electronics",
-    weight: "1,200 kg",
-    transportMode: "Eco-Friendly Route"
+    origin: "shanghai",
+    originLabel: "Shanghai, China",
+    destination: "rotterdam",
+    destinationLabel: "Rotterdam, Netherlands",
+    cargoType: "electronics",
+    weight: "1200",
+    transportMode: "eco-friendly"
   },
   {
     id: "TPL-002",
     name: "Medical Supplies",
-    origin: "New York, USA",
-    destination: "Hamburg, Germany",
-    cargoType: "Pharmaceuticals",
-    weight: "850 kg",
-    transportMode: "Fastest Route"
+    origin: "newyork",
+    originLabel: "New York, USA",
+    destination: "hamburg",
+    destinationLabel: "Hamburg, Germany",
+    cargoType: "perishable",
+    weight: "850",
+    transportMode: "fastest"
   },
   {
     id: "TPL-003",
     name: "Luxury Goods",
-    origin: "Dubai, UAE",
-    destination: "Mumbai, India",
-    cargoType: "Luxury Goods",
-    weight: "450 kg",
-    transportMode: "Most Reliable"
+    origin: "dubai",
+    originLabel: "Dubai, UAE",
+    destination: "mumbai",
+    destinationLabel: "Mumbai, India",
+    cargoType: "fragile",
+    weight: "450",
+    transportMode: "reliable"
   },
   {
     id: "TPL-004",
     name: "Auto Parts",
-    origin: "Tokyo, Japan",
-    destination: "Los Angeles, USA",
-    cargoType: "Automotive",
-    weight: "3,200 kg",
-    transportMode: "Most Economical"
+    origin: "tokyo",
+    originLabel: "Tokyo, Japan",
+    destination: "losangeles",
+    destinationLabel: "Los Angeles, USA",
+    cargoType: "machinery",
+    weight: "3200",
+    transportMode: "cheapest"
   }
 ];
 
@@ -61,8 +69,9 @@ export const ShipmentTemplates = () => {
         description: `Using "${template.name}" template for new shipment.`,
       });
       
-      // Navigate to new booking form
-      navigate('/bookings');
+      // Navigate to bookings page with activeTab=new-booking to focus on the form
+      // Use the navigate state to indicate we want to show the new booking tab
+      navigate('/bookings', { state: { activeTab: 'new-booking' } });
     }
   };
 
@@ -78,14 +87,14 @@ export const ShipmentTemplates = () => {
             <div className="flex-1">
               <h3 className="font-medium text-white">{template.name}</h3>
               <p className="text-sm text-muted-foreground">
-                {template.origin} → {template.destination}
+                {template.originLabel} → {template.destinationLabel}
               </p>
               <div className="mt-2 flex gap-2">
                 <span className="rounded-full bg-nexus-blue/20 px-2 py-0.5 text-xs text-nexus-blue">
                   {template.cargoType}
                 </span>
                 <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                  {template.weight}
+                  {template.weight} kg
                 </span>
               </div>
               <div className="mt-3">
