@@ -1,0 +1,207 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 5%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 7%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 265 62% 56%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 180 100% 42%;
+    --accent-foreground: 210 40% 98%;
+
+    --muted: 220 30% 15%;
+    --muted-foreground: 215 20% 65%;
+
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32.6% 17.5%;
+    --input: 217 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 265 62% 56%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 220 30% 12%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border selection:bg-nexus-blue/20 selection:text-white;
+  }
+  
+  html, body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/5 border border-white/10 shadow-[0_4px_15px_-2px_rgba(0,0,0,0.4)];
+  }
+  
+  .neo-blur {
+    @apply backdrop-blur-2xl bg-black/30 border border-white/10;
+  }
+  
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-nexus-blue via-nexus-blue/90 to-nexus-blue/70 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-nexus-purple via-nexus-purple/90 to-nexus-purple/70 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-teal {
+    @apply bg-gradient-to-r from-nexus-teal via-nexus-teal/90 to-nexus-teal/70 bg-clip-text text-transparent;
+  }
+
+  .shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer::before {
+    @apply absolute inset-0 -translate-x-full;
+    content: '';
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.05),
+      transparent
+    );
+    animation: shimmer 2s infinite;
+  }
+  
+  .glow-effect {
+    @apply relative;
+  }
+  
+  .glow-effect::after {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300 rounded-md;
+    content: '';
+    z-index: -1;
+    filter: blur(15px);
+  }
+  
+  .glow-blue:hover::after {
+    @apply opacity-100 bg-nexus-blue/30;
+  }
+  
+  .glow-purple:hover::after {
+    @apply opacity-100 bg-nexus-purple/30;
+  }
+  
+  .glow-teal:hover::after {
+    @apply opacity-100 bg-nexus-teal/30;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
+  }
+  
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+}
+
+/* Custom elements - moved from utilities layer to components layer */
+@layer components {
+  .nexus-button {
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-muted border border-white/10 rounded-md;
+  }
+
+  .nexus-button::before {
+    @apply absolute inset-0 border-0 ease-out duration-300;
+    content: '';
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  /* Add hover effect directly instead of using group */
+  .nexus-button:hover::before {
+    @apply border-[25px];
+  }
+
+  .nexus-button-primary {
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-blue/20 border border-white/10 rounded-md;
+  }
+  
+  .nexus-button-primary:hover {
+    @apply bg-nexus-blue/30 shadow-[0_0_15px_-2px_rgba(0,98,255,0.5)];
+  }
+
+  .nexus-button-secondary {
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-purple/20 border border-white/10 rounded-md;
+  }
+  
+  .nexus-button-secondary:hover {
+    @apply bg-nexus-purple/30 shadow-[0_0_15px_-2px_rgba(110,54,229,0.5)];
+  }
+
+  .nexus-button-accent {
+    @apply relative inline-flex items-center justify-center px-5 py-2 overflow-hidden font-medium transition-all bg-nexus-teal/20 border border-white/10 rounded-md;
+  }
+  
+  .nexus-button-accent:hover {
+    @apply bg-nexus-teal/30 shadow-[0_0_15px_-2px_rgba(0,207,213,0.5)];
+  }
+
+  .nexus-card {
+    @apply relative overflow-hidden rounded-xl border border-white/10 shadow-xl transition-all duration-300 hover:border-white/20 hover:shadow-2xl;
+  }
+
+  .nexus-card-blue {
+    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-blue/10;
+  }
+
+  .nexus-card-purple {
+    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-purple/10;
+  }
+
+  .nexus-card-teal {
+    @apply nexus-card bg-gradient-to-br from-background via-background to-nexus-teal/10;
+  }
+
+  .nexus-input {
+    @apply bg-muted border-white/10 focus:border-nexus-blue/50 focus:ring-1 focus:ring-nexus-blue/50 rounded-md px-3 py-2 transition-all duration-200;
+  }
+}
