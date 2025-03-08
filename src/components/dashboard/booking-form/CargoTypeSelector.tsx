@@ -45,7 +45,7 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
             role="combobox"
             type="button"
             className={cn(
-              "w-full justify-between border-white/10 bg-muted text-left font-normal",
+              "w-full justify-between bg-background text-left font-normal",
               !cargoType && "text-muted-foreground",
               error && "border-destructive"
             )}
@@ -98,7 +98,7 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
                       />
                       <div className="flex flex-col">
                         <span className="font-medium">{type.label}</span>
-                        <div className="ml-auto flex space-x-1 mt-1">
+                        <div className="ml-auto flex flex-wrap gap-1 mt-1">
                           {type.restrictions.includes("no-air") && (
                             <span className="text-xs bg-red-500/20 text-red-500 px-1 rounded">No Air</span>
                           )}
@@ -110,6 +110,15 @@ const CargoTypeSelector: React.FC<CargoTypeSelectorProps> = ({
                           )}
                           {type.restrictions.includes("special-handling") && (
                             <span className="text-xs bg-yellow-500/20 text-yellow-500 px-1 rounded">Special Handling</span>
+                          )}
+                          {type.restrictions.includes("high-value") && (
+                            <span className="text-xs bg-purple-500/20 text-purple-500 px-1 rounded">High Value</span>
+                          )}
+                          {type.restrictions.includes("oversized") && (
+                            <span className="text-xs bg-orange-500/20 text-orange-500 px-1 rounded">Oversized</span>
+                          )}
+                          {type.restrictions.includes("weight-restrictions") && (
+                            <span className="text-xs bg-gray-500/20 text-gray-500 px-1 rounded">Weight Limit</span>
                           )}
                         </div>
                       </div>

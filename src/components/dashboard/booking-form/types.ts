@@ -96,3 +96,61 @@ export interface AirportFee {
   security: number;
   customs: number;
 }
+
+// New interfaces for financial analysis
+export interface CurrencyConversion {
+  fromCurrency: string;
+  toCurrency: string;
+  rate: number;
+  timestamp: Date;
+}
+
+export interface AirTransportCost {
+  baseFare: number;
+  baseFareCurrency: string;
+  airportTaxes: number;
+  fuelSurcharge: number;
+  securityFee: number;
+  bankCharges: number;
+  seasonalFactor: number; // percentage multiplier for seasonal prices
+  totalInOriginalCurrency: number;
+  totalConverted?: number;
+  airline?: string;
+}
+
+export interface SeaTransportCost {
+  baseFreight: number;
+  containerType: "FCL" | "LCL";
+  portHandling: number;
+  customDuties: number;
+  fuelSurcharge: number;
+  documentationFees: number;
+  insurance: number;
+  totalInUSD: number;
+  totalConverted?: number;
+  carrier?: string;
+}
+
+export interface RoadTransportCost {
+  baseFare: number;
+  distanceKm: number;
+  tollCharges: number;
+  borderCrossing?: number;
+  fuelSurcharge: number;
+  driverAllowance: number;
+  totalInOriginalCurrency: number;
+  totalConverted?: number;
+  carrier?: string;
+}
+
+export interface FinancialBreakdown {
+  transportMode: string;
+  userCurrency: string;
+  airCosts?: AirTransportCost;
+  seaCosts?: SeaTransportCost;
+  roadCosts?: RoadTransportCost;
+  exchangeRates: Record<string, number>;
+  totalCost: number;
+  profitMargin: number;
+  companyCost: number;
+}
