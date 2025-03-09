@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { toast } from "@/components/ui/use-toast";
@@ -300,6 +299,7 @@ const Analytics = () => {
   const activeData = {
     costTrendData: costTrendData[dateRange as keyof typeof costTrendData],
     routeComparisonData: routeComparisonData[dateRange as keyof typeof routeComparisonData],
+    bulkSavingsData: bulkSavingsData[dateRange as keyof typeof bulkSavingsData],
     shipmentVolumeData: shipmentVolumeData[dateRange as keyof typeof shipmentVolumeData],
     topRoutesData: topRoutesData[dateRange as keyof typeof topRoutesData],
     transportModeData: transportModeData[dateRange as keyof typeof transportModeData],
