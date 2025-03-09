@@ -63,7 +63,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
     if (!isEmergencyShipment) {
       toast({
         title: "Emergency Shipping Activated",
-        description: "Your shipment will be prioritized with helicopter and express options.",
+        description: "Your shipment will be prioritized with air and express options.",
       });
     }
   };

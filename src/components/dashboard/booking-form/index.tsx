@@ -315,7 +315,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     toast({
       title: "Booking Confirmed",
-      description: `Booking #${bookingData.id} has been confirmed successfully.`
+      description: `Booking #${bookingData.id} has been confirmed and saved to history.`
     });
     
     setOrigin("");

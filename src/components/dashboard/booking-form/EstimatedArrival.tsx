@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Clock, Calendar, MapPin, AlertTriangle, RefreshCw } from "lucide-react";
+import { Clock, Calendar, MapPin, AlertTriangle, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
@@ -23,6 +23,23 @@ const EstimatedArrival = ({ estimatedTime, origin, destination, transportMode }:
   const [hasPortCongestion, setHasPortCongestion] = useState(false);
   const [showRouteChangeAlert, setShowRouteChangeAlert] = useState(false);
   const [routeChangeData, setRouteChangeData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [displayedEstimatedTime, setDisplayedEstimatedTime] = useState("");
+  
+  // Handle loading effect when origin/destination changes
+  useEffect(() => {
+    if (origin && destination && estimatedTime) {
+      setIsLoading(true);
+      setDisplayedEstimatedTime("");
+      
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+        setDisplayedEstimatedTime(estimatedTime);
+      }, 4000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [origin, destination, estimatedTime]);
   
   // Simulate weather and port conditions when origin/destination changes
   useEffect(() => {
@@ -102,7 +119,7 @@ const EstimatedArrival = ({ estimatedTime, origin, destination, transportMode }:
     });
   };
 
-  if (!origin || !destination || !estimatedTime) {
+  if (!origin || !destination) {
     return (
       <div className="space-y-2">
         <label className="text-sm font-medium text-muted-foreground">
@@ -127,9 +144,16 @@ const EstimatedArrival = ({ estimatedTime, origin, destination, transportMode }:
         <div className="flex flex-col">
           <div className="flex items-center text-nexus-blue-light font-medium">
             <Clock className="mr-2 h-4 w-4" />
-            <span>{estimatedTime}</span>
+            {isLoading ? (
+              <div className="flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span>Calculating arrival time...</span>
+              </div>
+            ) : (
+              <span>{displayedEstimatedTime}</span>
+            )}
             
-            {(hasWeatherAlert || hasPortCongestion) && (
+            {!isLoading && (hasWeatherAlert || hasPortCongestion) && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -155,7 +179,7 @@ const EstimatedArrival = ({ estimatedTime, origin, destination, transportMode }:
             </span>
           </div>
           
-          {(hasWeatherAlert || hasPortCongestion) && (
+          {!isLoading && (hasWeatherAlert || hasPortCongestion) && (
             <div className="mt-2 pt-2 border-t border-amber-500/20">
               <div className="flex items-center justify-between">
                 <div className="flex items-center text-xs text-amber-500">

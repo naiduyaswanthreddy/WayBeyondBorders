@@ -1,4 +1,3 @@
-
 import { LocationData, CargoTypeData, TransportModeData } from "./types";
 
 // Extensive, predefined dataset of shipping locations
@@ -70,77 +69,77 @@ export const locations: LocationData[] = [
 
 // Expanded cargo types with detailed attributes
 export const cargoTypes: CargoTypeData[] = [
-  // General Cargo
-  { label: "General Cargo", value: "general", restrictions: [], airAllowed: true },
-  { label: "Mixed Freight", value: "mixed", restrictions: [], airAllowed: true },
-  
-  // Containers
-  { label: "20ft Container", value: "container20", restrictions: [], airAllowed: false },
-  { label: "40ft Container", value: "container40", restrictions: [], airAllowed: false },
-  { label: "40ft High Cube", value: "container40hc", restrictions: [], airAllowed: false },
-  { label: "Refrigerated Container", value: "reefer", restrictions: ["temperature-control"], airAllowed: false },
-  { label: "Open Top Container", value: "opentop", restrictions: ["special-handling"], airAllowed: false },
-  { label: "Flat Rack Container", value: "flatrack", restrictions: ["special-handling"], airAllowed: false },
-  { label: "Tank Container", value: "tank", restrictions: ["special-handling"], airAllowed: false },
-  
-  // Perishable Goods
-  { label: "Perishable Goods", value: "perishable", restrictions: ["prioritize-air", "temperature-control"], airPriority: true, airAllowed: true },
-  { label: "Fresh Produce", value: "produce", restrictions: ["prioritize-air", "temperature-control"], airPriority: true, airAllowed: true },
-  { label: "Frozen Food", value: "frozen", restrictions: ["temperature-control"], airAllowed: true },
-  { label: "Dairy Products", value: "dairy", restrictions: ["prioritize-air", "temperature-control"], airPriority: true, airAllowed: true },
-  { label: "Meat & Seafood", value: "meat", restrictions: ["prioritize-air", "temperature-control"], airPriority: true, airAllowed: true },
-  { label: "Flowers & Plants", value: "flowers", restrictions: ["prioritize-air", "temperature-control"], airPriority: true, airAllowed: true },
-  
-  // Hazardous Materials
-  { label: "Hazardous Materials", value: "hazmat", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  { label: "Flammable Liquids", value: "flammable", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  { label: "Corrosive Substances", value: "corrosive", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  { label: "Toxic Materials", value: "toxic", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  { label: "Radioactive Materials", value: "radioactive", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  
-  // High-Value Goods
-  { label: "Electronics", value: "electronics", restrictions: ["temperature-control", "high-value"], airAllowed: true },
-  { label: "Pharmaceuticals", value: "pharmaceuticals", restrictions: ["temperature-control", "high-value"], airAllowed: true },
-  { label: "Luxury Goods", value: "luxury", restrictions: ["high-value"], airAllowed: true },
-  { label: "Artwork", value: "artwork", restrictions: ["careful-handling", "high-value"], airAllowed: true },
-  
-  // Oversized & Heavy
-  { label: "Vehicles", value: "vehicles", restrictions: ["special-handling", "oversized"], airAllowed: false },
-  { label: "Heavy Machinery", value: "machinery", restrictions: ["weight-restrictions", "oversized"], airAllowed: false },
-  { label: "Construction Equipment", value: "construction", restrictions: ["weight-restrictions", "oversized"], airAllowed: false },
-  { label: "Project Cargo", value: "project", restrictions: ["special-handling", "oversized"], airAllowed: false },
-  
-  // Bulk Cargo
-  { label: "Bulk Dry", value: "bulkdry", restrictions: ["no-air"], airAllowed: false },
-  { label: "Bulk Grain", value: "grain", restrictions: ["no-air"], airAllowed: false },
-  { label: "Bulk Coal", value: "coal", restrictions: ["no-air"], airAllowed: false },
-  { label: "Bulk Minerals", value: "minerals", restrictions: ["no-air"], airAllowed: false },
-  
-  // Liquid Bulk
-  { label: "Bulk Liquids", value: "liquids", restrictions: ["no-air"], airAllowed: false },
-  { label: "Crude Oil", value: "oil", restrictions: ["no-air"], airAllowed: false },
-  { label: "Petroleum Products", value: "petroleum", restrictions: ["no-air"], airAllowed: false },
-  { label: "Chemicals", value: "chemicals", restrictions: ["no-air", "special-handling"], airAllowed: false },
-  { label: "Vegetable Oils", value: "vegoil", restrictions: ["no-air"], airAllowed: false },
-  
-  // Special Cargo
-  { label: "Live Animals", value: "animals", restrictions: ["prioritize-air", "special-handling"], airPriority: true, airAllowed: true },
-  { label: "Human Remains", value: "remains", restrictions: ["special-handling"], airAllowed: true },
-  { label: "Diplomatic Cargo", value: "diplomatic", restrictions: ["special-handling"], airAllowed: true },
-  { label: "Military Equipment", value: "military", restrictions: ["special-handling"], airAllowed: true },
+  { 
+    value: "general", 
+    label: "General Merchandise", 
+    restrictions: [],
+    description: "Standard goods with no special handling requirements"
+  },
+  { 
+    value: "electronics", 
+    label: "Electronics & Devices", 
+    restrictions: ["special-handling"],
+    description: "Electronic equipment, computers, phones, etc."
+  },
+  { 
+    value: "apparel", 
+    label: "Apparel & Textiles", 
+    restrictions: [],
+    description: "Clothing, fabrics, and textile materials"
+  },
+  { 
+    value: "perishable", 
+    label: "Perishable Goods", 
+    restrictions: ["prioritize-air", "refrigerated"],
+    description: "Food, flowers, and other items requiring temperature control"
+  },
+  { 
+    value: "hazardous", 
+    label: "Hazardous Materials", 
+    restrictions: ["no-air", "special-handling"],
+    description: "Chemicals, flammable items, and regulated materials"
+  },
+  { 
+    value: "pharmaceutical", 
+    label: "Pharmaceuticals", 
+    restrictions: ["refrigerated", "prioritize-air"],
+    description: "Medicines, vaccines, and medical supplies"
+  },
+  { 
+    value: "automotive", 
+    label: "Automotive Parts", 
+    restrictions: [],
+    description: "Vehicle parts and accessories"
+  },
+  { 
+    value: "oversized", 
+    label: "Oversized Cargo", 
+    restrictions: ["no-air", "special-handling"],
+    description: "Large equipment, machinery, or heavy items"
+  },
+  { 
+    value: "livestock", 
+    label: "Livestock & Animals", 
+    restrictions: ["special-handling", "prioritize-air"],
+    description: "Live animals requiring special care"
+  },
+  { 
+    value: "valuable", 
+    label: "Valuable Items", 
+    restrictions: ["special-handling"],
+    description: "High-value goods, jewelry, art, etc."
+  }
 ];
 
 // Transport modes with detailed attributes
 export const transportModes: TransportModeData[] = [
-  { label: "Any (AI Optimized)", value: "any" },
-  { label: "Air Freight", value: "air" },
-  { label: "Express Air", value: "express" },
-  { label: "Sea Freight", value: "sea" },
-  { label: "Road Transport", value: "road" },
-  { label: "Rail Transport", value: "rail" },
-  { label: "Multimodal (Sea+Road)", value: "searoad" },
-  { label: "Multimodal (Air+Road)", value: "airroad" },
-  { label: "Multimodal (Sea+Rail)", value: "searail" },
+  { value: "any", label: "Any Mode (AI Optimized)" },
+  { value: "air", label: "Air Freight" },
+  { value: "sea", label: "Sea Freight" },
+  { value: "road", label: "Road Transport" },
+  { value: "rail", label: "Rail Transport" },
+  { value: "express", label: "Express Delivery" },
+  { value: "multimode", label: "Multimode Transport" }
 ];
 
 // Additional transport-specific data could be added here for more complex routing

@@ -111,7 +111,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
   const [showCostOptimizer, setShowCostOptimizer] = useState<boolean>(false);
   const [optimizationComplete, setOptimizationComplete] = useState<boolean>(false);
   const [savingsAmount, setSavingsAmount] = useState<number>(0);
-  const [showGoogleMap, setShowGoogleMap] = useState<boolean>(false);
   const [googleMapDialogOpen, setGoogleMapDialogOpen] = useState<boolean>(false);
   
   const navigate = useNavigate();
@@ -256,17 +255,16 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     };
     sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
     
-    toast({
-      title: `${selectedRouteDetails?.name} Selected`,
-      description: "Review detailed breakdown below",
-    });
-
     if (selectedRouteDetails?.isEcoFriendly && selectedRouteDetails.ecoPoints) {
       addPoints(selectedRouteDetails.ecoPoints);
       toast({
-        title: `Earned ${selectedRouteDetails.ecoPoints} Eco Points!`,
-        description: "Thank you for choosing the eco-friendly option",
-        variant: "default"
+        title: `${selectedRouteDetails?.name} Selected`,
+        description: `Earned ${selectedRouteDetails.ecoPoints} Eco Points! Thank you for choosing the eco-friendly option.`,
+      });
+    } else {
+      toast({
+        title: `${selectedRouteDetails?.name} Selected`,
+        description: "Review detailed breakdown below",
       });
     }
   };
@@ -329,15 +327,6 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       });
     }, 1500);
   };
-
-  const toggleMapView = () => {
-    setShowGoogleMap(!showGoogleMap);
-    
-    toast({
-      title: showGoogleMap ? "Switched to Stylized View" : "Switched to Google Maps View",
-      description: showGoogleMap ? "Using simplified route visualization" : "Using real-time Google Maps data",
-    });
-  };
   
   const openFullMapView = () => {
     setGoogleMapDialogOpen(true);
@@ -357,10 +346,10 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
             variant="outline" 
             size="sm" 
             className="gap-1 text-xs"
-            onClick={toggleMapView}
+            onClick={openFullMapView}
           >
             <ArrowDownUp className="h-3 w-3" />
-            {showGoogleMap ? "Switch to Stylized" : "Switch to Google Maps"}
+            View Larger Map
           </Button>
           <Button 
             variant="outline" 
@@ -388,31 +377,15 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
         selectedRoute={selectedRoute}
         onRouteSelect={handleRouteSelect}
       />
-
-      {showGoogleMap ? (
-        <div className="relative">
-          <GoogleMapDisplay 
-            origin={originLabel}
-            destination={destinationLabel}
-          />
-          <Button
-            size="sm"
-            className="absolute bottom-4 right-4 bg-background/90 backdrop-blur-md"
-            onClick={openFullMapView}
-          >
-            View Larger Map
-          </Button>
-        </div>
-      ) : (
-        <RouteMapDisplay 
-          selectedRoute={selectedRoute}
-          selectedRouteDetails={selectedRouteDetails}
-          origin={originLabel}
-          destination={destinationLabel}
-        />
-      )}
       
       <RouteMapDetails selectedRouteDetails={selectedRouteDetails} />
+
+      <RouteMapDisplay 
+        selectedRoute={selectedRoute}
+        selectedRouteDetails={selectedRouteDetails}
+        origin={originLabel}
+        destination={destinationLabel}
+      />
       
       {!showCostOptimizer ? (
         <div className="flex justify-center">
@@ -516,6 +489,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
             <GoogleMapDisplay 
               origin={originLabel}
               destination={destinationLabel}
+              transportModes={selectedRouteDetails?.modes.map(m => m.toLowerCase()) || []}
             />
           </div>
           <DialogFooter>

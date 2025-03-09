@@ -29,6 +29,10 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   availableRoutes,
   restrictionWarning,
 }) => {
+  // Determine if multimode should be enabled for this cargo type
+  const selectedCargo = cargoTypes.find(c => c.value === cargoType);
+  const canUseMultimode = !selectedCargo?.restrictions.includes("no-multimode");
+  
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium text-muted-foreground">
@@ -44,9 +48,17 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
         <SelectContent>
           {transportModes.map((mode) => {
             const isAirMode = mode.value === 'air' || mode.value === 'express';
+            const isMultiMode = mode.value === 'multimode';
             const selectedCargo = cargoTypes.find(c => c.value === cargoType);
-            const isDisabled = (selectedCargo?.restrictions.includes("no-air") && isAirMode) || 
-                              (mode.value !== 'any' && !availableRoutes.includes(mode.value) && availableRoutes.length > 0);
+            
+            // Determine if mode should be disabled
+            const isDisabled = 
+              // Check if air mode is restricted for this cargo
+              (selectedCargo?.restrictions.includes("no-air") && isAirMode) || 
+              // Check if mode is available for the route (except for 'any' which is always available)
+              (mode.value !== 'any' && mode.value !== 'multimode' && !availableRoutes.includes(mode.value) && availableRoutes.length > 0) ||
+              // Check if multimode should be disabled
+              (isMultiMode && !canUseMultimode);
             
             return (
               <SelectItem 
@@ -57,6 +69,7 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
               >
                 {mode.label}
                 {isDisabled && " (Not available for this route/cargo)"}
+                {isMultiMode && canUseMultimode && " (Recommended for efficiency)"}
               </SelectItem>
             );
           })}
@@ -81,6 +94,11 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
               {route.charAt(0).toUpperCase() + route.slice(1)}
             </span>
           ))}
+          {canUseMultimode && (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-green-500/20 text-green-400">
+              Multimode
+            </span>
+          )}
         </div>
       )}
     </div>
