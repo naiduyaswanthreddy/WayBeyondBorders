@@ -1,4 +1,10 @@
 
+declare global {
+  interface Window {
+    google: typeof google;
+  }
+}
+
 declare namespace google {
   namespace maps {
     class Map {
@@ -87,8 +93,8 @@ declare namespace google {
 
     interface IconSequence {
       icon: Symbol;
-      offset?: string;
       repeat?: string;
+      offset?: string;
     }
 
     interface InfoWindowOptions {
@@ -206,5 +212,4 @@ declare namespace google {
   }
 }
 
-// Make sure TypeScript knows this is a module
 export {};
