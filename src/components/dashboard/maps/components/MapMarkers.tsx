@@ -59,18 +59,18 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     
     // Add click listeners to markers
     originMarker.addListener("click", () => {
-      // Fix: Use the correct InfoWindow.open() method signature
+      // Fix: Use the correct InfoWindow.open() method signature with proper typing
       originInfo.open({
         map,
-        anchor: originMarker
+        anchor: originMarker as unknown as google.maps.MVCObject
       });
     });
     
     destMarker.addListener("click", () => {
-      // Fix: Use the correct InfoWindow.open() method signature
+      // Fix: Use the correct InfoWindow.open() method signature with proper typing
       destInfo.open({
         map,
-        anchor: destMarker
+        anchor: destMarker as unknown as google.maps.MVCObject
       });
     });
     
