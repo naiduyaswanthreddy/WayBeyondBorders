@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
@@ -26,6 +27,14 @@ const Bookings = () => {
       setActiveTab(location.state.activeTab);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    // Notify booking form component about tab changes
+    const event = new CustomEvent('bookingTabChange', { 
+      detail: { tab: activeSubTab }
+    });
+    window.dispatchEvent(event);
+  }, [activeSubTab]);
 
   const simulateRouteAlert = () => {
     showRouteChangeAlert({
@@ -77,7 +86,7 @@ const Bookings = () => {
               value={activeTab}
               onValueChange={setActiveTab}
             >
-              <TabsList className="grid w-full grid-cols-5 bg-white text-gray-700">
+              <TabsList className="grid w-full grid-cols-5 bg-white/80 text-gray-700">
                 <TabsTrigger value="new-booking" className="gap-2 data-[state=active]:bg-nexus-blue data-[state=active]:text-white">
                   <RouteIcon className="h-4 w-4" />
                   <span>New Booking</span>
@@ -107,7 +116,7 @@ const Bookings = () => {
                   onValueChange={setActiveSubTab}
                   className="w-full"
                 >
-                  <TabsList className="w-auto mb-4 bg-white text-gray-700">
+                  <TabsList className="w-auto mb-4 bg-white/80 text-gray-700">
                     <TabsTrigger value="booking" className="text-sm data-[state=active]:bg-nexus-blue data-[state=active]:text-white">Single Booking</TabsTrigger>
                     <TabsTrigger value="multi-stop" className="text-sm data-[state=active]:bg-nexus-blue data-[state=active]:text-white">Multi-Stop</TabsTrigger>
                     <TabsTrigger value="shared" className="text-sm data-[state=active]:bg-nexus-blue data-[state=active]:text-white">
@@ -190,35 +199,33 @@ const Bookings = () => {
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="multi-stop" className="pt-4">
-                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
-                      <RouteIcon className="h-12 w-12 text-muted-foreground" />
-                      <h3 className="mt-4 text-xl font-semibold text-white">Multi-Stop Shipping</h3>
-                      <p className="mt-2 text-center text-muted-foreground">
-                        Plan complex routes with multiple pickup and delivery locations.
-                      </p>
-                      <Button 
-                        className="mt-6"
-                        onClick={() => setActiveSubTab("booking")}
-                      >
-                        Switch to Single Booking
-                      </Button>
+                  <TabsContent value="multi-stop" className="space-y-6">
+                    <div className="animate-fade-in [animation-delay:700ms]">
+                      <BookingForm />
+                    </div>
+                    
+                    <div className="animate-fade-in [animation-delay:800ms]">
+                      <RouteMap />
+                    </div>
+                    
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
+                      <EcoPointsCard />
                     </div>
                   </TabsContent>
                   
-                  <TabsContent value="shared" className="pt-4">
-                    <div className="flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-white/10 bg-white/5 p-8">
-                      <Share2 className="h-12 w-12 text-muted-foreground" />
-                      <h3 className="mt-4 text-xl font-semibold text-white">Shipment Ride-Sharing</h3>
-                      <p className="mt-2 text-center text-muted-foreground">
-                        Share transportation with others to reduce costs and environmental impact.
-                      </p>
-                      <Button 
-                        className="mt-6"
-                        onClick={() => setActiveSubTab("booking")}
-                      >
-                        Switch to Single Booking
-                      </Button>
+                  <TabsContent value="shared" className="space-y-6">
+                    <div className="animate-fade-in [animation-delay:700ms]">
+                      <BookingForm />
+                    </div>
+                    
+                    <div className="animate-fade-in [animation-delay:800ms]">
+                      <RouteMap />
+                    </div>
+                    
+                    <div className="grid gap-6 md:grid-cols-2">
+                      <CostBreakdown className="animate-fade-in [animation-delay:900ms]" />
+                      <EcoPointsCard />
                     </div>
                   </TabsContent>
                 </Tabs>

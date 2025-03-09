@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { TabsContent } from "@/components/ui/tabs";
 import SingleBookingForm from "./SingleBookingForm";
@@ -8,8 +8,22 @@ import RideSharingBookingForm from "./RideSharingBookingForm";
 import { BookingFormProps } from "./types";
 
 const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
-  // We'll use this to track which tab is active based on the parent Tabs component
   const [activeTab, setActiveTab] = useState("booking");
+  
+  useEffect(() => {
+    // Listen for tab changes from parent component
+    const handleTabChange = (event: CustomEvent) => {
+      if (event.detail && event.detail.tab) {
+        setActiveTab(event.detail.tab);
+      }
+    };
+    
+    window.addEventListener('bookingTabChange', handleTabChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('bookingTabChange', handleTabChange as EventListener);
+    };
+  }, []);
   
   return (
     <>
