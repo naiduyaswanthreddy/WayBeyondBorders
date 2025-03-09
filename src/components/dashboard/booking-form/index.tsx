@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -14,8 +13,6 @@ import EstimatedArrival from "./EstimatedArrival";
 import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
-import MultiStopBooking, { Stop } from "./MultiStopBooking";
-import RideSharing from "./RideSharing";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, CargoItem, TemplateData } from "./types";
@@ -37,12 +34,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
   const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
-  
-  // Multi-stop and Ride-sharing states
-  const [stops, setStops] = useState<Stop[]>([]);
-  const [enableRideSharing, setEnableRideSharing] = useState(false);
-  const [selectedSharedOption, setSelectedSharedOption] = useState<string | null>(null);
-  const [activeView, setActiveView] = useState<"single" | "multi-stop" | "shared">("single");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -95,17 +86,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         originLabel: finalOriginLabel,
         destination: destination || "manual",
         destinationLabel: finalDestinationLabel,
-        stops: stops.map(stop => ({
-          address: stop.location ? locations.find(loc => loc.value === stop.location)?.label || stop.locationInput : stop.locationInput,
-          type: stop.type
-        })),
         date: date ? format(date, 'yyyy-MM-dd') : null,
         cargoType,
         weight,
         transportMode,
         cargoItems,
-        availableRoutes,
-        isSharedRide: enableRideSharing
+        availableRoutes
       };
       
       sessionStorage.setItem('routeMapData', JSON.stringify(routeData));
@@ -113,11 +99,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeData });
       window.dispatchEvent(updateEvent);
     }
-  }, [
-    origin, destination, originInput, destinationInput, 
-    date, cargoType, weight, transportMode, cargoItems, 
-    availableRoutes, stops, enableRideSharing
-  ]);
+  }, [origin, destination, originInput, destinationInput, date, cargoType, weight, transportMode, cargoItems, availableRoutes]);
 
   const calculateEstimatedArrival = (originLabel: string, destinationLabel: string, mode: string) => {
     if (!originLabel || !destinationLabel) {
@@ -153,27 +135,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     }
     else {
       days = mode === "air" || mode === "express" ? "2-4" : mode === "sea" ? "14-28" : "7-14";
-    }
-    
-    // Add time for stops if any
-    if (stops.length > 0) {
-      const extraDays = stops.length * 0.5;
-      const daysRange = days.split('-');
-      if (daysRange.length === 2) {
-        const minDays = parseFloat(daysRange[0]) + extraDays;
-        const maxDays = parseFloat(daysRange[1]) + extraDays;
-        days = `${minDays}-${maxDays}`;
-      }
-    }
-    
-    // Adjust for shared rides
-    if (enableRideSharing) {
-      const daysRange = days.split('-');
-      if (daysRange.length === 2) {
-        const minDays = parseFloat(daysRange[0]) + 1;
-        const maxDays = parseFloat(daysRange[1]) + 2;
-        days = `${minDays}-${maxDays}`;
-      }
     }
     
     setEstimatedArrival(`${days} days (AI optimized)`);
@@ -272,15 +233,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     if (!cargoType) errors.cargoType = "Cargo type is required";
     if (!weight && cargoItems.length === 0) errors.weight = "Weight or cargo items are required";
     
-    // Validate each stop location if using multi-stop
-    if (activeView === "multi-stop" && stops.length > 0) {
-      stops.forEach((stop, index) => {
-        if (!stop.location && !stop.locationInput) {
-          errors[`stop-${index}`] = `Stop ${index + 1} location is required`;
-        }
-      });
-    }
-    
     setValidationErrors(errors);
     
     return Object.keys(errors).length === 0;
@@ -304,19 +256,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       originLabel: originLocation?.label || originInput,
       destination: destination || "manual",
       destinationLabel: destLocation?.label || destinationInput,
-      stops: stops.map(stop => ({
-        address: stop.location ? locations.find(loc => loc.value === stop.location)?.label || stop.locationInput : stop.locationInput,
-        type: stop.type
-      })),
       date: date ? format(date, 'yyyy-MM-dd') : null,
       cargoType,
       weight,
       transportMode,
       cargoItems,
-      availableRoutes,
-      isMultiStop: activeView === "multi-stop",
-      isSharedRide: activeView === "shared" && enableRideSharing,
-      sharedRideOption: selectedSharedOption
+      availableRoutes
     };
     
     sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
@@ -354,19 +299,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       originLabel: originLocation?.label || originInput,
       destination,
       destinationLabel: destLocation?.label || destinationInput,
-      stops: stops.map(stop => ({
-        address: stop.location ? locations.find(loc => loc.value === stop.location)?.label || stop.locationInput : stop.locationInput,
-        type: stop.type
-      })),
       date: date ? format(date, 'yyyy-MM-dd') : null,
       cargoType,
       weight,
       transportMode,
       cargoItems,
       availableRoutes,
-      isMultiStop: activeView === "multi-stop",
-      isSharedRide: activeView === "shared" && enableRideSharing,
-      sharedRideOption: selectedSharedOption,
       status: "Confirmed",
       createdAt: new Date().toISOString()
     };
@@ -389,9 +327,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     setWeight("");
     setTransportMode("any");
     setCargoItems([]);
-    setStops([]);
-    setEnableRideSharing(false);
-    setSelectedSharedOption(null);
     
     setTimeout(() => {
       navigate('/bookings', { state: { activeTab: 'history' } });
@@ -423,8 +358,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       destinationInput,
       cargoType,
       transportMode,
-      cargoItems,
-      stops: activeView === "multi-stop" ? stops : []
+      cargoItems
     });
     
     localStorage.setItem('shipmentTemplates', JSON.stringify(templates));
@@ -444,138 +378,107 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         </span>
       </div>
 
-      {activeView === "single" && (
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-2">
-            <LocationSelector 
-              label="Origin"
-              value={origin}
-              onChange={setOrigin}
-              manualInput={originInput}
-              onManualInputChange={setOriginInput}
-              locations={locations}
-              placeholder="Select or enter origin location"
-              error={validationErrors.origin}
-            />
-            {validationErrors.origin && (
-              <p className="text-xs text-destructive">{validationErrors.origin}</p>
-            )}
-          </div>
-  
-          <div className="space-y-2">
-            <LocationSelector 
-              label="Destination"
-              value={destination}
-              onChange={setDestination}
-              manualInput={destinationInput}
-              onManualInputChange={setDestinationInput}
-              locations={locations}
-              placeholder="Select or enter destination location"
-              error={validationErrors.destination}
-            />
-            {validationErrors.destination && (
-              <p className="text-xs text-destructive">{validationErrors.destination}</p>
-            )}
-          </div>
-  
-          <div className="space-y-2">
-            <ShippingDatePicker 
-              date={date}
-              setDate={setDate}
-              error={validationErrors.date}
-            />
-            {validationErrors.date && (
-              <p className="text-xs text-destructive">{validationErrors.date}</p>
-            )}
-          </div>
-  
-          <div className="space-y-2">
-            <CargoTypeSelector 
-              cargoType={cargoType}
-              setCargoType={setCargoType}
-              cargoTypes={cargoTypes}
-              restrictions={restrictions}
-              error={validationErrors.cargoType}
-            />
-            {validationErrors.cargoType && (
-              <p className="text-xs text-destructive">{validationErrors.cargoType}</p>
-            )}
-          </div>
-  
-          <TransportModeSelector 
-            transportMode={transportMode}
-            handleTransportModeChange={handleTransportModeChange}
-            transportModes={transportModes}
-            cargoType={cargoType}
-            cargoTypes={cargoTypes}
-            availableRoutes={availableRoutes}
-            restrictionWarning={restrictionWarning}
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <LocationSelector 
+            label="Origin"
+            value={origin}
+            onChange={setOrigin}
+            manualInput={originInput}
+            onManualInputChange={setOriginInput}
+            locations={locations}
+            placeholder="Select or enter origin location"
+            error={validationErrors.origin}
           />
-  
-          <div className="space-y-2">
-            <WeightInput 
-              weight={weight}
-              setWeight={setWeight}
-              error={validationErrors.weight}
-            />
-            {validationErrors.weight && (
-              <p className="text-xs text-destructive">{validationErrors.weight}</p>
-            )}
-          </div>
-          
-          <EstimatedArrival 
-            estimatedTime={estimatedArrival}
-            origin={origin || originInput}
-            destination={destination || destinationInput}
-            transportMode={transportMode}
-          />
-          
-          <CargoItemsSection 
-            cargoItems={cargoItems}
-            setCargoItems={setCargoItems}
-          />
+          {validationErrors.origin && (
+            <p className="text-xs text-destructive">{validationErrors.origin}</p>
+          )}
         </div>
-      )}
-      
-      {activeView === "multi-stop" && (
-        <MultiStopBooking
-          origin={origin}
-          originInput={originInput}
-          destination={destination}
-          destinationInput={destinationInput}
-          stops={stops}
-          onOriginChange={setOrigin}
-          onOriginInputChange={setOriginInput}
-          onDestinationChange={setDestination}
-          onDestinationInputChange={setDestinationInput}
-          onStopsChange={setStops}
+
+        <div className="space-y-2">
+          <LocationSelector 
+            label="Destination"
+            value={destination}
+            onChange={setDestination}
+            manualInput={destinationInput}
+            onManualInputChange={setDestinationInput}
+            locations={locations}
+            placeholder="Select or enter destination location"
+            error={validationErrors.destination}
+          />
+          {validationErrors.destination && (
+            <p className="text-xs text-destructive">{validationErrors.destination}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <ShippingDatePicker 
+            date={date}
+            setDate={setDate}
+            error={validationErrors.date}
+          />
+          {validationErrors.date && (
+            <p className="text-xs text-destructive">{validationErrors.date}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <CargoTypeSelector 
+            cargoType={cargoType}
+            setCargoType={setCargoType}
+            cargoTypes={cargoTypes}
+            restrictions={restrictions}
+            error={validationErrors.cargoType}
+          />
+          {validationErrors.cargoType && (
+            <p className="text-xs text-destructive">{validationErrors.cargoType}</p>
+          )}
+        </div>
+
+        <TransportModeSelector 
+          transportMode={transportMode}
+          handleTransportModeChange={handleTransportModeChange}
+          transportModes={transportModes}
+          cargoType={cargoType}
+          cargoTypes={cargoTypes}
+          availableRoutes={availableRoutes}
+          restrictionWarning={restrictionWarning}
         />
-      )}
-      
-      {activeView === "shared" && (
-        <RideSharing
+
+        <div className="space-y-2">
+          <WeightInput 
+            weight={weight}
+            setWeight={setWeight}
+            error={validationErrors.weight}
+          />
+          {validationErrors.weight && (
+            <p className="text-xs text-destructive">{validationErrors.weight}</p>
+          )}
+        </div>
+        
+        <EstimatedArrival 
+          estimatedTime={estimatedArrival}
           origin={origin || originInput}
           destination={destination || destinationInput}
-          cargoType={cargoType}
-          weight={weight}
           transportMode={transportMode}
-          enableRideSharing={enableRideSharing}
-          onEnableRideSharingChange={setEnableRideSharing}
-          selectedSharedOption={selectedSharedOption}
-          onSelectSharedOption={setSelectedSharedOption}
         />
-      )}
+        
+        <CargoItemsSection 
+          cargoItems={cargoItems}
+          setCargoItems={setCargoItems}
+        />
 
-      <ActionButtons 
-        handleSaveTemplate={handleSaveTemplate}
-        handleBookingConfirmation={handleBookingConfirmation}
-        handleFindRoutes={handleFindRoutes}
-        origin={origin || originInput}
-        destination={destination || destinationInput}
-        weight={weight}
-        isEmergencyShipment={isEmergencyShipment}
-        setIsEmergencyShipment={setIsEmergencyShipment}
-      />
+        <ActionButtons 
+          handleSaveTemplate={handleSaveTemplate}
+          handleBookingConfirmation={handleBookingConfirmation}
+          handleFindRoutes={handleFindRoutes}
+          origin={origin || originInput}
+          destination={destination || destinationInput}
+          weight={weight}
+          isEmergencyShipment={isEmergencyShipment}
+          setIsEmergencyShipment={setIsEmergencyShipment}
+        />
+      </div>
       
       <TermsConfirmationDialog
         open={confirmDialogOpen}

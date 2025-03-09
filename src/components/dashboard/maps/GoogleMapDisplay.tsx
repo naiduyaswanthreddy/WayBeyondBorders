@@ -7,36 +7,22 @@ import { getFallbackCoordinates } from "./utils/locationUtils";
 import { drawRouteLines } from "./utils/routeUtils";
 import MapMarkers from "./components/MapMarkers";
 
-interface StopPoint {
-  address: string;
-  type: 'pickup' | 'dropoff' | 'both';
-}
-
 interface GoogleMapDisplayProps {
   origin: string;
   destination: string;
-  stops?: StopPoint[];
   transportModes?: string[];
-  isSharedRide?: boolean;
 }
 
 const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({ 
   origin, 
-  destination,
-  stops = [], 
-  transportModes = ["driving"],
-  isSharedRide = false
+  destination, 
+  transportModes = ["driving"]
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [originLatLng, setOriginLatLng] = useState<google.maps.LatLng | null>(null);
   const [destLatLng, setDestLatLng] = useState<google.maps.LatLng | null>(null);
-  const [stopLatLngs, setStopLatLngs] = useState<{
-    position: google.maps.LatLng;
-    title: string;
-    type: 'pickup' | 'dropoff' | 'both';
-  }[]>([]);
   const [mapType, setMapType] = useState<string>("roadmap");
   
   const { isLoaded } = useGoogleMapsLoader();
@@ -47,19 +33,15 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
     if (mapInstance && window.google?.maps) {
       switch(type) {
         case "satellite":
-          // @ts-ignore - setMapTypeId exists but not in the type definitions
           mapInstance.setMapTypeId(google.maps.MapTypeId.SATELLITE);
           break;
         case "hybrid":
-          // @ts-ignore - setMapTypeId exists but not in the type definitions
           mapInstance.setMapTypeId(google.maps.MapTypeId.HYBRID);
           break;
         case "terrain":
-          // @ts-ignore - setMapTypeId exists but not in the type definitions
           mapInstance.setMapTypeId(google.maps.MapTypeId.TERRAIN);
           break;
         default:
-          // @ts-ignore - setMapTypeId exists but not in the type definitions
           mapInstance.setMapTypeId(google.maps.MapTypeId.ROADMAP);
       }
     }
@@ -97,109 +79,45 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       // Create geocoder to convert address strings to coordinates
       const geocoder = new window.google.maps.Geocoder();
       
-      // Function to geocode an address
-      const geocodeAddress = (address: string) => {
-        return new Promise<google.maps.LatLng>((resolve) => {
-          geocoder.geocode({ address }, (results, status) => {
+      // Convert origin and destination to coordinates
+      Promise.all([
+        new Promise<google.maps.LatLng>((resolve) => {
+          geocoder.geocode({ address: origin }, (results, status) => {
             if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
               resolve(results[0].geometry.location);
             } else {
               // Use fallback coordinates for major shipping cities
-              const fallbackCoords = getFallbackCoordinates(address);
+              const fallbackCoords = getFallbackCoordinates(origin);
               resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
             }
           });
-        });
-      };
-      
-      // Geocode all addresses: origin, stops, and destination
-      const geocodePromises = [
-        geocodeAddress(origin),
-        ...stops.map(stop => geocodeAddress(stop.address)),
-        geocodeAddress(destination)
-      ];
-      
-      Promise.all(geocodePromises)
-        .then((coordinates) => {
-          // First coordinate is origin
-          const originCoord = coordinates[0];
-          setOriginLatLng(originCoord);
-          
-          // Last coordinate is destination
-          const destCoord = coordinates[coordinates.length - 1];
-          setDestLatLng(destCoord);
-          
-          // Middle coordinates are stops (if any)
-          if (stops.length > 0) {
-            const stopCoordinates = coordinates.slice(1, coordinates.length - 1).map((coord, idx) => ({
-              position: coord,
-              title: stops[idx].address,
-              type: stops[idx].type
-            }));
-            setStopLatLngs(stopCoordinates);
-          }
-          
-          // Draw route lines based on transport modes
-          if (stops.length > 0) {
-            // Draw segments between each pair of points
-            let previousPoint = originCoord;
-            
-            // Draw from origin to first stop
-            drawRouteLines(
-              map, 
-              previousPoint, 
-              stopCoordinates[0].position, 
-              transportModes,
-              isSharedRide
-            );
-            
-            // Draw between stops
-            for (let i = 0; i < stopCoordinates.length; i++) {
-              const currentPoint = stopCoordinates[i].position;
-              
-              // If this is not the last stop, draw to the next stop
-              if (i < stopCoordinates.length - 1) {
-                const nextPoint = stopCoordinates[i + 1].position;
-                drawRouteLines(
-                  map, 
-                  currentPoint, 
-                  nextPoint, 
-                  transportModes,
-                  isSharedRide
-                );
-              } else {
-                // If this is the last stop, draw to the destination
-                drawRouteLines(
-                  map, 
-                  currentPoint, 
-                  destCoord, 
-                  transportModes,
-                  isSharedRide
-                );
-              }
-              
-              previousPoint = currentPoint;
+        }),
+        new Promise<google.maps.LatLng>((resolve) => {
+          geocoder.geocode({ address: destination }, (results, status) => {
+            if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
+              resolve(results[0].geometry.location);
+            } else {
+              // Use fallback coordinates for major shipping cities
+              const fallbackCoords = getFallbackCoordinates(destination);
+              resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
             }
-          } else {
-            // No stops, just draw from origin to destination
-            drawRouteLines(
-              map, 
-              originCoord, 
-              destCoord, 
-              transportModes,
-              isSharedRide
-            );
-          }
+          });
         })
-        .finally(() => {
-          setIsLoading(false);
-        });
+      ]).then(([originCoord, destCoord]) => {
+        setOriginLatLng(originCoord);
+        setDestLatLng(destCoord);
+        
+        // Draw route lines based on transport modes
+        drawRouteLines(map, originCoord, destCoord, transportModes);
+      }).finally(() => {
+        setIsLoading(false);
+      });
       
     } catch (error) {
       console.error("Error initializing Google Maps:", error);
       setIsLoading(false);
     }
-  }, [isLoaded, origin, destination, stops, transportModes, isSharedRide]);
+  }, [isLoaded, origin, destination, transportModes]);
 
   return (
     <div className="w-full h-[500px] rounded-lg overflow-hidden border border-white/10 relative">
@@ -221,26 +139,10 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       {mapInstance && originLatLng && destLatLng && (
         <MapMarkers
           map={mapInstance}
-          markers={[
-            {
-              position: originLatLng,
-              title: origin,
-              isOrigin: true
-            },
-            // Add stop markers
-            ...stopLatLngs.map((stop) => ({
-              position: stop.position,
-              title: stop.title,
-              isStop: true,
-              stopType: stop.type
-            })),
-            {
-              position: destLatLng,
-              title: destination,
-              isDestination: true
-            }
-          ]}
-          isSharedRide={isSharedRide}
+          originLatLng={originLatLng}
+          destLatLng={destLatLng}
+          origin={origin}
+          destination={destination}
         />
       )}
       
@@ -273,16 +175,6 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           </button>
         </div>
       </div>
-      
-      {/* Shared ride indicator */}
-      {isSharedRide && (
-        <div className="absolute top-3 left-3 z-10 bg-black/60 rounded-md px-3 py-1 backdrop-blur-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-400"></div>
-            <span className="text-xs text-white">Shared Ride</span>
-          </div>
-        </div>
-      )}
       
       {/* Map attribution - important for Google Maps */}
       <div className="absolute bottom-1 left-1 text-[8px] text-white/70">

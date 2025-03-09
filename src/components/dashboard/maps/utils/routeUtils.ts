@@ -55,8 +55,7 @@ export const drawRouteLines = (
   map: google.maps.Map, 
   origin: google.maps.LatLng, 
   destination: google.maps.LatLng, 
-  modes: string[],
-  isSharedRide = false
+  modes: string[]
 ) => {
   // For air travel - draw a curved arc line
   if (modes.includes("air")) {
@@ -67,7 +66,6 @@ export const drawRouteLines = (
       strokeColor: "#0062FF",
       strokeOpacity: 0.8,
       strokeWeight: 3,
-      strokeDasharray: isSharedRide ? [10, 5] : null, // Dashed line for shared rides
       map: map,
       icons: [{
         icon: { path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
@@ -102,78 +100,10 @@ export const drawRouteLines = (
       strokeOpacity: 0.8,
       strokeWeight: 3,
       map: map,
-      // Add dashed style for shared rides
-      icons: isSharedRide ? [
-        {
-          icon: {
-            path: 'M 0,-1 0,1',
-            strokeOpacity: 1,
-            scale: 3
-          },
-          offset: '0',
-          repeat: '10px'
-        }
-      ] : [{
+      icons: [{
         icon: { path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
         repeat: "100px"
       }]
     });
   }
-};
-
-// Helper function to calculate distances between points
-export const calculateDistances = (
-  points: google.maps.LatLng[]
-): number[] => {
-  if (!points || points.length < 2) return [];
-  
-  const distances: number[] = [];
-  
-  for (let i = 0; i < points.length - 1; i++) {
-    const distance = window.google.maps.geometry?.spherical.computeDistanceBetween(
-      points[i],
-      points[i + 1]
-    ) || 0;
-    
-    // Convert to kilometers
-    distances.push(distance / 1000);
-  }
-  
-  return distances;
-};
-
-// Helper function to estimate travel times between points
-export const estimateTravelTimes = (
-  distances: number[],
-  modes: string[]
-): { hours: number; minutes: number }[] => {
-  return distances.map((distance, index) => {
-    let speedKmh = 60; // Default speed
-    
-    // Adjust speed based on transport mode
-    const mode = modes[Math.min(index, modes.length - 1)];
-    switch (mode) {
-      case 'air':
-        speedKmh = 800;
-        break;
-      case 'sea':
-        speedKmh = 35;
-        break;
-      case 'truck':
-        speedKmh = 70;
-        break;
-      case 'electric truck':
-        speedKmh = 65;
-        break;
-      default:
-        speedKmh = 60;
-    }
-    
-    // Calculate time in hours
-    const timeHours = distance / speedKmh;
-    const hours = Math.floor(timeHours);
-    const minutes = Math.round((timeHours - hours) * 60);
-    
-    return { hours, minutes };
-  });
 };
