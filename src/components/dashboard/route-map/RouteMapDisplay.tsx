@@ -35,6 +35,14 @@ export const RouteMapDisplay: React.FC<RouteMapDisplayProps> = ({
           <div className="flex flex-col gap-1 text-sm">
             <div className="mb-1 font-medium text-white">{selectedRouteDetails.name}</div>
             <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">From:</span>
+              <span className="text-white">{origin}</span>
+            </div>
+            <div className="flex justify-between text-xs">
+              <span className="text-muted-foreground">To:</span>
+              <span className="text-white">{destination}</span>
+            </div>
+            <div className="flex justify-between text-xs">
               <span className="text-muted-foreground">Duration:</span>
               <span className="text-white">{selectedRouteDetails.duration}</span>
             </div>

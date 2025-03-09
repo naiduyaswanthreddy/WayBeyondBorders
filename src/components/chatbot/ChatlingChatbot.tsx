@@ -26,7 +26,9 @@ const ChatlingChatbot: React.FC<ChatlingChatbotProps> = ({
       
       // Clean up on unmount
       return () => {
-        document.body.removeChild(script);
+        if (document.getElementById("chatling-embed-script")) {
+          document.body.removeChild(document.getElementById("chatling-embed-script")!);
+        }
         delete window.chtlConfig;
       };
     }

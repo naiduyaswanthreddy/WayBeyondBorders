@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -167,76 +168,79 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     setSavingsAmount(0);
   }, [selectedRoute, origin, destination]);
 
-  const routes = [
-    {
-      id: "fastest",
-      name: "Fastest Route",
-      icon: Zap,
-      color: "text-nexus-blue",
-      bgColor: "bg-nexus-blue/20",
-      borderColor: "border-nexus-blue/30",
-      duration: "3 days, 4 hours",
-      cost: "$4,250",
-      co2: "2.4 tons",
-      modes: ["Air", "Truck"],
-      weather: "Clear",
-      weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
-      weatherStatus: "Optimal",
-    },
-    {
-      id: "cheapest",
-      name: "Most Economical",
-      icon: DollarSign,
-      color: "text-nexus-purple",
-      bgColor: "bg-nexus-purple/20",
-      borderColor: "border-nexus-purple/30",
-      duration: "6 days, 12 hours",
-      cost: "$2,780",
-      co2: "1.8 tons",
-      modes: ["Sea", "Truck"],
-      weather: "Mild Rain",
-      weatherIcon: <Droplets className="h-4 w-4 text-blue-400" />,
-      weatherStatus: "Minimal Delay",
-    },
-    {
-      id: "reliable",
-      name: "Most Reliable",
-      icon: Shield,
-      color: "text-nexus-teal",
-      bgColor: "bg-nexus-teal/20",
-      borderColor: "border-nexus-teal/30",
-      duration: "4 days, 8 hours",
-      cost: "$3,950",
-      co2: "2.1 tons",
-      modes: ["Air", "Truck"],
-      weather: "Stormy",
-      weatherIcon: <Umbrella className="h-4 w-4 text-yellow-400" />,
-      weatherStatus: "Alternate Route",
-    },
-    {
-      id: "eco-friendly",
-      name: "Eco-Friendly",
-      icon: Leaf,
-      color: "text-green-500",
-      bgColor: "bg-green-500/20",
-      borderColor: "border-green-500/30",
-      duration: "5 days, 6 hours",
-      cost: "$3,450",
-      co2: "0.9 tons",
-      co2Savings: "1.5 tons",
-      modes: ["Sea", "Electric Truck"],
-      weather: "Clear",
-      weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
-      weatherStatus: "Optimal",
-      ecoPoints: 125,
-      isEcoFriendly: true
-    }
-  ];
+  // Updated route descriptions based on origin/destination
+  const getRoutes = () => {
+    return [
+      {
+        id: "fastest",
+        name: "Fastest Route",
+        icon: Zap,
+        color: "text-nexus-blue",
+        bgColor: "bg-nexus-blue/20",
+        borderColor: "border-nexus-blue/30",
+        duration: "3 days, 4 hours",
+        cost: "$4,250",
+        co2: "2.4 tons",
+        modes: ["Air", "Truck"],
+        weather: "Clear",
+        weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
+        weatherStatus: "Optimal",
+      },
+      {
+        id: "cheapest",
+        name: "Most Economical",
+        icon: DollarSign,
+        color: "text-nexus-purple",
+        bgColor: "bg-nexus-purple/20",
+        borderColor: "border-nexus-purple/30",
+        duration: "6 days, 12 hours",
+        cost: "$2,780",
+        co2: "1.8 tons",
+        modes: ["Sea", "Truck"],
+        weather: "Mild Rain",
+        weatherIcon: <Droplets className="h-4 w-4 text-blue-400" />,
+        weatherStatus: "Minimal Delay",
+      },
+      {
+        id: "reliable",
+        name: "Most Reliable",
+        icon: Shield,
+        color: "text-nexus-teal",
+        bgColor: "bg-nexus-teal/20",
+        borderColor: "border-nexus-teal/30",
+        duration: "4 days, 8 hours",
+        cost: "$3,950",
+        co2: "2.1 tons",
+        modes: ["Air", "Truck"],
+        weather: "Stormy",
+        weatherIcon: <Umbrella className="h-4 w-4 text-yellow-400" />,
+        weatherStatus: "Alternate Route",
+      },
+      {
+        id: "eco-friendly",
+        name: "Eco-Friendly",
+        icon: Leaf,
+        color: "text-green-500",
+        bgColor: "bg-green-500/20",
+        borderColor: "border-green-500/30",
+        duration: "5 days, 6 hours",
+        cost: "$3,450",
+        co2: "0.9 tons",
+        co2Savings: "1.5 tons",
+        modes: ["Sea", "Electric Truck"],
+        weather: "Clear",
+        weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
+        weatherStatus: "Optimal",
+        ecoPoints: 125,
+        isEcoFriendly: true
+      }
+    ];
+  };
 
   const handleRouteSelect = (routeId: string) => {
     setSelectedRoute(routeId as any);
     
-    const selectedRouteDetails = routes.find(r => r.id === routeId);
+    const selectedRouteDetails = getRoutes().find(r => r.id === routeId);
     
     const routeWithLocations = {
       ...selectedRouteDetails,
@@ -258,19 +262,19 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     if (selectedRouteDetails?.isEcoFriendly && selectedRouteDetails.ecoPoints) {
       addPoints(selectedRouteDetails.ecoPoints);
       toast({
-        title: `${selectedRouteDetails?.name} Selected`,
-        description: `Earned ${selectedRouteDetails.ecoPoints} Eco Points! Thank you for choosing the eco-friendly option.`,
+        title: selectedRouteDetails?.name + " Selected",
+        description: "Earned " + selectedRouteDetails.ecoPoints + " Eco Points! Thank you for choosing the eco-friendly option.",
       });
     } else {
       toast({
-        title: `${selectedRouteDetails?.name} Selected`,
+        title: selectedRouteDetails?.name + " Selected",
         description: "Review detailed breakdown below",
       });
     }
   };
 
   const handleDownloadRoute = () => {
-    const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
+    const selectedRouteDetails = getRoutes().find((r) => r.id === selectedRoute);
     if (!selectedRouteDetails) return;
     
     const routeData = JSON.stringify({
@@ -284,7 +288,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `route-${selectedRouteDetails.id}-${origin}-to-${destination}.json`;
+    link.download = "route-" + selectedRouteDetails.id + "-" + origin + "-to-" + destination + ".json";
     document.body.appendChild(link);
     link.click();
     
@@ -322,7 +326,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
       
       toast({
         title: "AI Cost Optimization Complete",
-        description: `Identified potential savings of $${savings}`,
+        description: "Identified potential savings of $" + savings,
         variant: "default"
       });
     }, 1500);
@@ -332,6 +336,7 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
     setGoogleMapDialogOpen(true);
   };
 
+  const routes = getRoutes();
   const selectedRouteDetails = routes.find((r) => r.id === selectedRoute);
 
   return (
@@ -450,18 +455,18 @@ const RouteMap: React.FC<{ className?: string }> = ({ className }) => {
                   onClick={() => {
                     toast({
                       title: "Optimizations Applied",
-                      description: `Cost savings of $${savingsAmount} have been applied to your route`,
+                      description: "Cost savings of $" + savingsAmount + " have been applied to your route",
                     });
                     
                     const route = routes.find(r => r.id === selectedRoute);
                     if (route) {
                       const currentCost = parseFloat(route.cost.replace('$', '').replace(',', ''));
                       const newCost = currentCost - savingsAmount;
-                      route.cost = `$${newCost.toLocaleString()}`;
+                      route.cost = "$" + newCost.toLocaleString();
                       
                       sessionStorage.setItem('selectedRoute', JSON.stringify({
                         ...route,
-                        cost: `$${newCost.toLocaleString()}`,
+                        cost: "$" + newCost.toLocaleString(),
                         origin: originLabel,
                         destination: destinationLabel
                       }));
