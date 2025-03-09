@@ -26,6 +26,7 @@ interface LocationSelectorProps {
   locations: LocationData[];
   placeholder?: string;
   error?: string;
+  hideLabel?: boolean; // Added hideLabel prop
 }
 
 const LocationSelector = ({
@@ -37,6 +38,7 @@ const LocationSelector = ({
   locations,
   placeholder = "Select a location",
   error,
+  hideLabel = false, // Default value is false
 }: LocationSelectorProps) => {
   const [open, setOpen] = useState(false);
   const [inputMode, setInputMode] = useState<"saved" | "manual">(
@@ -65,11 +67,13 @@ const LocationSelector = ({
 
   return (
     <div className="w-full space-y-2">
-      <div className="flex justify-between">
-        <label className="text-sm font-medium text-muted-foreground">
-          {label}
-        </label>
-      </div>
+      {!hideLabel && (
+        <div className="flex justify-between">
+          <label className="text-sm font-medium text-muted-foreground">
+            {label}
+          </label>
+        </div>
+      )}
 
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
