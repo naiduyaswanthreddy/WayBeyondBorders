@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/layout/Navbar";
 import { toast } from "@/components/ui/use-toast";
@@ -121,6 +122,30 @@ const Analytics = () => {
     ]
   };
 
+  // Add the missing transportModeData
+  const transportModeData = {
+    week: [
+      { name: "Sea", value: 45 },
+      { name: "Air", value: 30 },
+      { name: "Road", value: 25 },
+    ],
+    month: [
+      { name: "Sea", value: 48 },
+      { name: "Air", value: 27 },
+      { name: "Road", value: 25 },
+    ],
+    quarter: [
+      { name: "Sea", value: 50 },
+      { name: "Air", value: 25 },
+      { name: "Road", value: 25 },
+    ],
+    year: [
+      { name: "Sea", value: 52 },
+      { name: "Air", value: 23 },
+      { name: "Road", value: 25 },
+    ]
+  };
+
   // Section 2: Sustainability & Eco-Friendly Impact
   const ecoImpactData = {
     week: [
@@ -209,6 +234,7 @@ const Analytics = () => {
     costTrendData: costTrendData[dateRange as keyof typeof costTrendData],
     routeComparisonData: routeComparisonData[dateRange as keyof typeof routeComparisonData],
     bulkSavingsData: bulkSavingsData[dateRange as keyof typeof bulkSavingsData],
+    transportModeData: transportModeData[dateRange as keyof typeof transportModeData], // Added missing transportModeData
     ecoImpactData: ecoImpactData[dateRange as keyof typeof ecoImpactData],
     ecoPointsData: ecoPointsData[dateRange as keyof typeof ecoPointsData]
   };
