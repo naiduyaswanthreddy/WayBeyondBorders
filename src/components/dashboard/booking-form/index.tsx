@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -69,7 +70,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking."
+          description: "\"" + template.name + "\" template has been applied to your new booking."
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
@@ -143,7 +144,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       days = mode === "air" || mode === "express" ? "2-4" : mode === "sea" ? "14-28" : "7-14";
     }
     
-    setEstimatedArrival(`${days} days (AI optimized)`);
+    setEstimatedArrival(days + " days (AI optimized)");
   };
 
   useEffect(() => {
@@ -179,7 +180,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         setTransportMode("any");
         toast({
           title: "Transport Mode Reset",
-          description: `Selected transport mode is not available between ${originLocation.label} and ${destLocation.label}`
+          description: "Selected transport mode is not available between " + originLocation.label + " and " + destLocation.label
         });
       }
     }
@@ -221,7 +222,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     if (value !== "any" && !availableRoutes.includes(value)) {
       toast({
         title: "Transport Mode Unavailable",
-        description: `${value.charAt(0).toUpperCase() + value.slice(1)} transport is not available for this route.`,
+        description: value.charAt(0).toUpperCase() + value.slice(1) + " transport is not available for this route.",
         variant: "destructive"
       });
       return;
@@ -270,7 +271,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     const originLocation = locations.find(loc => loc.value === origin);
     const destLocation = locations.find(loc => loc.value === destination);
 
-    const bookingId = `BK-${Date.now().toString().slice(-6)}`;
+    const bookingId = "BK-" + Date.now().toString().slice(-6);
     
     const bookingData = {
       id: bookingId,
@@ -298,7 +299,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     toast({
       title: "Booking Confirmed",
-      description: `Booking #${bookingData.id} has been confirmed and saved to history.`
+      description: "Booking #" + bookingData.id + " has been confirmed and saved to history."
     });
     
     setTimeout(() => {
@@ -335,7 +336,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     const originLocation = locations.find(loc => loc.value === origin);
     const destLocation = locations.find(loc => loc.value === destination);
     
-    const templateName = `${originLocation?.label || originInput} to ${destLocation?.label || destinationInput}`;
+    const templateName = (originLocation?.label || originInput) + " to " + (destLocation?.label || destinationInput);
     const templates = JSON.parse(localStorage.getItem('shipmentTemplates') || '[]');
     
     templates.push({
@@ -354,7 +355,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     toast({
       title: "Template Saved",
-      description: `Your shipment details have been saved as "${templateName}"`
+      description: "Your shipment details have been saved as \"" + templateName + "\""
     });
   };
 
