@@ -36,7 +36,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
         />
         <Label
           htmlFor="emergency-mode"
-          className="cursor-pointer text-muted-foreground text-sm"
+          className={`cursor-pointer ${isEmergencyShipment ? 'text-red-400 font-medium' : 'text-muted-foreground'} text-sm`}
         >
           Emergency shipment (priority handling)
         </Label>

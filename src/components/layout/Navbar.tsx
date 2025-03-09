@@ -252,14 +252,14 @@ const Navbar = () => {
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2 border-white/10 bg-muted hover:bg-muted/80">
                 <User className="h-4 w-4" />
-                <span>John Doe</span>
+                <span>CodeBlue</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-56 p-0">
               <div className="border-b border-white/10 p-4">
-                <p className="font-medium">John Doe</p>
-                <p className="text-xs text-muted-foreground">john.doe@example.com</p>
+                <p className="font-medium">CodeBlue</p>
+                <p className="text-xs text-muted-foreground">codeblue@example.com</p>
               </div>
               <div className="space-y-1 p-2">
                 <Button variant="ghost" className="w-full justify-start text-sm">View Profile</Button>

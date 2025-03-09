@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -16,9 +15,18 @@ import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
 import BookingConfirmationDocument from "./BookingConfirmationDocument";
+import EmergencyShippingMode from "./EmergencyShippingMode";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, CargoItem, TemplateData } from "./types";
+
+// List of illegal goods for validation
+const illegalGoodsList = [
+  "weapon", "weapons", "gun", "guns", "firearm", "firearms", "explosive", "explosives",
+  "narcotics", "cocaine", "heroin", "meth", "marijuana", "cannabis", "drug", "drugs",
+  "ivory", "rhino", "endangered", "hazardous", "radioactive", "uranium", "plutonium",
+  "human", "organ", "organs", "biological", "virus", "toxin", "poison"
+];
 
 const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [date, setDate] = useState<Date | undefined>();
@@ -41,6 +49,14 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
   const [showConfirmationDocument, setShowConfirmationDocument] = useState(false);
   const [hasIllegalGoods, setHasIllegalGoods] = useState(false);
+  const [showEmergencyMode, setShowEmergencyMode] = useState(false);
+  const [costOptimizationResults, setCostOptimizationResults] = useState<{ 
+    originalCost: number;
+    optimizedCost: number;
+    savings: number;
+    savingsPercent: number;
+  } | null>(null);
+  const [isRunningOptimization, setIsRunningOptimization] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -359,6 +375,100 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     });
   };
 
+  // Check if a cargo item contains illegal goods
+  const checkForIllegalGoods = (items: CargoItem[]): boolean => {
+    return items.some(item => {
+      const itemNameLower = item.name.toLowerCase();
+      return illegalGoodsList.some(illegalItem => 
+        itemNameLower.includes(illegalItem)
+      );
+    });
+  };
+
+  useEffect(() => {
+    // Check for illegal goods whenever cargo items change
+    const hasIllegal = checkForIllegalGoods(cargoItems);
+    setHasIllegalGoods(hasIllegal);
+    
+    if (hasIllegal) {
+      toast({
+        title: "Illegal Goods Detected",
+        description: "Your cargo contains items that are restricted for shipment. Please remove these items.",
+        variant: "destructive"
+      });
+    }
+  }, [cargoItems]);
+
+  // Handle emergency mode activation
+  const handleEmergencyModeToggle = () => {
+    // If not activated yet, show the modal
+    if (!isEmergencyShipment) {
+      setShowEmergencyMode(true);
+    } else {
+      // If turning off, just toggle it
+      setIsEmergencyShipment(false);
+      toast({
+        title: "Emergency Mode Deactivated",
+        description: "Your shipment has been returned to standard processing."
+      });
+    }
+  };
+
+  const activateEmergencyMode = () => {
+    setIsEmergencyShipment(true);
+    setShowEmergencyMode(false);
+    
+    // Force air transport for emergency shipments
+    if (transportMode !== "air" && transportMode !== "express") {
+      setTransportMode("express");
+    }
+    
+    toast({
+      title: "Emergency Mode Activated",
+      description: "Your shipment has been marked for priority handling and expedited delivery.",
+      variant: "default"
+    });
+  };
+
+  // Run AI cost optimization
+  const runCostOptimization = () => {
+    if (!origin && !originInput || !destination && !destinationInput) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter origin and destination to run cost optimization.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsRunningOptimization(true);
+    
+    // Simulate an API call with a delay
+    setTimeout(() => {
+      // Calculate a base cost based on distance and cargo type
+      const baseCost = Math.floor(Math.random() * 5000) + 3000; // Random cost between $3000-$8000
+      
+      // Calculate optimization percentage (15-35% savings)
+      const savingsPercent = Math.floor(Math.random() * 20) + 15;
+      const savings = Math.round(baseCost * (savingsPercent / 100));
+      const optimizedCost = baseCost - savings;
+      
+      setCostOptimizationResults({
+        originalCost: baseCost,
+        optimizedCost: optimizedCost,
+        savings: savings,
+        savingsPercent: savingsPercent
+      });
+      
+      setIsRunningOptimization(false);
+      
+      toast({
+        title: "Cost Optimization Complete",
+        description: "AI has found potential savings of $" + savings + " (" + savingsPercent + "%) on your shipment."
+      });
+    }, 3000);
+  };
+
   return (
     <div className={cn("nexus-card-blue p-6", className)}>
       <div className="mb-4 flex items-center justify-between">
@@ -486,16 +596,97 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
               onIllegalGoodsDetected={setHasIllegalGoods}
             />
 
-            <ActionButtons 
-              handleSaveTemplate={handleSaveTemplate}
-              handleBookingConfirmation={handleBookingConfirmation}
-              origin={origin || originInput}
-              destination={destination || destinationInput}
-              weight={weight}
-              isEmergencyShipment={isEmergencyShipment}
-              setIsEmergencyShipment={setIsEmergencyShipment}
-              hasIllegalGoods={hasIllegalGoods}
-            />
+            <div className="col-span-2 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full focus:outline-none ${isEmergencyShipment ? 'bg-red-500' : 'bg-white/10'}`}
+                    onClick={handleEmergencyModeToggle}
+                  >
+                    <span
+                      className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform ${isEmergencyShipment ? 'translate-x-6' : 'translate-x-1'}`}
+                    />
+                  </button>
+                  <span className={`text-sm ${isEmergencyShipment ? 'text-red-400 font-medium' : 'text-muted-foreground'}`}>
+                    Emergency shipment (priority handling)
+                  </span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={runCostOptimization}
+                  disabled={isRunningOptimization || (!origin && !originInput) || (!destination && !destinationInput)}
+                  className="bg-nexus-blue/10 text-nexus-blue-light hover:bg-nexus-blue/20"
+                >
+                  {isRunningOptimization ? (
+                    <>
+                      <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"></span>
+                      Optimizing...
+                    </>
+                  ) : (
+                    "Run AI Cost Optimization"
+                  )}
+                </Button>
+              </div>
+
+              {costOptimizationResults && (
+                <div className="rounded-md bg-green-500/10 border border-green-500/20 p-3">
+                  <h4 className="font-medium text-green-400 mb-2">Cost Optimization Results</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div>
+                      <p className="text-muted-foreground">Original Cost:</p>
+                      <p className="text-white line-through">${costOptimizationResults.originalCost}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Optimized Cost:</p>
+                      <p className="text-green-400 font-semibold">${costOptimizationResults.optimizedCost}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Savings:</p>
+                      <p className="text-green-400">${costOptimizationResults.savings}</p>
+                    </div>
+                    <div>
+                      <p className="text-muted-foreground">Percentage:</p>
+                      <p className="text-green-400">{costOptimizationResults.savingsPercent}%</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="grid gap-3 md:grid-cols-2">
+                <Button
+                  variant="outline"
+                  className="border-white/10 bg-white/5 hover:bg-white/10"
+                  onClick={handleSaveTemplate}
+                >
+                  <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                  </svg>
+                  Save as Template
+                </Button>
+                
+                <Button
+                  onClick={handleBookingConfirmation}
+                  className="bg-nexus-blue hover:bg-nexus-blue/90"
+                  disabled={hasIllegalGoods}
+                >
+                  <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  {hasIllegalGoods ? "Remove Illegal Items" : "Confirm Booking"}
+                </Button>
+              </div>
+              
+              {hasIllegalGoods && (
+                <div className="bg-red-500/20 border border-red-500/30 rounded-md p-2 mt-2">
+                  <p className="text-xs text-red-300">
+                    Illegal or restricted items detected. Please remove these items before confirming the booking.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
           
           <TermsConfirmationDialog
@@ -503,6 +694,13 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
             onOpenChange={setConfirmDialogOpen}
             onConfirm={completeBooking}
           />
+          
+          {showEmergencyMode && (
+            <EmergencyShippingMode
+              onClose={() => setShowEmergencyMode(false)}
+              onActivate={activateEmergencyMode}
+            />
+          )}
         </>
       )}
     </div>
