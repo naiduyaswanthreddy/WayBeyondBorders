@@ -300,7 +300,6 @@ const Analytics = () => {
   const activeData = {
     costTrendData: costTrendData[dateRange as keyof typeof costTrendData],
     routeComparisonData: routeComparisonData[dateRange as keyof typeof routeComparisonData],
-    bulkSavingsData: bulkSavingsData[dateRange as keyof typeof bulkSavingsData],
     shipmentVolumeData: shipmentVolumeData[dateRange as keyof typeof shipmentVolumeData],
     topRoutesData: topRoutesData[dateRange as keyof typeof topRoutesData],
     transportModeData: transportModeData[dateRange as keyof typeof transportModeData],
@@ -337,8 +336,6 @@ const Analytics = () => {
               {/* Section 1: Cost & Savings Analytics */}
               <CostSavingsAnalytics activeData={activeData} dateRange={dateRange} />
               
-              {/* Section 2: Shipment Volume & Route Performance */}
-              <ShipmentVolumeAnalytics activeData={activeData} />
               
               {/* Section 3: Sustainability & Eco-Friendly Impact */}
               <SustainabilityAnalytics activeData={activeData} points={points} />
