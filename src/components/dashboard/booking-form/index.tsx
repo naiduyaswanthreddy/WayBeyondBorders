@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
 
 import LocationSelector from "./LocationSelector";
 import ShippingDatePicker from "./ShippingDatePicker";
@@ -67,7 +69,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking."
+          description: `"${template.name}" template has been applied to your new booking.`
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
