@@ -23,8 +23,29 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
   const [mapInstance, setMapInstance] = useState<google.maps.Map | null>(null);
   const [originLatLng, setOriginLatLng] = useState<google.maps.LatLng | null>(null);
   const [destLatLng, setDestLatLng] = useState<google.maps.LatLng | null>(null);
+  const [mapType, setMapType] = useState<string>("roadmap");
   
   const { isLoaded } = useGoogleMapsLoader();
+  
+  // Handle map type change
+  const handleMapTypeChange = (type: string) => {
+    setMapType(type);
+    if (mapInstance) {
+      switch(type) {
+        case "satellite":
+          mapInstance.setMapTypeId(window.google.maps.MapTypeId.SATELLITE);
+          break;
+        case "hybrid":
+          mapInstance.setMapTypeId(window.google.maps.MapTypeId.HYBRID);
+          break;
+        case "terrain":
+          mapInstance.setMapTypeId(window.google.maps.MapTypeId.TERRAIN);
+          break;
+        default:
+          mapInstance.setMapTypeId(window.google.maps.MapTypeId.ROADMAP);
+      }
+    }
+  };
   
   useEffect(() => {
     if (!isLoaded || !mapRef.current || !window.google?.maps) return;
@@ -36,15 +57,30 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       const map = new window.google.maps.Map(mapRef.current, {
         center: { lat: 20, lng: 0 }, // Default center
         zoom: 2,
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP, // Fixed: Use window.google.maps.MapTypeId instead of string
+        mapTypeId: window.google.maps.MapTypeId.HYBRID, // Start with hybrid view
         disableDefaultUI: false,
-        streetViewControl: false,
+        streetViewControl: true,
         fullscreenControl: true,
         zoomControl: true,
-        styles: mapStyles
+        mapTypeControl: true,
+        mapTypeControlOptions: {
+          style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+          position: window.google.maps.ControlPosition.TOP_RIGHT,
+          mapTypeIds: [
+            window.google.maps.MapTypeId.ROADMAP,
+            window.google.maps.MapTypeId.HYBRID,
+            window.google.maps.MapTypeId.SATELLITE,
+            window.google.maps.MapTypeId.TERRAIN
+          ]
+        },
+        styles: mapType === "roadmap" ? mapStyles : [] // Only apply custom styles in roadmap view
       });
       
       setMapInstance(map);
+      setMapType("hybrid"); // Set initial state to match the mapTypeId
+      
+      // Add 45-degree imagery where available
+      map.setTilt(45);
       
       // Create geocoder to convert address strings to coordinates
       const geocoder = new window.google.maps.Geocoder();
@@ -90,7 +126,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
   }, [isLoaded, origin, destination, transportModes]);
 
   return (
-    <div className="w-full h-[400px] rounded-lg overflow-hidden border border-white/10 relative">
+    <div className="w-full h-[500px] rounded-lg overflow-hidden border border-white/10 relative">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80 z-10">
           <div className="flex flex-col items-center">
@@ -115,6 +151,36 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           destination={destination}
         />
       )}
+      
+      {/* Map type controls */}
+      <div className="absolute bottom-14 left-3 z-10 bg-black/60 rounded-md p-2 backdrop-blur-sm">
+        <div className="flex gap-2 text-xs">
+          <button 
+            onClick={() => handleMapTypeChange("roadmap")} 
+            className={`px-2 py-1 rounded ${mapType === "roadmap" ? "bg-nexus-blue text-white" : "bg-white/20 text-white/80"}`}
+          >
+            Road
+          </button>
+          <button 
+            onClick={() => handleMapTypeChange("satellite")} 
+            className={`px-2 py-1 rounded ${mapType === "satellite" ? "bg-nexus-blue text-white" : "bg-white/20 text-white/80"}`}
+          >
+            Satellite
+          </button>
+          <button 
+            onClick={() => handleMapTypeChange("hybrid")} 
+            className={`px-2 py-1 rounded ${mapType === "hybrid" ? "bg-nexus-blue text-white" : "bg-white/20 text-white/80"}`}
+          >
+            Hybrid
+          </button>
+          <button 
+            onClick={() => handleMapTypeChange("terrain")} 
+            className={`px-2 py-1 rounded ${mapType === "terrain" ? "bg-nexus-blue text-white" : "bg-white/20 text-white/80"}`}
+          >
+            Terrain
+          </button>
+        </div>
+      </div>
       
       {/* Map attribution - important for Google Maps */}
       <div className="absolute bottom-1 left-1 text-[8px] text-white/70">

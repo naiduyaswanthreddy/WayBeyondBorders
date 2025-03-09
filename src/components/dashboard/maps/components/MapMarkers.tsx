@@ -24,12 +24,13 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       position: originLatLng,
       map: map,
       title: origin,
+      animation: window.google.maps.Animation.DROP,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 8,
+        scale: 10,
         fillColor: "#0062FF",
         fillOpacity: 1,
-        strokeWeight: 2,
+        strokeWeight: 3,
         strokeColor: "#FFFFFF",
       }
     });
@@ -38,23 +39,36 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       position: destLatLng,
       map: map,
       title: destination,
+      animation: window.google.maps.Animation.DROP,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 8,
+        scale: 10,
         fillColor: "#6E36E5",
         fillOpacity: 1,
-        strokeWeight: 2,
+        strokeWeight: 3,
         strokeColor: "#FFFFFF",
       }
     });
     
-    // Create info windows
+    // Create enhanced info windows with styled content
     const originInfo = new window.google.maps.InfoWindow({
-      content: `<div style="color: black; padding: 5px;"><strong>${origin}</strong></div>`,
+      content: `
+        <div style="color: black; padding: 8px; max-width: 200px; font-family: 'Arial', sans-serif;">
+          <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: #0062FF;">${origin}</div>
+          <div style="font-size: 12px; color: #555;">Origin Location</div>
+        </div>
+      `,
+      pixelOffset: new window.google.maps.Size(0, -5)
     });
     
     const destInfo = new window.google.maps.InfoWindow({
-      content: `<div style="color: black; padding: 5px;"><strong>${destination}</strong></div>`,
+      content: `
+        <div style="color: black; padding: 8px; max-width: 200px; font-family: 'Arial', sans-serif;">
+          <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: #6E36E5;">${destination}</div>
+          <div style="font-size: 12px; color: #555;">Destination Location</div>
+        </div>
+      `,
+      pixelOffset: new window.google.maps.Size(0, -5)
     });
     
     // Add click listeners to markers
@@ -74,11 +88,27 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       });
     });
     
+    // Bounce animation on hover
+    const addBounceOnHover = (marker: google.maps.Marker) => {
+      marker.addListener('mouseover', () => {
+        marker.setAnimation(window.google.maps.Animation.BOUNCE);
+      });
+      
+      marker.addListener('mouseout', () => {
+        marker.setAnimation(null);
+      });
+    };
+    
+    addBounceOnHover(originMarker);
+    addBounceOnHover(destMarker);
+    
     // Create bounds to fit both markers
     const bounds = new window.google.maps.LatLngBounds();
     bounds.extend(originLatLng);
     bounds.extend(destLatLng);
-    map.fitBounds(bounds);
+    
+    // Add some padding to the bounds
+    map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
 
     return () => {
       // Clean up markers when component unmounts
