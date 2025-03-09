@@ -7,6 +7,7 @@
 ## 📌 Project Overview  
 **Way Beyond Borders** is a cutting-edge logistics solution designed to **optimize cross-border freight movement** using **AI-driven route planning, real-time adjustments, and sustainability incentives**. It helps **freight companies, e-commerce businesses, and supply chain operators** efficiently manage shipments while **reducing costs, improving transit times, and minimizing carbon emissions**
 
+
 ---
 
 ## 🌍 Live Demo & Deployment  
