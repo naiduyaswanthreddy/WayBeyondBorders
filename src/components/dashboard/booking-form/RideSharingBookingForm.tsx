@@ -29,11 +29,11 @@ import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
 import EstimatedArrival from "./EstimatedArrival";
+import RecommendedShippingDays from "../RecommendedShippingDays";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps } from "./types";
 
-// Mock data for ride sharing options
 const rideSharingOptions = [
   {
     id: "rs-001",
@@ -97,7 +97,6 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
   
-  // Ride sharing specific state
   const [enableRideSharing, setEnableRideSharing] = useState(true);
   const [availableRideShares, setAvailableRideShares] = useState<any[]>([]);
   const [selectedRideShare, setSelectedRideShare] = useState<string | null>(null);
@@ -160,7 +159,7 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
         (destinationLabel.includes("London") || destinationLabel.includes("Rotterdam") || destinationLabel.includes("Hamburg"))) {
       days = transportMode === "air" || transportMode === "express" ? 1.5 : transportMode === "sea" ? 10 : 6;
     }
-    else if ((destinationLabel.includes("New York") || destinationLabel.includes("Los Angeles") || destinationLabel.includes("Miami")) && 
+    else if ((destinationLabel.includes("New York") || destinationLabel.includes("Los Angeles") || originLabel.includes("Miami")) && 
              (originLabel.includes("London") || originLabel.includes("Rotterdam") || originLabel.includes("Hamburg"))) {
       days = transportMode === "air" || transportMode === "express" ? 1.5 : transportMode === "sea" ? 10 : 6;
     }
@@ -184,7 +183,6 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       days = transportMode === "air" || transportMode === "express" ? 3 : transportMode === "sea" ? 21 : 10.5;
     }
     
-    // Add a small delay for ride-sharing logistics
     if (enableRideSharing) {
       days += 0.5;
     }
@@ -217,7 +215,6 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       setEstimatedArrival(`${Math.ceil(days)} days`);
     }
     
-    // Set pricing for comparison
     let basePrice = 0;
     
     switch (transportMode) {
@@ -242,11 +239,10 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     setOriginalPrice(basePrice);
     
-    // Calculate discount if ride sharing is enabled
     if (enableRideSharing) {
-      const discount = basePrice * 0.28; // 28% discount for ride sharing
+      const discount = basePrice * 0.28;
       setDiscountedPrice(basePrice - discount);
-      setEcoPoints(Math.floor(discount / 10)); // Eco points are roughly discount / 10
+      setEcoPoints(Math.floor(discount / 10));
     } else {
       setDiscountedPrice(0);
       setEcoPoints(0);
@@ -273,26 +269,20 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       return;
     }
     
-    // Filter available ride shares based on criteria
     const matchingShares = rideSharingOptions.filter(share => {
-      // Check origin and destination compatibility
       const originMatch = share.origin.includes(originLabel) || originLabel.includes(share.origin);
       const destMatch = share.destination.includes(destinationLabel) || destinationLabel.includes(share.destination);
       
-      // Check cargo compatibility
       const cargoMatch = !cargoType || share.cargoTypeCompatibility.includes(cargoType);
       
-      // Check transport mode compatibility
       const modeMatch = transportMode === "any" || share.transportMode === transportMode;
       
-      // Check date compatibility
       let dateMatch = true;
       if (date) {
         const bookingDate = format(date, 'yyyy-MM-dd');
         const shareDate = share.departureDate;
         
         if (flexibleDates) {
-          // Allow booking date to be within 3 days of share date
           const bookingTimestamp = new Date(bookingDate).getTime();
           const shareTimestamp = new Date(shareDate).getTime();
           const diffDays = Math.abs(bookingTimestamp - shareTimestamp) / (1000 * 60 * 60 * 24);
@@ -307,7 +297,6 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     setAvailableRideShares(matchingShares);
     
-    // Select the first ride share by default
     if (matchingShares.length > 0) {
       setSelectedRideShare(matchingShares[0].id);
     } else {
@@ -536,10 +525,8 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
     
     const selectedShare = availableRideShares.find(share => share.id === id);
     if (selectedShare) {
-      // Update transport mode to match the share
       setTransportMode(selectedShare.transportMode);
       
-      // Adjust estimated arrival based on the selected share
       calculateEstimatedArrival();
     }
   };
@@ -817,6 +804,10 @@ const RideSharingBookingForm: React.FC<BookingFormProps> = ({ className }) => {
           setIsEmergencyShipment={setIsEmergencyShipment}
           isRideSharing={true}
         />
+      </div>
+      
+      <div className="mt-8">
+        <RecommendedShippingDays />
       </div>
       
       <TermsConfirmationDialog

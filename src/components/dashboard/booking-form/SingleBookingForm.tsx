@@ -13,6 +13,7 @@ import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
 import EstimatedArrival from "./EstimatedArrival";
+import RecommendedShippingDays from "../RecommendedShippingDays";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps } from "./types";
@@ -429,6 +430,10 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
           setIsEmergencyShipment={setIsEmergencyShipment}
           isMultiStop={false}
         />
+      </div>
+      
+      <div className="mt-8">
+        <RecommendedShippingDays />
       </div>
       
       <TermsConfirmationDialog

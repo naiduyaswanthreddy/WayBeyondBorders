@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { TabsContent } from "@/components/ui/tabs";
 import SingleBookingForm from "./SingleBookingForm";
 import MultiStopBookingForm from "./MultiStopBookingForm";
 import RideSharingBookingForm from "./RideSharingBookingForm";
@@ -23,6 +22,28 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     return () => {
       window.removeEventListener('bookingTabChange', handleTabChange as EventListener);
     };
+  }, []);
+
+  // Initialize route data for Google Maps
+  useEffect(() => {
+    const updateRouteInitial = () => {
+      const storedBookingData = sessionStorage.getItem('bookingData');
+      if (storedBookingData) {
+        const bookingData = JSON.parse(storedBookingData);
+        const routeData = {
+          origin: bookingData.originLabel || bookingData.originInput || "",
+          destination: bookingData.destinationLabel || bookingData.destinationInput || "",
+          transportMode: bookingData.transportMode || "any",
+          isMultiStop: bookingData.isMultiStop || false
+        };
+        
+        const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeData });
+        window.dispatchEvent(updateEvent);
+      }
+    };
+    
+    // Initial update
+    updateRouteInitial();
   }, []);
   
   return (

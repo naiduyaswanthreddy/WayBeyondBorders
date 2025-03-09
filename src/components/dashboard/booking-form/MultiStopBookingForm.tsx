@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -18,6 +17,7 @@ import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
 import EstimatedArrival from "./EstimatedArrival";
+import RecommendedShippingDays from "../RecommendedShippingDays";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, StopType } from "./types";
@@ -41,7 +41,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
   
-  // Multi-stop specific state
   const [stops, setStops] = useState<StopType[]>([]);
   const [nextStopId, setNextStopId] = useState(1);
   
@@ -101,7 +100,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       { location: destinationLabel, type: "dropoff" as const }
     ];
     
-    // Calculate transit time and distance between each stop
     for (let i = 0; i < allStops.length - 1; i++) {
       const currentStop = allStops[i].location;
       const nextStop = allStops[i + 1].location;
@@ -109,7 +107,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       let segmentDays = 0;
       let segmentDistance = 0;
       
-      // Simplified distance and time calculation logic (expand with actual geo-routing in production)
       if ((currentStop.includes("New York") || currentStop.includes("Los Angeles")) && 
           (nextStop.includes("London") || nextStop.includes("Rotterdam"))) {
         segmentDays = transportMode === "air" ? 1.5 : transportMode === "sea" ? 10 : 6;
@@ -125,7 +122,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
         segmentDistance = transportMode === "air" ? 6000 : 7500;
       }
       else {
-        // Default calculation for other routes
         segmentDays = transportMode === "air" ? 1.5 : transportMode === "sea" ? 7 : 5;
         segmentDistance = transportMode === "air" ? 4000 : 5000;
       }
@@ -377,7 +373,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
 
   const removeStop = (id: string) => {
     const updatedStops = stops.filter(stop => stop.id !== id);
-    // Re-order remaining stops
     const reorderedStops = updatedStops.map((stop, index) => ({
       ...stop,
       order: index + 1
@@ -426,7 +421,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
     
-    // Update order after reordering
     const updatedItems = items.map((item, index) => ({
       ...item,
       order: index + 1
@@ -481,7 +475,6 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
           )}
         </div>
         
-        {/* Intermediate Stops Section */}
         <div className="col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-base font-medium text-white">Intermediate Stops</h3>
@@ -715,6 +708,10 @@ const MultiStopBookingForm: React.FC<BookingFormProps> = ({ className }) => {
         onOpenChange={setConfirmDialogOpen}
         onConfirm={completeBooking}
       />
+      
+      <div className="mt-8">
+        <RecommendedShippingDays />
+      </div>
     </div>
   );
 };
