@@ -19,6 +19,8 @@ interface RouteDetails {
   weatherIcon: React.ReactNode;
   weatherStatus: string;
   isEcoFriendly?: boolean;
+  origin?: string;
+  destination?: string;
 }
 
 interface BookingData {
@@ -96,6 +98,8 @@ const Routes = () => {
         weather: "Clear",
         weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
         weatherStatus: "Optimal",
+        origin: bookingData?.origin,
+        destination: bookingData?.destination
       },
       {
         id: "cheapest",
@@ -107,6 +111,8 @@ const Routes = () => {
         weather: "Mild Rain",
         weatherIcon: <Wind className="h-4 w-4 text-blue-400" />,
         weatherStatus: "Minimal Delay",
+        origin: bookingData?.origin,
+        destination: bookingData?.destination
       },
       {
         id: "reliable",
@@ -118,6 +124,8 @@ const Routes = () => {
         weather: "Stormy",
         weatherIcon: <Wind className="h-4 w-4 text-yellow-400" />,
         weatherStatus: "Alternate Route",
+        origin: bookingData?.origin,
+        destination: bookingData?.destination
       },
       {
         id: "eco-friendly",
@@ -130,7 +138,9 @@ const Routes = () => {
         weather: "Clear",
         weatherIcon: <Wind className="h-4 w-4 text-green-400" />,
         weatherStatus: "Optimal",
-        isEcoFriendly: true
+        isEcoFriendly: true,
+        origin: bookingData?.origin,
+        destination: bookingData?.destination
       },
     ];
     
@@ -219,11 +229,11 @@ const Routes = () => {
   // Determine the actual origin and destination for display
   const originLabel = bookingData?.origin ? 
     (locations.find(l => l.value === bookingData.origin)?.label || bookingData.origin) : 
-    routeDetails.origin || "Origin";
+    (routeDetails.origin || "Origin");
     
   const destinationLabel = bookingData?.destination ? 
     (locations.find(l => l.value === bookingData.destination)?.label || bookingData.destination) : 
-    routeDetails.destination || "Destination";
+    (routeDetails.destination || "Destination");
 
   return (
     <div className="min-h-screen bg-background">
