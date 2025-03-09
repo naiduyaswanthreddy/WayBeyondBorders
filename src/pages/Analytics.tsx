@@ -1,17 +1,22 @@
+
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import { toast } from "@/components/ui/use-toast";
 import { useEcoPoints } from "@/context/EcoPointsContext";
 import CostSavingsAnalytics from "@/components/analytics/CostSavingsAnalytics";
-import ShipmentVolumeAnalytics from "@/components/analytics/ShipmentVolumeAnalytics";
 import SustainabilityAnalytics from "@/components/analytics/SustainabilityAnalytics";
 import AIPredictionsAlerts from "@/components/analytics/AIPredictionsAlerts";
 import AnalyticsTimeRangeFilter from "@/components/analytics/AnalyticsTimeRangeFilter";
 
 const Analytics = () => {
+  const location = useLocation();
   const [dateRange, setDateRange] = useState("month");
   const { points } = useEcoPoints();
   const [dataLoaded, setDataLoaded] = useState(false);
+  
+  // Get booking data from location state if available
+  const bookingData = location.state?.bookingData || null;
 
   // Disable sidebar when this component mounts
   useEffect(() => {
@@ -335,7 +340,6 @@ const Analytics = () => {
             <>
               {/* Section 1: Cost & Savings Analytics */}
               <CostSavingsAnalytics activeData={activeData} dateRange={dateRange} />
-              
               
               {/* Section 3: Sustainability & Eco-Friendly Impact */}
               <SustainabilityAnalytics activeData={activeData} points={points} />
