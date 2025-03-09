@@ -2,6 +2,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 
+declare global {
+  interface Window {
+    google: typeof google;
+  }
+}
+
 interface GoogleMapDisplayProps {
   origin: string;
   destination: string;
@@ -26,7 +32,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       }
 
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDhUmpR2V68xXAU9p6XsWFQnLAaRCzIgPU&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDhUmpR2V68xXAU9p6XsWFQnLAaRCzIgPU&libraries=places,geometry`;
       script.async = true;
       script.defer = true;
       script.onload = () => initializeMap();
@@ -40,11 +46,11 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       
       try {
         // Create map instance
-        const map = new google.maps.Map(mapRef.current, {
+        const map = new window.google.maps.Map(mapRef.current, {
           center: { lat: 20, lng: 0 }, // Default center
           zoom: 2,
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
-          mapTypeControl: false,
+          mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+          disableDefaultUI: false,
           streetViewControl: false,
           fullscreenControl: true,
           zoomControl: true,
@@ -68,40 +74,40 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
         });
         
         // Create geocoder to convert address strings to coordinates
-        const geocoder = new google.maps.Geocoder();
+        const geocoder = new window.google.maps.Geocoder();
         
         // Convert origin and destination to coordinates
         Promise.all([
           new Promise<google.maps.LatLng>((resolve, reject) => {
             geocoder.geocode({ address: origin }, (results, status) => {
-              if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+              if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
                 resolve(results[0].geometry.location);
               } else {
                 // Use fallback coordinates for major shipping cities
                 const fallbackCoords = getFallbackCoordinates(origin);
-                resolve(new google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
+                resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
               }
             });
           }),
           new Promise<google.maps.LatLng>((resolve, reject) => {
             geocoder.geocode({ address: destination }, (results, status) => {
-              if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
+              if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
                 resolve(results[0].geometry.location);
               } else {
                 // Use fallback coordinates for major shipping cities
                 const fallbackCoords = getFallbackCoordinates(destination);
-                resolve(new google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
+                resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
               }
             });
           })
         ]).then(([originLatLng, destLatLng]) => {
           // Create markers for origin and destination
-          const originMarker = new google.maps.Marker({
+          const originMarker = new window.google.maps.Marker({
             position: originLatLng,
             map: map,
             title: origin,
             icon: {
-              path: google.maps.SymbolPath.CIRCLE,
+              path: window.google.maps.SymbolPath.CIRCLE,
               scale: 8,
               fillColor: "#0062FF",
               fillOpacity: 1,
@@ -110,12 +116,12 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
             }
           });
           
-          const destMarker = new google.maps.Marker({
+          const destMarker = new window.google.maps.Marker({
             position: destLatLng,
             map: map,
             title: destination,
             icon: {
-              path: google.maps.SymbolPath.CIRCLE,
+              path: window.google.maps.SymbolPath.CIRCLE,
               scale: 8,
               fillColor: "#6E36E5",
               fillOpacity: 1,
@@ -125,11 +131,11 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           });
           
           // Create info windows
-          const originInfo = new google.maps.InfoWindow({
+          const originInfo = new window.google.maps.InfoWindow({
             content: `<div style="color: black; padding: 5px;"><strong>${origin}</strong></div>`,
           });
           
-          const destInfo = new google.maps.InfoWindow({
+          const destInfo = new window.google.maps.InfoWindow({
             content: `<div style="color: black; padding: 5px;"><strong>${destination}</strong></div>`,
           });
           
@@ -143,7 +149,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           });
           
           // Create bounds to fit both markers
-          const bounds = new google.maps.LatLngBounds();
+          const bounds = new window.google.maps.LatLngBounds();
           bounds.extend(originLatLng);
           bounds.extend(destLatLng);
           map.fitBounds(bounds);
@@ -171,7 +177,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       // For air travel - draw a curved arc line
       if (modes.includes("air")) {
         const pathCoordinates = getArcCoordinates(origin, destination);
-        new google.maps.Polyline({
+        new window.google.maps.Polyline({
           path: pathCoordinates,
           geodesic: false,
           strokeColor: "#0062FF",
@@ -179,7 +185,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           strokeWeight: 3,
           map: map,
           icons: [{
-            icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
+            icon: { path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
             repeat: "100px"
           }]
         });
@@ -188,7 +194,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       // For sea travel - draw a different curved line
       if (modes.includes("sea")) {
         const pathCoordinates = getArcCoordinates(origin, destination, -1); // Negative bend for different curve
-        new google.maps.Polyline({
+        new window.google.maps.Polyline({
           path: pathCoordinates,
           geodesic: false,
           strokeColor: "#00CFD5",
@@ -196,7 +202,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           strokeWeight: 3,
           map: map,
           icons: [{
-            icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
+            icon: { path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
             repeat: "100px"
           }]
         });
@@ -204,7 +210,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       
       // For truck/road travel
       if (modes.includes("truck") || modes.includes("electric truck")) {
-        new google.maps.Polyline({
+        new window.google.maps.Polyline({
           path: [origin, destination],
           geodesic: true,
           strokeColor: modes.includes("electric truck") ? "#34D399" : "#FCD34D",
@@ -212,7 +218,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           strokeWeight: 3,
           map: map,
           icons: [{
-            icon: { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
+            icon: { path: window.google.maps.SymbolPath.FORWARD_CLOSED_ARROW },
             repeat: "100px"
           }]
         });
@@ -232,7 +238,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       const lngDest = destination.lng();
       
       // Calculate distance and midpoint
-      const distance = google.maps.geometry?.spherical.computeDistanceBetween(origin, destination) || 0;
+      const distance = window.google.maps.geometry?.spherical.computeDistanceBetween(origin, destination) || 0;
       const midLat = (latOrigin + latDest) / 2;
       const midLng = (lngOrigin + lngDest) / 2;
       
@@ -264,7 +270,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
         const lat = uu * latOrigin + 2 * u * t * bendLat + tt * latDest;
         const lng = uu * lngOrigin + 2 * u * t * bendLng + tt * lngDest;
         
-        points.push(new google.maps.LatLng(lat, lng));
+        points.push(new window.google.maps.LatLng(lat, lng));
       }
       
       return points;
