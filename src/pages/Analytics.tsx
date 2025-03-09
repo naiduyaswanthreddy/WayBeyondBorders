@@ -4,6 +4,7 @@ import Navbar from "@/components/layout/Navbar";
 import { toast } from "@/components/ui/use-toast";
 import { useEcoPoints } from "@/context/EcoPointsContext";
 import CostSavingsAnalytics from "@/components/analytics/CostSavingsAnalytics";
+import ShipmentVolumeAnalytics from "@/components/analytics/ShipmentVolumeAnalytics";
 import SustainabilityAnalytics from "@/components/analytics/SustainabilityAnalytics";
 import AIPredictionsAlerts from "@/components/analytics/AIPredictionsAlerts";
 import AnalyticsTimeRangeFilter from "@/components/analytics/AnalyticsTimeRangeFilter";
@@ -122,7 +123,67 @@ const Analytics = () => {
     ]
   };
 
-  // Add the missing transportModeData
+  // Section 2: Shipment Volume & Route Performance
+  const shipmentVolumeData = {
+    week: [
+      { date: "Mon", shipments: 12 },
+      { date: "Tue", shipments: 18 },
+      { date: "Wed", shipments: 15 },
+      { date: "Thu", shipments: 22 },
+      { date: "Fri", shipments: 28 },
+      { date: "Sat", shipments: 16 },
+      { date: "Sun", shipments: 8 },
+    ],
+    month: [
+      { date: "Week 1", shipments: 119 },
+      { date: "Week 2", shipments: 135 },
+      { date: "Week 3", shipments: 142 },
+      { date: "Week 4", shipments: 156 },
+    ],
+    quarter: [
+      { date: "Jan", shipments: 552 },
+      { date: "Feb", shipments: 580 },
+      { date: "Mar", shipments: 615 },
+    ],
+    year: [
+      { date: "Q1", shipments: 1747 },
+      { date: "Q2", shipments: 1890 },
+      { date: "Q3", shipments: 2050 },
+      { date: "Q4", shipments: 2215 },
+    ]
+  };
+
+  const topRoutesData = {
+    week: [
+      { route: "Shanghai - Rotterdam", shipments: 25, onTime: 22, delay: 3 },
+      { route: "Singapore - Los Angeles", shipments: 18, onTime: 16, delay: 2 },
+      { route: "Dubai - Hamburg", shipments: 15, onTime: 14, delay: 1 },
+      { route: "New York - London", shipments: 12, onTime: 11, delay: 1 },
+      { route: "Hong Kong - Sydney", shipments: 10, onTime: 9, delay: 1 },
+    ],
+    month: [
+      { route: "Shanghai - Rotterdam", shipments: 95, onTime: 85, delay: 10 },
+      { route: "Singapore - Los Angeles", shipments: 72, onTime: 65, delay: 7 },
+      { route: "Dubai - Hamburg", shipments: 60, onTime: 55, delay: 5 },
+      { route: "New York - London", shipments: 48, onTime: 44, delay: 4 },
+      { route: "Hong Kong - Sydney", shipments: 40, onTime: 36, delay: 4 },
+    ],
+    quarter: [
+      { route: "Shanghai - Rotterdam", shipments: 285, onTime: 255, delay: 30 },
+      { route: "Singapore - Los Angeles", shipments: 216, onTime: 195, delay: 21 },
+      { route: "Dubai - Hamburg", shipments: 180, onTime: 165, delay: 15 },
+      { route: "New York - London", shipments: 144, onTime: 132, delay: 12 },
+      { route: "Hong Kong - Sydney", shipments: 120, onTime: 108, delay: 12 },
+    ],
+    year: [
+      { route: "Shanghai - Rotterdam", shipments: 1140, onTime: 1020, delay: 120 },
+      { route: "Singapore - Los Angeles", shipments: 864, onTime: 780, delay: 84 },
+      { route: "Dubai - Hamburg", shipments: 720, onTime: 660, delay: 60 },
+      { route: "New York - London", shipments: 576, onTime: 528, delay: 48 },
+      { route: "Hong Kong - Sydney", shipments: 480, onTime: 432, delay: 48 },
+    ]
+  };
+
   const transportModeData = {
     week: [
       { name: "Sea", value: 45 },
@@ -131,22 +192,22 @@ const Analytics = () => {
     ],
     month: [
       { name: "Sea", value: 48 },
-      { name: "Air", value: 27 },
-      { name: "Road", value: 25 },
+      { name: "Air", value: 28 },
+      { name: "Road", value: 24 },
     ],
     quarter: [
       { name: "Sea", value: 50 },
-      { name: "Air", value: 25 },
-      { name: "Road", value: 25 },
+      { name: "Air", value: 27 },
+      { name: "Road", value: 23 },
     ],
     year: [
       { name: "Sea", value: 52 },
-      { name: "Air", value: 23 },
-      { name: "Road", value: 25 },
+      { name: "Air", value: 26 },
+      { name: "Road", value: 22 },
     ]
   };
 
-  // Section 2: Sustainability & Eco-Friendly Impact
+  // Section 3: Sustainability & Eco-Friendly Impact
   const ecoImpactData = {
     week: [
       { date: "Mon", standardCO2: 2.4, ecoCO2: 0.9, saved: 1.5 },
@@ -205,7 +266,7 @@ const Analytics = () => {
     ]
   };
 
-  // Section 3: AI-Powered Predictions & Alerts
+  // Section 4: AI-Powered Predictions & Alerts
   const predictionData = [
     {
       id: "delay-forecast",
@@ -230,11 +291,19 @@ const Analytics = () => {
     }
   ];
 
+  const bestShippingDays = {
+    sea: ["Tuesday", "Wednesday"],
+    air: ["Monday", "Thursday"],
+    road: ["Wednesday", "Friday"]
+  };
+
   const activeData = {
     costTrendData: costTrendData[dateRange as keyof typeof costTrendData],
     routeComparisonData: routeComparisonData[dateRange as keyof typeof routeComparisonData],
     bulkSavingsData: bulkSavingsData[dateRange as keyof typeof bulkSavingsData],
-    transportModeData: transportModeData[dateRange as keyof typeof transportModeData], // Added missing transportModeData
+    shipmentVolumeData: shipmentVolumeData[dateRange as keyof typeof shipmentVolumeData],
+    topRoutesData: topRoutesData[dateRange as keyof typeof topRoutesData],
+    transportModeData: transportModeData[dateRange as keyof typeof transportModeData],
     ecoImpactData: ecoImpactData[dateRange as keyof typeof ecoImpactData],
     ecoPointsData: ecoPointsData[dateRange as keyof typeof ecoPointsData]
   };
@@ -268,12 +337,16 @@ const Analytics = () => {
               {/* Section 1: Cost & Savings Analytics */}
               <CostSavingsAnalytics activeData={activeData} dateRange={dateRange} />
               
-              {/* Section 2: Sustainability & Eco-Friendly Impact */}
+              {/* Section 2: Shipment Volume & Route Performance */}
+              <ShipmentVolumeAnalytics activeData={activeData} />
+              
+              {/* Section 3: Sustainability & Eco-Friendly Impact */}
               <SustainabilityAnalytics activeData={activeData} points={points} />
               
-              {/* Section 3: AI-Powered Predictions & Alerts (without recommended shipping days) */}
+              {/* Section 4: AI-Powered Predictions & Alerts */}
               <AIPredictionsAlerts 
                 predictionData={predictionData} 
+                bestShippingDays={bestShippingDays}
               />
             </>
           )}

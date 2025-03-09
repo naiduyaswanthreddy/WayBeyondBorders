@@ -9,14 +9,6 @@ export interface CargoItem {
   weight: string;
 }
 
-export interface StopType {
-  id: string;
-  location: string;
-  locationInput: string;
-  type: "pickup" | "dropoff" | "both";
-  order: number;
-}
-
 export interface TemplateData {
   id: string;
   name: string;
@@ -31,9 +23,6 @@ export interface TemplateData {
   transportMode?: string;
   cargoItems?: CargoItem[];
   date?: string;
-  isMultiStop?: boolean;
-  stops?: StopType[];
-  isRideSharing?: boolean;
 }
 
 export interface LocationData {
@@ -51,7 +40,7 @@ export interface CargoTypeData {
   restrictions: string[];
   airPriority?: boolean;
   airAllowed?: boolean;
-  description?: string;
+  description?: string;  // Added missing property
 }
 
 export interface TransportModeData {
@@ -188,27 +177,4 @@ export interface AnimationConfig {
   duration: number;
   easing: string;
   delay: number;
-}
-
-// Ride-sharing types
-export interface SharedShipmentOption {
-  id: string;
-  carrier: string;
-  departureDate: Date;
-  arrivalEstimate: string;
-  capacity: string;
-  costSaving: number;
-  co2Reduction: number;
-  participants: number;
-}
-
-export interface SharedShipment {
-  id: string;
-  origin: string;
-  destination: string;
-  date: string;
-  departureDate: string;
-  participants: number;
-  savings: number;
-  co2Reduction: number;
 }
