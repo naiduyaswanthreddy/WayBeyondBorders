@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, Clock, Download, DollarSign, MapPin, Package, Shield, Truck, Wind, Zap, Anchor, Plane, Leaf } from "lucide-react";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
+import ChatlingChatbot from "@/components/chatbot/ChatlingChatbot";
 
 interface RouteDetails {
   id: string;
@@ -40,7 +40,8 @@ const locations = [
   { value: "busan", label: "Busan, South Korea" },
   { value: "newyork", label: "New York, USA" },
   { value: "tokyo", label: "Tokyo, Japan" },
-  { value: "antwerp", label: "Antwerp, Belgium" }
+  { value: "antwerp", label: "Antwerp, Belgium" },
+  { value: "miami", label: "Miami, USA" },
 ];
 
 const Routes = () => {
@@ -48,6 +49,7 @@ const Routes = () => {
   const navigate = useNavigate();
   const [routeDetails, setRouteDetails] = useState<RouteDetails | null>(null);
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
+  const [showChatbot, setShowChatbot] = useState(false);
   
   useEffect(() => {
     // Try to get selected route from sessionStorage
@@ -174,6 +176,15 @@ const Routes = () => {
     });
   };
 
+  const verifyWithAI = () => {
+    setShowChatbot(true);
+    
+    toast({
+      title: "AI Verification Initiated",
+      description: "Chat with our AI assistant to verify route details",
+    });
+  };
+
   if (!routeDetails) {
     return (
       <div className="min-h-screen bg-background">
@@ -205,9 +216,25 @@ const Routes = () => {
     );
   }
 
+  // Determine the actual origin and destination for display
+  const originLabel = bookingData?.origin ? 
+    (locations.find(l => l.value === bookingData.origin)?.label || bookingData.origin) : 
+    routeDetails.origin || "Origin";
+    
+  const destinationLabel = bookingData?.destination ? 
+    (locations.find(l => l.value === bookingData.destination)?.label || bookingData.destination) : 
+    routeDetails.destination || "Destination";
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      
+      {showChatbot && (
+        <ChatlingChatbot 
+          chatbotId="clfm4a3gs00k90bl68vqfgc4m" 
+          initialMessage={`Verify route from ${originLabel} to ${destinationLabel} using ${routeDetails.modes.join(', ')} transport.`}
+        />
+      )}
       
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
@@ -227,16 +254,23 @@ const Routes = () => {
                   Route Planning
                 </h1>
                 <p className="mt-2 text-muted-foreground">
-                  {bookingData ? 
-                    `${locations.find(l => l.value === bookingData.origin)?.label || 'Origin'} to 
-                     ${locations.find(l => l.value === bookingData.destination)?.label || 'Destination'}` : 
-                    'Selected route details and breakdown'}
+                  {originLabel} to {destinationLabel}
                 </p>
               </div>
-              <Button className="nexus-button-primary gap-2" onClick={handleBookRoute}>
-                Book This Route
-                <CheckCircle2 className="h-4 w-4" />
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  className="gap-2"
+                  onClick={verifyWithAI}
+                >
+                  <Shield className="h-4 w-4" />
+                  Verify with AI
+                </Button>
+                <Button className="nexus-button-primary gap-2" onClick={handleBookRoute}>
+                  Book This Route
+                  <CheckCircle2 className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             {/* Route Summary */}
@@ -313,10 +347,10 @@ const Routes = () => {
                             <p className="text-sm text-muted-foreground">Route Section</p>
                             <p className="text-white">
                               {index === 0 ? 
-                                (mode.toLowerCase() === 'sea' ? "Shanghai to Rotterdam Port" : 
-                                 mode.toLowerCase() === 'air' ? "Shanghai to Amsterdam Airport" : 
-                                 "Shanghai Local Transport") : 
-                                "Rotterdam Local Delivery"}
+                                (mode.toLowerCase() === 'sea' ? originLabel + " to Port" : 
+                                 mode.toLowerCase() === 'air' ? originLabel + " to Airport" : 
+                                 originLabel + " Local Transport") : 
+                                destinationLabel + " Local Delivery"}
                             </p>
                           </div>
                           <div>
@@ -439,10 +473,10 @@ const Routes = () => {
 
                     {/* Cities/Points Labels */}
                     <div className="absolute left-[10%] top-[36%] rounded-md bg-black/70 px-2 py-1 text-sm text-white backdrop-blur-sm">
-                      Shanghai, China
+                      {originLabel}
                     </div>
                     <div className="absolute right-[10%] top-[26%] rounded-md bg-black/70 px-2 py-1 text-sm text-white backdrop-blur-sm">
-                      Rotterdam, Netherlands
+                      {destinationLabel}
                     </div>
                     
                     {/* Satellite map attribution */}
@@ -456,6 +490,10 @@ const Routes = () => {
             
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-4 justify-end">
+              <Button variant="outline" className="gap-2" onClick={verifyWithAI}>
+                <Shield className="h-4 w-4" />
+                Verify with AI
+              </Button>
               <Button variant="outline" className="gap-2" onClick={handleDownloadRouteDetails}>
                 <Download className="h-4 w-4" />
                 Download Route Details
