@@ -1,10 +1,21 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
-import { Share2, Users, UserCheck, Zap, Truck, ArrowDownUp, Leaf } from "lucide-react";
+import { 
+  Share2, 
+  Users, 
+  UserCheck, 
+  Zap, 
+  Truck, 
+  ArrowDownUp, 
+  Leaf,
+  Calendar,
+  Clock,
+  Ship,
+  Plane
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
