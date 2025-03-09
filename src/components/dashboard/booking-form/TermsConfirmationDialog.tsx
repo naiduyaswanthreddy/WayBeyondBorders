@@ -1,12 +1,16 @@
 
 import React, { useState } from "react";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { ShieldCheck, AlertTriangle, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle, MessageCircle } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface TermsConfirmationDialogProps {
   open: boolean;
@@ -14,182 +18,192 @@ interface TermsConfirmationDialogProps {
   onConfirm: () => void;
 }
 
-const TermsConfirmationDialog: React.FC<TermsConfirmationDialogProps> = ({ 
-  open, 
+const TermsConfirmationDialog: React.FC<TermsConfirmationDialogProps> = ({
+  open,
   onOpenChange,
-  onConfirm
+  onConfirm,
 }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [dangerousGoodsUnderstood, setDangerousGoodsUnderstood] = useState(false);
   const [illegalGoodsChecked, setIllegalGoodsChecked] = useState(false);
-  const [verificationComplete, setVerificationComplete] = useState(false);
+  const [chatbotVerifying, setChatbotVerifying] = useState(false);
 
-  const handleConfirm = () => {
-    if (termsAccepted && verificationComplete) {
-      onConfirm();
-      onOpenChange(false);
-    } else if (!verificationComplete) {
-      toast({
-        title: "Verification Required",
-        description: "Please complete the illegal goods verification by consulting with the chatbot.",
-        variant: "destructive"
-      });
+  const handleSubmit = () => {
+    if (!termsAccepted || !dangerousGoodsUnderstood || !illegalGoodsChecked) {
+      return;
     }
+    onConfirm();
+    resetForm();
   };
 
-  const handleVerificationCheck = () => {
-    if (illegalGoodsChecked) {
-      setVerificationComplete(true);
-      toast({
-        title: "Verification Complete",
-        description: "Thank you for verifying your shipment contents.",
-      });
-    }
+  const resetForm = () => {
+    setTermsAccepted(false);
+    setDangerousGoodsUnderstood(false);
+    setIllegalGoodsChecked(false);
+    setChatbotVerifying(false);
   };
 
-  const openChatbot = () => {
-    // Trigger chatbot if available
-    if (window.chtlConfig) {
-      // Attempt to find and click the chatbot button
-      const chatbotButtons = document.querySelectorAll('[id^="chatling-"]');
-      chatbotButtons.forEach(button => {
-        (button as HTMLButtonElement).click();
-      });
-
-      toast({
-        title: "Chatbot Opened",
-        description: "Please verify your shipment contents with the chatbot assistant.",
-      });
-    } else {
-      toast({
-        title: "Chatbot Unavailable",
-        description: "Please check your shipment manually to ensure compliance with regulations.",
-      });
+  const openChatbotForVerification = () => {
+    setChatbotVerifying(true);
+    
+    // Open the chatbot interface
+    if (window.chtlConfig && typeof window.chtlConfig.chatbotId === 'string') {
+      // Find the chat widget button and click it to open the chat
+      const chatButton = document.querySelector('.chatling-launcher-button') as HTMLElement;
+      if (chatButton) {
+        chatButton.click();
+        
+        // Send initial message to the chatbot
+        setTimeout(() => {
+          // Try to find the input field and send button
+          const chatInput = document.querySelector('.chatling-composer-input textarea') as HTMLTextAreaElement;
+          const sendButton = document.querySelector('.chatling-composer-send-button') as HTMLButtonElement;
+          
+          if (chatInput && sendButton) {
+            chatInput.value = "I need to verify my cargo does not contain any illegal or restricted goods. Can you help me with the verification process?";
+            // Trigger input event to activate the send button
+            const event = new Event('input', { bubbles: true });
+            chatInput.dispatchEvent(event);
+            sendButton.click();
+          }
+        }, 1000);
+      }
     }
   };
 
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-xl">
-        <AlertDialogHeader>
-          <AlertDialogTitle>Booking Confirmation</AlertDialogTitle>
-          <AlertDialogDescription>
-            Please review and acknowledge the terms before confirming your booking.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        
-        <div className="my-4 max-h-60 overflow-y-auto pr-2 space-y-4">
-          <Alert>
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertDescription>
-              By confirming this booking, you acknowledge that you are the primary point of contact for this shipment.
-            </AlertDescription>
-          </Alert>
-          
-          <Alert variant="destructive">
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertDescription>
-              Any misleading information or prohibited items found will result in penalties, including potential fines and legal action.
-            </AlertDescription>
-          </Alert>
-          
-          <Alert>
-            <AlertTriangle className="h-4 w-4 mr-2" />
-            <AlertDescription>
-              Your booking details are being shared with regulatory authorities, customs, and relevant carriers as required by law.
-            </AlertDescription>
-          </Alert>
-          
-          <div className="text-sm space-y-2 bg-background/80 p-4 rounded-md border">
-            <h4 className="font-medium">Additional Terms & Conditions:</h4>
-            <p>1. You are responsible for ensuring all cargo declarations are accurate and complete.</p>
-            <p>2. All dangerous goods must be properly declared according to international regulations.</p>
-            <p>3. NexusShip reserves the right to inspect any shipment at any time.</p>
-            <p>4. You agree to comply with all applicable laws and regulations related to international trade.</p>
-            <p>5. Liability for goods is limited according to standard carrier terms unless additional insurance is purchased.</p>
-            <p>6. Payment must be received before shipment processing can begin.</p>
-            <p>7. Cancellation policies apply as per the service agreement.</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center space-x-2 my-2">
-          <Checkbox 
-            id="terms" 
-            checked={termsAccepted}
-            onCheckedChange={(checked) => setTermsAccepted(checked === true)}
-          />
-          <label
-            htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            I acknowledge & accept these terms
-          </label>
-        </div>
-        
-        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-md">
-          <h4 className="font-medium text-red-400 mb-2">Required Verification</h4>
-          <p className="text-sm text-muted-foreground mb-3">
-            All shipments must be verified for illegal goods and banned items. Please confirm you have checked your shipment contents.
-          </p>
-          
-          <div className="flex items-center justify-between mt-3">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="illegalGoods" 
-                checked={illegalGoodsChecked}
-                onCheckedChange={(checked) => setIllegalGoodsChecked(checked === true)}
-                disabled={verificationComplete}
-              />
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!newOpen) {
+        resetForm();
+      }
+      onOpenChange(newOpen);
+    }}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center text-lg">
+            <ShieldCheck className="h-5 w-5 mr-2 text-nexus-blue" />
+            Booking Confirmation
+          </DialogTitle>
+          <DialogDescription>
+            Please review and accept the terms before confirming your booking
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="terms"
+              checked={termsAccepted}
+              onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+            />
+            <div className="grid gap-1">
               <label
-                htmlFor="illegalGoods"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                htmlFor="terms"
+                className="text-sm font-medium leading-none cursor-pointer"
               >
-                I verify that my shipment does not contain illegal or banned items
+                Terms and Conditions
               </label>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={openChatbot}
-                disabled={verificationComplete}
-                className="text-xs"
-              >
-                <MessageCircle className="h-3 w-3 mr-1" />
-                Verify with Chatbot
-              </Button>
-              
-              <Button 
-                variant={verificationComplete ? "premium-outline" : "premium-blue"}
-                size="sm" 
-                onClick={handleVerificationCheck}
-                disabled={!illegalGoodsChecked || verificationComplete}
-                className="text-xs"
-              >
-                {verificationComplete ? "Verified ✓" : "Mark as Verified"}
-              </Button>
+              <p className="text-xs text-muted-foreground">
+                I accept the terms and conditions for shipping, including payment
+                terms, liability limitations, and cancellation policies.
+              </p>
             </div>
           </div>
-          
-          {verificationComplete && (
-            <div className="mt-3 text-xs text-green-400">
-              Verification complete. Thank you for confirming your shipment contents.
+
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="dangerous-goods"
+              checked={dangerousGoodsUnderstood}
+              onCheckedChange={(checked) =>
+                setDangerousGoodsUnderstood(checked as boolean)
+              }
+            />
+            <div className="grid gap-1">
+              <label
+                htmlFor="dangerous-goods"
+                className="text-sm font-medium leading-none cursor-pointer"
+              >
+                Dangerous Goods Declaration
+              </label>
+              <p className="text-xs text-muted-foreground">
+                I understand the regulations regarding dangerous goods and
+                confirm that all items are properly declared and packaged
+                according to international shipping standards.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="illegal-goods"
+              checked={illegalGoodsChecked}
+              onCheckedChange={(checked) =>
+                setIllegalGoodsChecked(checked as boolean)
+              }
+              disabled={!chatbotVerifying}
+            />
+            <div className="grid gap-1">
+              <label
+                htmlFor="illegal-goods"
+                className={`text-sm font-medium leading-none ${!chatbotVerifying ? 'text-muted-foreground' : 'cursor-pointer'}`}
+              >
+                Illegal Goods Verification
+                {!chatbotVerifying && <span className="ml-2 text-xs text-orange-400">(Requires verification)</span>}
+              </label>
+              <p className="text-xs text-muted-foreground">
+                I confirm that my shipment does not contain any illegal goods, prohibited items, 
+                or contraband according to international laws and regulations.
+              </p>
+            </div>
+          </div>
+
+          {!chatbotVerifying ? (
+            <Button
+              variant="outline"
+              className="mt-2 border-orange-500/30 bg-orange-500/10 text-orange-400 hover:bg-orange-500/20"
+              onClick={openChatbotForVerification}
+            >
+              <Bot className="mr-2 h-4 w-4" />
+              Verify with Chatbot
+            </Button>
+          ) : (
+            <div className="rounded-md bg-green-500/10 border border-green-500/30 p-2 text-xs text-green-400">
+              Verification in progress. After consulting with the chatbot, check the box above to confirm.
             </div>
           )}
+
+          <div className="mt-4 rounded-md bg-amber-500/10 border border-amber-500/30 p-3">
+            <div className="flex">
+              <AlertTriangle className="h-5 w-5 text-amber-500 mr-2" />
+              <div>
+                <h4 className="text-sm font-medium text-amber-500">Important Notice</h4>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Providing false information regarding the contents of your shipment 
+                  may result in legal consequences, fines, or shipment confiscation.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
-        
-        <AlertDialogFooter className="mt-4">
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction 
-            onClick={handleConfirm}
-            disabled={!termsAccepted || !verificationComplete}
-            className={!termsAccepted || !verificationComplete ? "opacity-50 cursor-not-allowed" : ""}
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            className="border-white/10 bg-white/5 hover:bg-white/10"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={!termsAccepted || !dangerousGoodsUnderstood || !illegalGoodsChecked}
+            className="bg-nexus-blue hover:bg-nexus-blue/90"
           >
             Confirm Booking
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -40,6 +39,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
   const [confirmedBookingId, setConfirmedBookingId] = useState("");
   const [showConfirmationDocument, setShowConfirmationDocument] = useState(false);
+  const [hasIllegalGoods, setHasIllegalGoods] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,7 +69,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking.`
+          description: `"${template.name}" template has been applied to your new booking."
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
@@ -244,49 +244,20 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleFindRoutes = () => {
-    if (!validateForm()) {
-      toast({
-        title: "Incomplete Information",
-        description: "Please fill in all required fields to find optimal routes.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const originLocation = locations.find(loc => loc.value === origin);
-    const destLocation = locations.find(loc => loc.value === destination);
-
-    const bookingData = {
-      origin: origin || "manual",
-      originLabel: originLocation?.label || originInput,
-      destination: destination || "manual",
-      destinationLabel: destLocation?.label || destinationInput,
-      date: date ? format(date, 'yyyy-MM-dd') : null,
-      cargoType,
-      weight,
-      transportMode,
-      cargoItems,
-      availableRoutes
-    };
-    
-    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
-    
-    toast({
-      title: "Finding optimal routes",
-      description: "Analyzing available routes based on your requirements..."
-    });
-    
-    setTimeout(() => {
-      navigate('/routes');
-    }, 500);
-  };
-  
   const handleBookingConfirmation = () => {
     if (!validateForm()) {
       toast({
         title: "Incomplete Information",
         description: "Please fill in all required fields before confirming booking.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (hasIllegalGoods) {
+      toast({
+        title: "Illegal Goods Detected",
+        description: "Your cargo contains items that are restricted for shipment. Please remove these items before proceeding.",
         variant: "destructive"
       });
       return;
@@ -511,17 +482,18 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
             <CargoItemsSection 
               cargoItems={cargoItems}
               setCargoItems={setCargoItems}
+              onIllegalGoodsDetected={setHasIllegalGoods}
             />
 
             <ActionButtons 
               handleSaveTemplate={handleSaveTemplate}
               handleBookingConfirmation={handleBookingConfirmation}
-              handleFindRoutes={handleFindRoutes}
               origin={origin || originInput}
               destination={destination || destinationInput}
               weight={weight}
               isEmergencyShipment={isEmergencyShipment}
               setIsEmergencyShipment={setIsEmergencyShipment}
+              hasIllegalGoods={hasIllegalGoods}
             />
           </div>
           
