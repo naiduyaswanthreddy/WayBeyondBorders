@@ -59,11 +59,19 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     
     // Add click listeners to markers
     originMarker.addListener("click", () => {
-      originInfo.open(map, originMarker);
+      // Fix: Use the correct InfoWindow.open() method signature
+      originInfo.open({
+        map,
+        anchor: originMarker
+      });
     });
     
     destMarker.addListener("click", () => {
-      destInfo.open(map, destMarker);
+      // Fix: Use the correct InfoWindow.open() method signature
+      destInfo.open({
+        map,
+        anchor: destMarker
+      });
     });
     
     // Create bounds to fit both markers

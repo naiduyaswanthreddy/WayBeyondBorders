@@ -36,7 +36,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       const map = new window.google.maps.Map(mapRef.current, {
         center: { lat: 20, lng: 0 }, // Default center
         zoom: 2,
-        mapTypeId: window.google.maps.MapTypeId.ROADMAP,
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP, // Fixed: Use window.google.maps.MapTypeId instead of string
         disableDefaultUI: false,
         streetViewControl: false,
         fullscreenControl: true,

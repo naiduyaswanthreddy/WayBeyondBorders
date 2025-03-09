@@ -21,7 +21,7 @@ declare namespace google {
     interface MapOptions {
       center?: LatLng | LatLngLiteral;
       zoom?: number;
-      mapTypeId?: string;
+      mapTypeId?: MapTypeId;
       disableDefaultUI?: boolean;
       streetViewControl?: boolean;
       fullscreenControl?: boolean;
@@ -224,7 +224,8 @@ declare namespace google {
     class InfoWindow {
       constructor(opts?: InfoWindowOptions);
       close(): void;
-      open(opts?: InfoWindowOpenOptions): void;
+      // Updated: Changed the open method's signature to accept InfoWindowOpenOptions
+      open(options: InfoWindowOpenOptions): void;
       setContent(content: string | Element): void;
       setOptions(options: InfoWindowOptions): void;
     }
