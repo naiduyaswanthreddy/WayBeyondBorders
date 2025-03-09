@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { format } from "date-fns";
@@ -14,8 +13,6 @@ import EstimatedArrival from "./EstimatedArrival";
 import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
-import MultiStopBooking from "./MultiStopBooking";
-import RideSharing from "./RideSharing";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, CargoItem, TemplateData } from "./types";
@@ -37,8 +34,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
   const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
-  const [isRideSharingEnabled, setIsRideSharingEnabled] = useState(false);
-  const [rideSharingDetails, setRideSharingDetails] = useState<any>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -205,19 +200,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     }
   }, [cargoType]);
 
-  useEffect(() => {
-    if (isRideSharingEnabled && rideSharingDetails) {
-      sessionStorage.setItem('rideSharingDetails', JSON.stringify(rideSharingDetails));
-    } else {
-      sessionStorage.removeItem('rideSharingDetails');
-    }
-    
-    const updateEvent = new CustomEvent('rideSharingUpdated', { 
-      detail: { enabled: isRideSharingEnabled, details: rideSharingDetails } 
-    });
-    window.dispatchEvent(updateEvent);
-  }, [isRideSharingEnabled, rideSharingDetails]);
-
   const handleTransportModeChange = (value: string) => {
     const selectedCargo = cargoTypes.find(c => c.value === cargoType);
     
@@ -311,19 +293,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     const originLocation = locations.find(loc => loc.value === origin);
     const destLocation = locations.find(loc => loc.value === destination);
 
-    let intermediateStops = [];
-    const multiStopData = sessionStorage.getItem('multiStopData');
-    if (multiStopData) {
-      try {
-        const parsedData = JSON.parse(multiStopData);
-        if (parsedData.intermediateStops) {
-          intermediateStops = parsedData.intermediateStops;
-        }
-      } catch (error) {
-        console.error("Error parsing multi-stop data:", error);
-      }
-    }
-
     const bookingData = {
       id: `BK-${Date.now().toString().slice(-6)}`,
       origin,
@@ -337,29 +306,12 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
       cargoItems,
       availableRoutes,
       status: "Confirmed",
-      createdAt: new Date().toISOString(),
-      intermediateStops: intermediateStops,
-      isSharedRide: isRideSharingEnabled,
-      rideSharingDetails: rideSharingDetails
+      createdAt: new Date().toISOString()
     };
     
     const bookingHistory = JSON.parse(localStorage.getItem('bookingHistory') || '[]');
     bookingHistory.push(bookingData);
     localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
-    
-    if (isRideSharingEnabled && rideSharingDetails) {
-      const sharedShipments = JSON.parse(localStorage.getItem('sharedShipments') || '[]');
-      sharedShipments.push({
-        id: bookingData.id,
-        origin: originLocation?.label || originInput,
-        destination: destLocation?.label || destinationInput,
-        date: date ? format(date, 'yyyy-MM-dd') : new Date().toISOString(),
-        participants: rideSharingDetails.participants || 2,
-        savings: rideSharingDetails.costSaving || 200,
-        co2Reduction: rideSharingDetails.co2Saving || 300
-      });
-      localStorage.setItem('sharedShipments', JSON.stringify(sharedShipments));
-    }
     
     toast({
       title: "Booking Confirmed",
@@ -375,8 +327,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     setWeight("");
     setTransportMode("any");
     setCargoItems([]);
-    setIsRideSharingEnabled(false);
-    setRideSharingDetails(null);
     
     setTimeout(() => {
       navigate('/bookings', { state: { activeTab: 'history' } });
@@ -527,31 +477,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
           weight={weight}
           isEmergencyShipment={isEmergencyShipment}
           setIsEmergencyShipment={setIsEmergencyShipment}
-        />
-      </div>
-      
-      <div className="mt-8 md:col-span-2">
-        <MultiStopBooking 
-          origin={origin}
-          destination={destination}
-          originInput={originInput}
-          destinationInput={destinationInput}
-          onOriginChange={setOrigin}
-          onDestinationChange={setDestination}
-          onOriginInputChange={setOriginInput}
-          onDestinationInputChange={setDestinationInput}
-        />
-      </div>
-      
-      <div className="mt-8 md:col-span-2">
-        <RideSharing 
-          origin={origin || originInput}
-          destination={destination || destinationInput}
-          cargoType={cargoType}
-          transportMode={transportMode}
-          weight={weight}
-          onRideSharingToggle={setIsRideSharingEnabled}
-          onRideSharingDetailsChange={setRideSharingDetails}
         />
       </div>
       
