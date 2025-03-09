@@ -5,7 +5,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, MessageCircle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface TermsConfirmationDialogProps {
   open: boolean;
@@ -19,11 +20,50 @@ const TermsConfirmationDialog: React.FC<TermsConfirmationDialogProps> = ({
   onConfirm
 }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [illegalGoodsChecked, setIllegalGoodsChecked] = useState(false);
+  const [verificationComplete, setVerificationComplete] = useState(false);
 
   const handleConfirm = () => {
-    if (termsAccepted) {
+    if (termsAccepted && verificationComplete) {
       onConfirm();
       onOpenChange(false);
+    } else if (!verificationComplete) {
+      toast({
+        title: "Verification Required",
+        description: "Please complete the illegal goods verification by consulting with the chatbot.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVerificationCheck = () => {
+    if (illegalGoodsChecked) {
+      setVerificationComplete(true);
+      toast({
+        title: "Verification Complete",
+        description: "Thank you for verifying your shipment contents.",
+      });
+    }
+  };
+
+  const openChatbot = () => {
+    // Trigger chatbot if available
+    if (window.chtlConfig) {
+      // Attempt to find and click the chatbot button
+      const chatbotButtons = document.querySelectorAll('[id^="chatling-"]');
+      chatbotButtons.forEach(button => {
+        (button as HTMLButtonElement).click();
+      });
+
+      toast({
+        title: "Chatbot Opened",
+        description: "Please verify your shipment contents with the chatbot assistant.",
+      });
+    } else {
+      toast({
+        title: "Chatbot Unavailable",
+        description: "Please check your shipment manually to ensure compliance with regulations.",
+      });
     }
   };
 
@@ -85,12 +125,65 @@ const TermsConfirmationDialog: React.FC<TermsConfirmationDialogProps> = ({
           </label>
         </div>
         
-        <AlertDialogFooter>
+        <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-md">
+          <h4 className="font-medium text-red-400 mb-2">Required Verification</h4>
+          <p className="text-sm text-muted-foreground mb-3">
+            All shipments must be verified for illegal goods and banned items. Please confirm you have checked your shipment contents.
+          </p>
+          
+          <div className="flex items-center justify-between mt-3">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="illegalGoods" 
+                checked={illegalGoodsChecked}
+                onCheckedChange={(checked) => setIllegalGoodsChecked(checked === true)}
+                disabled={verificationComplete}
+              />
+              <label
+                htmlFor="illegalGoods"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                I verify that my shipment does not contain illegal or banned items
+              </label>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={openChatbot}
+                disabled={verificationComplete}
+                className="text-xs"
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                Verify with Chatbot
+              </Button>
+              
+              <Button 
+                variant={verificationComplete ? "premium-outline" : "premium-blue"}
+                size="sm" 
+                onClick={handleVerificationCheck}
+                disabled={!illegalGoodsChecked || verificationComplete}
+                className="text-xs"
+              >
+                {verificationComplete ? "Verified ✓" : "Mark as Verified"}
+              </Button>
+            </div>
+          </div>
+          
+          {verificationComplete && (
+            <div className="mt-3 text-xs text-green-400">
+              Verification complete. Thank you for confirming your shipment contents.
+            </div>
+          )}
+        </div>
+        
+        <AlertDialogFooter className="mt-4">
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction 
             onClick={handleConfirm}
-            disabled={!termsAccepted}
-            className={!termsAccepted ? "opacity-50 cursor-not-allowed" : ""}
+            disabled={!termsAccepted || !verificationComplete}
+            className={!termsAccepted || !verificationComplete ? "opacity-50 cursor-not-allowed" : ""}
           >
             Confirm Booking
           </AlertDialogAction>

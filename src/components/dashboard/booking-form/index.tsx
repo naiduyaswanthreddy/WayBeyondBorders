@@ -13,6 +13,7 @@ import EstimatedArrival from "./EstimatedArrival";
 import CargoItemsSection from "./CargoItemsSection";
 import ActionButtons from "./ActionButtons";
 import TermsConfirmationDialog from "./TermsConfirmationDialog";
+import BookingConfirmationDocument from "./BookingConfirmationDocument";
 
 import { locations, cargoTypes, transportModes } from "./data";
 import { BookingFormProps, CargoItem, TemplateData } from "./types";
@@ -34,6 +35,9 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [estimatedArrival, setEstimatedArrival] = useState<string>("");
   const [isEmergencyShipment, setIsEmergencyShipment] = useState(false);
+  const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [confirmedBookingId, setConfirmedBookingId] = useState("");
+  const [showConfirmationDocument, setShowConfirmationDocument] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -63,7 +67,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         
         toast({
           title: "Template Loaded",
-          description: `"${template.name}" template has been applied to your new booking.`
+          description: `"${template.name}" template has been applied to your new booking."
         });
       } catch (error) {
         console.error("Error parsing template data:", error);
@@ -293,8 +297,10 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     const originLocation = locations.find(loc => loc.value === origin);
     const destLocation = locations.find(loc => loc.value === destination);
 
+    const bookingId = `BK-${Date.now().toString().slice(-6)}`;
+    
     const bookingData = {
-      id: `BK-${Date.now().toString().slice(-6)}`,
+      id: bookingId,
       origin,
       originLabel: originLocation?.label || originInput,
       destination,
@@ -313,11 +319,23 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     bookingHistory.push(bookingData);
     localStorage.setItem('bookingHistory', JSON.stringify(bookingHistory));
     
+    setConfirmedBookingId(bookingId);
+    setBookingConfirmed(true);
+    setShowConfirmationDocument(true);
+    
     toast({
       title: "Booking Confirmed",
       description: `Booking #${bookingData.id} has been confirmed and saved to history.`
     });
     
+    setTimeout(() => {
+      if (!showConfirmationDocument) {
+        navigateToHistory();
+      }
+    }, 5000);
+  };
+  
+  const navigateToHistory = () => {
     setOrigin("");
     setOriginInput("");
     setDestination("");
@@ -328,9 +346,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
     setTransportMode("any");
     setCargoItems([]);
     
-    setTimeout(() => {
-      navigate('/bookings', { state: { activeTab: 'history' } });
-    }, 1000);
+    navigate('/bookings', { state: { activeTab: 'history' } });
   };
 
   const handleSaveTemplate = () => {
@@ -378,113 +394,142 @@ const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
         </span>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <LocationSelector 
-            label="Origin"
-            value={origin}
-            onChange={setOrigin}
-            manualInput={originInput}
-            onManualInputChange={setOriginInput}
-            locations={locations}
-            placeholder="Select or enter origin location"
-            error={validationErrors.origin}
-          />
-          {validationErrors.origin && (
-            <p className="text-xs text-destructive">{validationErrors.origin}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <LocationSelector 
-            label="Destination"
-            value={destination}
-            onChange={setDestination}
-            manualInput={destinationInput}
-            onManualInputChange={setDestinationInput}
-            locations={locations}
-            placeholder="Select or enter destination location"
-            error={validationErrors.destination}
-          />
-          {validationErrors.destination && (
-            <p className="text-xs text-destructive">{validationErrors.destination}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <ShippingDatePicker 
-            date={date}
-            setDate={setDate}
-            error={validationErrors.date}
-          />
-          {validationErrors.date && (
-            <p className="text-xs text-destructive">{validationErrors.date}</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <CargoTypeSelector 
+      {showConfirmationDocument ? (
+        <div className="border border-green-500/30 bg-green-500/5 rounded-lg p-4">
+          <div className="text-center mb-4">
+            <h3 className="text-xl font-bold text-green-400">Booking Confirmed!</h3>
+            <p className="text-muted-foreground">Your booking #{confirmedBookingId} has been successfully processed</p>
+          </div>
+          
+          <BookingConfirmationDocument 
+            bookingId={confirmedBookingId}
+            origin={origin || originInput}
+            destination={destination || destinationInput}
+            date={date ? format(date, 'yyyy-MM-dd') : null}
             cargoType={cargoType}
-            setCargoType={setCargoType}
-            cargoTypes={cargoTypes}
-            restrictions={restrictions}
-            error={validationErrors.cargoType}
-          />
-          {validationErrors.cargoType && (
-            <p className="text-xs text-destructive">{validationErrors.cargoType}</p>
-          )}
-        </div>
-
-        <TransportModeSelector 
-          transportMode={transportMode}
-          handleTransportModeChange={handleTransportModeChange}
-          transportModes={transportModes}
-          cargoType={cargoType}
-          cargoTypes={cargoTypes}
-          availableRoutes={availableRoutes}
-          restrictionWarning={restrictionWarning}
-        />
-
-        <div className="space-y-2">
-          <WeightInput 
             weight={weight}
-            setWeight={setWeight}
-            error={validationErrors.weight}
+            transportMode={transportMode}
           />
-          {validationErrors.weight && (
-            <p className="text-xs text-destructive">{validationErrors.weight}</p>
-          )}
+          
+          <Button 
+            variant="outline" 
+            className="w-full mt-2"
+            onClick={navigateToHistory}
+          >
+            View Booking History
+          </Button>
         </div>
-        
-        <EstimatedArrival 
-          estimatedTime={estimatedArrival}
-          origin={origin || originInput}
-          destination={destination || destinationInput}
-          transportMode={transportMode}
-        />
-        
-        <CargoItemsSection 
-          cargoItems={cargoItems}
-          setCargoItems={setCargoItems}
-        />
+      ) : (
+        <>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <LocationSelector 
+                label="Origin"
+                value={origin}
+                onChange={setOrigin}
+                manualInput={originInput}
+                onManualInputChange={setOriginInput}
+                locations={locations}
+                placeholder="Select or enter origin location"
+                error={validationErrors.origin}
+              />
+              {validationErrors.origin && (
+                <p className="text-xs text-destructive">{validationErrors.origin}</p>
+              )}
+            </div>
 
-        <ActionButtons 
-          handleSaveTemplate={handleSaveTemplate}
-          handleBookingConfirmation={handleBookingConfirmation}
-          handleFindRoutes={handleFindRoutes}
-          origin={origin || originInput}
-          destination={destination || destinationInput}
-          weight={weight}
-          isEmergencyShipment={isEmergencyShipment}
-          setIsEmergencyShipment={setIsEmergencyShipment}
-        />
-      </div>
-      
-      <TermsConfirmationDialog
-        open={confirmDialogOpen}
-        onOpenChange={setConfirmDialogOpen}
-        onConfirm={completeBooking}
-      />
+            <div className="space-y-2">
+              <LocationSelector 
+                label="Destination"
+                value={destination}
+                onChange={setDestination}
+                manualInput={destinationInput}
+                onManualInputChange={setDestinationInput}
+                locations={locations}
+                placeholder="Select or enter destination location"
+                error={validationErrors.destination}
+              />
+              {validationErrors.destination && (
+                <p className="text-xs text-destructive">{validationErrors.destination}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <ShippingDatePicker 
+                date={date}
+                setDate={setDate}
+                error={validationErrors.date}
+              />
+              {validationErrors.date && (
+                <p className="text-xs text-destructive">{validationErrors.date}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <CargoTypeSelector 
+                cargoType={cargoType}
+                setCargoType={setCargoType}
+                cargoTypes={cargoTypes}
+                restrictions={restrictions}
+                error={validationErrors.cargoType}
+              />
+              {validationErrors.cargoType && (
+                <p className="text-xs text-destructive">{validationErrors.cargoType}</p>
+              )}
+            </div>
+
+            <TransportModeSelector 
+              transportMode={transportMode}
+              handleTransportModeChange={handleTransportModeChange}
+              transportModes={transportModes}
+              cargoType={cargoType}
+              cargoTypes={cargoTypes}
+              availableRoutes={availableRoutes}
+              restrictionWarning={restrictionWarning}
+            />
+
+            <div className="space-y-2">
+              <WeightInput 
+                weight={weight}
+                setWeight={setWeight}
+                error={validationErrors.weight}
+              />
+              {validationErrors.weight && (
+                <p className="text-xs text-destructive">{validationErrors.weight}</p>
+              )}
+            </div>
+            
+            <EstimatedArrival 
+              estimatedTime={estimatedArrival}
+              origin={origin || originInput}
+              destination={destination || destinationInput}
+              transportMode={transportMode}
+            />
+            
+            <CargoItemsSection 
+              cargoItems={cargoItems}
+              setCargoItems={setCargoItems}
+            />
+
+            <ActionButtons 
+              handleSaveTemplate={handleSaveTemplate}
+              handleBookingConfirmation={handleBookingConfirmation}
+              handleFindRoutes={handleFindRoutes}
+              origin={origin || originInput}
+              destination={destination || destinationInput}
+              weight={weight}
+              isEmergencyShipment={isEmergencyShipment}
+              setIsEmergencyShipment={setIsEmergencyShipment}
+            />
+          </div>
+          
+          <TermsConfirmationDialog
+            open={confirmDialogOpen}
+            onOpenChange={setConfirmDialogOpen}
+            onConfirm={completeBooking}
+          />
+        </>
+      )}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useGoogleMapsLoader } from "./hooks/useGoogleMapsLoader";
@@ -33,19 +32,15 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
     if (mapInstance && window.google?.maps) {
       switch(type) {
         case "satellite":
-          // Fixed: Use type assertion to access the method
           (mapInstance as any).setMapTypeId(google.maps.MapTypeId.SATELLITE);
           break;
         case "hybrid":
-          // Fixed: Use type assertion to access the method
           (mapInstance as any).setMapTypeId(google.maps.MapTypeId.HYBRID);
           break;
         case "terrain":
-          // Fixed: Use type assertion to access the method
           (mapInstance as any).setMapTypeId(google.maps.MapTypeId.TERRAIN);
           break;
         default:
-          // Fixed: Use type assertion to access the method
           (mapInstance as any).setMapTypeId(google.maps.MapTypeId.ROADMAP);
       }
     }

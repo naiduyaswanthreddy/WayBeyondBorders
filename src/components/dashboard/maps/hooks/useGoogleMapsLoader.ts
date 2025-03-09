@@ -13,7 +13,7 @@ export const useGoogleMapsLoader = () => {
     }
 
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDhUmpR2V68xXAU9p6XsWFQnLAaRCzIgPU&libraries=places,geometry`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDwfCy0-lqvF6jqMO32DiTb5HwObJvloVk&libraries=places,geometry`;
     script.async = true;
     script.defer = true;
     script.onload = () => setIsLoaded(true);
