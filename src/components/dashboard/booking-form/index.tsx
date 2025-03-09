@@ -8,6 +8,7 @@ import RideSharingBookingForm from "./RideSharingBookingForm";
 import { BookingFormProps } from "./types";
 
 const BookingForm: React.FC<BookingFormProps> = ({ className }) => {
+  // We'll use this to track which tab is active based on the parent Tabs component
   const [activeTab, setActiveTab] = useState("booking");
   
   return (
