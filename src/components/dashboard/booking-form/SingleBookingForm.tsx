@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
@@ -39,7 +38,6 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Reset estimated arrival when origin or destination changes
     if (origin !== "" && destination !== "") {
       calculateEstimatedArrival();
     } else {
@@ -112,7 +110,6 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       days = transportMode === "air" || transportMode === "express" ? 3 : transportMode === "sea" ? 21 : 10.5;
     }
     
-    // Set estimated arrival date
     if (date) {
       const arrivalDate = new Date(date);
       arrivalDate.setDate(arrivalDate.getDate() + Math.ceil(days));
@@ -120,7 +117,6 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       const formattedArrival = format(arrivalDate, 'MMM d, yyyy');
       setEstimatedArrival(`${Math.ceil(days)} days (${formattedArrival})`);
       
-      // Update route map data in session storage
       const routeData = {
         origin: originLabel,
         destination: destinationLabel,
@@ -134,7 +130,6 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       
       sessionStorage.setItem('routeMapData', JSON.stringify(routeData));
       
-      // Dispatch event to notify other components
       const updateEvent = new CustomEvent('routeDataUpdated', { detail: routeData });
       window.dispatchEvent(updateEvent);
     } else {
@@ -263,7 +258,6 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       description: `Booking #${bookingData.id} has been confirmed and saved to history.`
     });
     
-    // Reset form
     setOrigin("");
     setDestination("");
     setOriginInput("");
@@ -320,6 +314,14 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
       description: `Your shipment details have been saved as "${templateName}"`
     });
   };
+
+  const originLabel = origin 
+    ? locations.find(loc => loc.value === origin)?.label
+    : originInput;
+  
+  const destinationLabel = destination
+    ? locations.find(loc => loc.value === destination)?.label
+    : destinationInput;
 
   return (
     <div className={cn("nexus-card-blue p-6", className)}>
@@ -409,7 +411,12 @@ const SingleBookingForm: React.FC<BookingFormProps> = ({ className }) => {
           setCargoItems={setCargoItems}
         />
 
-        <EstimatedArrival estimatedArrival={estimatedArrival} />
+        <EstimatedArrival 
+          estimatedTime={estimatedArrival} 
+          origin={originLabel || ""} 
+          destination={destinationLabel || ""} 
+          transportMode={transportMode}
+        />
         
         <ActionButtons 
           handleSaveTemplate={handleSaveTemplate}
