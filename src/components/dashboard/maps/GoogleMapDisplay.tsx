@@ -1,22 +1,30 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useGoogleMapsLoader } from "./hooks/useGoogleMapsLoader";
 import { mapStyles } from "./utils/mapStyles";
 import { getFallbackCoordinates } from "./utils/locationUtils";
-import { drawRouteLines } from "./utils/routeUtils";
+import { drawRouteLines, drawMultiStopRoute } from "./utils/routeUtils";
 import MapMarkers from "./components/MapMarkers";
+
+interface Stop {
+  location: string;
+  type: "pickup" | "dropoff" | "both";
+}
 
 interface GoogleMapDisplayProps {
   origin: string;
   destination: string;
+  intermediateStops?: Stop[];
   transportModes?: string[];
+  isSharedRide?: boolean;
 }
 
 const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({ 
   origin, 
-  destination, 
-  transportModes = ["driving"]
+  destination,
+  intermediateStops = [], 
+  transportModes = ["driving"],
+  isSharedRide = false
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,6 +32,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
   const [originLatLng, setOriginLatLng] = useState<google.maps.LatLng | null>(null);
   const [destLatLng, setDestLatLng] = useState<google.maps.LatLng | null>(null);
   const [mapType, setMapType] = useState<string>("roadmap");
+  const [stopLatLngs, setStopLatLngs] = useState<google.maps.LatLng[]>([]);
   
   const { isLoaded } = useGoogleMapsLoader();
   
@@ -33,15 +42,19 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
     if (mapInstance && window.google?.maps) {
       switch(type) {
         case "satellite":
+          // @ts-ignore
           mapInstance.setMapTypeId(google.maps.MapTypeId.SATELLITE);
           break;
         case "hybrid":
+          // @ts-ignore
           mapInstance.setMapTypeId(google.maps.MapTypeId.HYBRID);
           break;
         case "terrain":
+          // @ts-ignore
           mapInstance.setMapTypeId(google.maps.MapTypeId.TERRAIN);
           break;
         default:
+          // @ts-ignore
           mapInstance.setMapTypeId(google.maps.MapTypeId.ROADMAP);
       }
     }
@@ -79,36 +92,45 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       // Create geocoder to convert address strings to coordinates
       const geocoder = new window.google.maps.Geocoder();
       
-      // Convert origin and destination to coordinates
-      Promise.all([
-        new Promise<google.maps.LatLng>((resolve) => {
-          geocoder.geocode({ address: origin }, (results, status) => {
-            if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
-              resolve(results[0].geometry.location);
-            } else {
-              // Use fallback coordinates for major shipping cities
-              const fallbackCoords = getFallbackCoordinates(origin);
-              resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
-            }
-          });
-        }),
-        new Promise<google.maps.LatLng>((resolve) => {
-          geocoder.geocode({ address: destination }, (results, status) => {
-            if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
-              resolve(results[0].geometry.location);
-            } else {
-              // Use fallback coordinates for major shipping cities
-              const fallbackCoords = getFallbackCoordinates(destination);
-              resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
-            }
-          });
-        })
-      ]).then(([originCoord, destCoord]) => {
-        setOriginLatLng(originCoord);
-        setDestLatLng(destCoord);
+      // Array of all locations to geocode (origin, destination, and intermediate stops)
+      const allLocations = [
+        origin,
+        ...intermediateStops.map(stop => stop.location),
+        destination
+      ];
+      
+      // Convert all locations to coordinates
+      Promise.all(
+        allLocations.map(location => 
+          new Promise<google.maps.LatLng>((resolve) => {
+            geocoder.geocode({ address: location }, (results, status) => {
+              if (status === window.google.maps.GeocoderStatus.OK && results && results[0]) {
+                resolve(results[0].geometry.location);
+              } else {
+                // Use fallback coordinates for major shipping cities
+                const fallbackCoords = getFallbackCoordinates(location);
+                resolve(new window.google.maps.LatLng(fallbackCoords.lat, fallbackCoords.lng));
+              }
+            });
+          })
+        )
+      ).then((coordinates) => {
+        // First coordinate is origin
+        setOriginLatLng(coordinates[0]);
         
-        // Draw route lines based on transport modes
-        drawRouteLines(map, originCoord, destCoord, transportModes);
+        // Last coordinate is destination
+        setDestLatLng(coordinates[coordinates.length - 1]);
+        
+        // Store all coordinates in order including intermediate stops
+        setStopLatLngs(coordinates);
+        
+        // If there are intermediate stops, draw a multi-stop route
+        if (intermediateStops.length > 0) {
+          drawMultiStopRoute(map, coordinates, transportModes, isSharedRide);
+        } else {
+          // Otherwise, draw a direct route
+          drawRouteLines(map, coordinates[0], coordinates[coordinates.length - 1], transportModes, isSharedRide);
+        }
       }).finally(() => {
         setIsLoading(false);
       });
@@ -117,7 +139,7 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       console.error("Error initializing Google Maps:", error);
       setIsLoading(false);
     }
-  }, [isLoaded, origin, destination, transportModes]);
+  }, [isLoaded, origin, destination, intermediateStops, transportModes, isSharedRide]);
 
   return (
     <div className="w-full h-[500px] rounded-lg overflow-hidden border border-white/10 relative">
@@ -143,6 +165,11 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
           destLatLng={destLatLng}
           origin={origin}
           destination={destination}
+          intermediateStops={intermediateStops.map((stop, index) => ({
+            location: stop.location,
+            type: stop.type,
+            position: stopLatLngs[index + 1] // +1 because first position is origin
+          }))}
         />
       )}
       
