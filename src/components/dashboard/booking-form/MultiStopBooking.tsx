@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
@@ -49,27 +48,22 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
   const [stops, setStops] = useState<Stop[]>([]);
   const [totalEstimatedTime, setTotalEstimatedTime] = useState<string>("");
 
-  // Initialize stop data array
   useEffect(() => {
-    // Reset all stops if origin or destination changes
     calculateTotalEstimatedTime();
   }, [origin, destination, stops]);
 
-  // Calculate total time based on all stops
   const calculateTotalEstimatedTime = () => {
     if (stops.length === 0) {
       setTotalEstimatedTime("");
       return;
     }
 
-    // This is a simplified calculation - in a real app, this would be more sophisticated
-    const baseTime = 2; // Base time in days
-    const stopFactor = stops.length * 0.5; // Each stop adds half a day
+    const baseTime = 2;
+    const stopFactor = stops.length * 0.5;
     
     setTotalEstimatedTime(`${baseTime + stopFactor} days (estimated)`);
   };
 
-  // Add a new stop
   const addStop = () => {
     const newStop: Stop = {
       id: `stop-${Date.now()}`,
@@ -86,7 +80,6 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
     });
   };
 
-  // Remove a stop
   const removeStop = (stopId: string) => {
     setStops(stops.filter(stop => stop.id !== stopId));
     
@@ -96,7 +89,6 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
     });
   };
 
-  // Handle drag and drop reordering
   const onDragEnd = (result: any) => {
     if (!result.destination) return;
     
@@ -107,14 +99,12 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
     setStops(items);
   };
 
-  // Update stop data
   const updateStop = (id: string, field: keyof Stop, value: string) => {
     setStops(stops.map(stop => 
       stop.id === id ? { ...stop, [field]: value } : stop
     ));
   };
 
-  // Export all stops data for parent component
   useEffect(() => {
     const stopsData = {
       origin,
@@ -124,10 +114,8 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
       intermediateStops: stops
     };
     
-    // Store in session storage for other components to use
     sessionStorage.setItem('multiStopData', JSON.stringify(stopsData));
     
-    // Dispatch an event to notify other components
     const updateEvent = new CustomEvent('multiStopDataUpdated', { detail: stopsData });
     window.dispatchEvent(updateEvent);
   }, [origin, destination, originInput, destinationInput, stops]);
@@ -254,6 +242,7 @@ const MultiStopBooking: React.FC<MultiStopBookingProps> = ({
                                 Location
                               </Label>
                               <LocationSelector
+                                label={`Stop ${index + 1} Location`}
                                 value={stop.location}
                                 onChange={(value) => updateStop(stop.id, "location", value)}
                                 manualInput={stop.manualLocation}
