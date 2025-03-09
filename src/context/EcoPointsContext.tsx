@@ -8,6 +8,11 @@ interface EcoPointsContextType {
   shareShipment: (origin: string, destination: string, weight: string) => void;
   hasAvailableShares: (origin: string, destination: string) => boolean;
   sharedShipments: SharedShipment[];
+  metrics: {
+    co2Saved: number;
+    treesPlanted: number;
+    plasticReduced: number;
+  };
 }
 
 interface SharedShipment {
@@ -17,6 +22,9 @@ interface SharedShipment {
   weight: string;
   date: string;
   matches: number;
+  participants: number;    // Added missing property
+  savings: number;         // Added missing property
+  co2Reduction: number;    // Added missing property
 }
 
 const EcoPointsContext = createContext<EcoPointsContextType | undefined>(undefined);
@@ -24,6 +32,13 @@ const EcoPointsContext = createContext<EcoPointsContextType | undefined>(undefin
 export const EcoPointsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [points, setPoints] = useState<number>(0);
   const [sharedShipments, setSharedShipments] = useState<SharedShipment[]>([]);
+  
+  // Define metrics for eco dashboard
+  const metrics = {
+    co2Saved: 1250,  // kg of CO2
+    treesPlanted: 25,
+    plasticReduced: 75 // kg of plastic
+  };
   
   useEffect(() => {
     // Load points from localStorage
@@ -36,6 +51,10 @@ export const EcoPointsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     const savedShipments = localStorage.getItem('sharedShipments');
     if (savedShipments) {
       setSharedShipments(JSON.parse(savedShipments));
+    } else {
+      // Initialize with default data if no saved shipments
+      const demoShipments: SharedShipment[] = [];
+      setSharedShipments(demoShipments);
     }
   }, []);
   
@@ -56,13 +75,22 @@ export const EcoPointsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
   
   const shareShipment = (origin: string, destination: string, weight: string) => {
+    // Generate random values for the demo
+    const matches = Math.floor(Math.random() * 3) + 2; // Random 2-4 matches
+    const participants = matches + 1; // Including the user
+    const savings = Math.floor(Math.random() * 150) + 50; // Random $50-$200 savings
+    const co2Reduction = Math.floor(Math.random() * 500) + 100; // Random 100-600kg CO2 reduction
+    
     const newShipment: SharedShipment = {
       id: Date.now().toString(),
       origin,
       destination,
       weight,
       date: new Date().toISOString(),
-      matches: Math.floor(Math.random() * 3) + 2 // Random 2-4 matches
+      matches,
+      participants,
+      savings,
+      co2Reduction
     };
     
     const updatedShipments = [...sharedShipments, newShipment];
@@ -91,7 +119,8 @@ export const EcoPointsProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         redeemPoints, 
         shareShipment, 
         hasAvailableShares,
-        sharedShipments
+        sharedShipments,
+        metrics
       }}
     >
       {children}

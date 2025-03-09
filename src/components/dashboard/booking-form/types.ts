@@ -40,6 +40,7 @@ export interface CargoTypeData {
   restrictions: string[];
   airPriority?: boolean;
   airAllowed?: boolean;
+  description?: string;  // Added missing property
 }
 
 export interface TransportModeData {

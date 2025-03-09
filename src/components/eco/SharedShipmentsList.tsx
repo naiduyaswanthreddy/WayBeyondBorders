@@ -56,7 +56,7 @@ export const SharedShipmentsList: React.FC = () => {
                 <div>
                   <h4 className="font-medium flex items-center">
                     <Check className="h-4 w-4 text-green-400 mr-1" />
-                    <span>Shared Shipment #{shipment.id.split('-')[1].substring(0, 4)}</span>
+                    <span>Shared Shipment #{shipment.id.slice(-6)}</span>
                   </h4>
                   <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                     <Calendar className="h-3 w-3" />
