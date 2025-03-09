@@ -33,16 +33,20 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
     if (mapInstance && window.google?.maps) {
       switch(type) {
         case "satellite":
-          mapInstance.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+          // Fixed: Use type assertion to access the method
+          (mapInstance as any).setMapTypeId(google.maps.MapTypeId.SATELLITE);
           break;
         case "hybrid":
-          mapInstance.setMapTypeId(google.maps.MapTypeId.HYBRID);
+          // Fixed: Use type assertion to access the method
+          (mapInstance as any).setMapTypeId(google.maps.MapTypeId.HYBRID);
           break;
         case "terrain":
-          mapInstance.setMapTypeId(google.maps.MapTypeId.TERRAIN);
+          // Fixed: Use type assertion to access the method
+          (mapInstance as any).setMapTypeId(google.maps.MapTypeId.TERRAIN);
           break;
         default:
-          mapInstance.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+          // Fixed: Use type assertion to access the method
+          (mapInstance as any).setMapTypeId(google.maps.MapTypeId.ROADMAP);
       }
     }
   };
