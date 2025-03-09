@@ -24,6 +24,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       position: originLatLng,
       map: map,
       title: origin,
+      // @ts-ignore - animation exists but not in the type definitions
       animation: window.google.maps.Animation.DROP,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
@@ -39,6 +40,7 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
       position: destLatLng,
       map: map,
       title: destination,
+      // @ts-ignore - animation exists but not in the type definitions
       animation: window.google.maps.Animation.DROP,
       icon: {
         path: window.google.maps.SymbolPath.CIRCLE,
@@ -73,7 +75,6 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     
     // Add click listeners to markers
     originMarker.addListener("click", () => {
-      // Fix: Use the correct InfoWindow.open() method signature with proper typing
       originInfo.open({
         map,
         anchor: originMarker as unknown as google.maps.MVCObject
@@ -81,7 +82,6 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     });
     
     destMarker.addListener("click", () => {
-      // Fix: Use the correct InfoWindow.open() method signature with proper typing
       destInfo.open({
         map,
         anchor: destMarker as unknown as google.maps.MVCObject
@@ -91,10 +91,12 @@ const MapMarkers: React.FC<MapMarkersProps> = ({
     // Bounce animation on hover
     const addBounceOnHover = (marker: google.maps.Marker) => {
       marker.addListener('mouseover', () => {
+        // @ts-ignore - setAnimation exists but not in the type definitions
         marker.setAnimation(window.google.maps.Animation.BOUNCE);
       });
       
       marker.addListener('mouseout', () => {
+        // @ts-ignore - setAnimation exists but not in the type definitions
         marker.setAnimation(null);
       });
     };

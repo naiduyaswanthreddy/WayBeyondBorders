@@ -30,19 +30,19 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
   // Handle map type change
   const handleMapTypeChange = (type: string) => {
     setMapType(type);
-    if (mapInstance) {
+    if (mapInstance && window.google?.maps) {
       switch(type) {
         case "satellite":
-          mapInstance.setMapTypeId(window.google.maps.MapTypeId.SATELLITE);
+          mapInstance.setMapTypeId(google.maps.MapTypeId.SATELLITE);
           break;
         case "hybrid":
-          mapInstance.setMapTypeId(window.google.maps.MapTypeId.HYBRID);
+          mapInstance.setMapTypeId(google.maps.MapTypeId.HYBRID);
           break;
         case "terrain":
-          mapInstance.setMapTypeId(window.google.maps.MapTypeId.TERRAIN);
+          mapInstance.setMapTypeId(google.maps.MapTypeId.TERRAIN);
           break;
         default:
-          mapInstance.setMapTypeId(window.google.maps.MapTypeId.ROADMAP);
+          mapInstance.setMapTypeId(google.maps.MapTypeId.ROADMAP);
       }
     }
   };
@@ -57,30 +57,24 @@ const GoogleMapDisplay: React.FC<GoogleMapDisplayProps> = ({
       const map = new window.google.maps.Map(mapRef.current, {
         center: { lat: 20, lng: 0 }, // Default center
         zoom: 2,
-        mapTypeId: window.google.maps.MapTypeId.HYBRID, // Start with hybrid view
+        mapTypeId: google.maps.MapTypeId.HYBRID, // Start with hybrid view
         disableDefaultUI: false,
         streetViewControl: true,
         fullscreenControl: true,
         zoomControl: true,
-        mapTypeControl: true,
-        mapTypeControlOptions: {
-          style: window.google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
-          position: window.google.maps.ControlPosition.TOP_RIGHT,
-          mapTypeIds: [
-            window.google.maps.MapTypeId.ROADMAP,
-            window.google.maps.MapTypeId.HYBRID,
-            window.google.maps.MapTypeId.SATELLITE,
-            window.google.maps.MapTypeId.TERRAIN
-          ]
-        },
         styles: mapType === "roadmap" ? mapStyles : [] // Only apply custom styles in roadmap view
       });
       
       setMapInstance(map);
       setMapType("hybrid"); // Set initial state to match the mapTypeId
       
-      // Add 45-degree imagery where available
-      map.setTilt(45);
+      // Add 45-degree imagery where available (may not work in all browsers)
+      try {
+        // @ts-ignore - setTilt is available but not in type definitions
+        map.setTilt(45);
+      } catch (e) {
+        console.warn("Unable to set map tilt: ", e);
+      }
       
       // Create geocoder to convert address strings to coordinates
       const geocoder = new window.google.maps.Geocoder();
